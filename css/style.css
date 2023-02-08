@@ -1,0 +1,74 @@
+@font-face {
+  font-family: Consolas;
+  src: url(../assets/font/CONSOLA.TTF);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Consolas;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: hsl(235, 46%, 20%);
+}
+
+.wrapper {
+  padding: 15px;
+  margin: 15px;
+  max-width: 768px;
+  text-align: center;
+  background-color: hsl(235, 43%, 61%);
+  color: hsl(226, 43%, 10%);
+  border-radius: 10px;
+  box-shadow: rgb(240, 247, 176) 0 0 8px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+p {
+  text-align: justify;
+}
+
+h3 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 15px 60px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: rgb(233, 109, 109);
+  color: black;
+  font-size: 20px;
+}
+
+a {
+  cursor: pointer;
+}
+
+.donatlink {
+  text-decoration: none;
+  font-size: 25px;
+  color: orange;
+}
+
+.otherlink {
+  font-size: 17px;
+  text-decoration: none;
+  color: orange;
+}
+
+#testBtn {
+  text-align: center;
+}
