@@ -1,21 +1,27 @@
 const btn = document.querySelector("button");
 const testBnt = document.querySelector("#testBtn");
+btn.addEventListener("click", clickTest);
 
 let sec = 10;
 const interval = setInterval(() => {
-  sec = sec - 1;
-  console.log(sec);
+  sec -= 1;
   btn.innerText = `до входа осталось ${sec}`;
-  if (sec === 1) {
-    btn.innerText = "иди в очко";
-    btn.style.backgroundColor = "green";
+  if (sec === 0) {
+    btn.innerText = "МОЖНО ВОЙТИ";
+    btn.style.backgroundColor = "rgb(106, 194, 72)";
     btn.removeAttribute("disabled");
     clearInterval(interval);
   }
 }, 1000);
 
-function clickTest() {
-  testBnt.innerText = "кнопка активна";
-}
+const test = { test: "test" };
 
-btn.addEventListener("click", clickTest);
+function clickTest() {
+  fetch("http://localhost:8000/posts", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+    },
+    body: JSON.stringify(test),
+  });
+}
