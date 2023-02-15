@@ -17,11 +17,11 @@ const interval = setInterval(() => {
 const test = { test: "test" };
 
 function clickTest() {
-  fetch("http://localhost:8000/posts", {
+  fetch("/api/v1/client", {
     method: "POST",
     headers: {
       "content-type": "application/json; charset=utf-8",
     },
-    body: JSON.stringify(test),
+    body: '',
   });
 }
