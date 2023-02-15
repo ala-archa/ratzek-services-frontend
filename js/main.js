@@ -3,18 +3,20 @@ const testBnt = document.querySelector("#testBtn");
 btn.addEventListener("click", clickTest);
 
 let sec = 10;
-const interval = setInterval(() => {
+function tickButton() {
   sec -= 1;
-  btn.innerText = `до входа осталось ${sec}`;
+  btn.innerText = `Подождите ${sec} сек`;
   if (sec === 0) {
     btn.innerText = "МОЖНО ВОЙТИ";
     btn.style.backgroundColor = "rgb(106, 194, 72)";
     btn.removeAttribute("disabled");
     clearInterval(interval);
   }
-}, 1000);
+}
 
-const test = { test: "test" };
+tickButton();
+
+const interval = setInterval(tickButton, 1000);
 
 function clickTest() {
   fetch("/api/v1/client", {
