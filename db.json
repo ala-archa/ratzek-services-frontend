@@ -1,8 +1,3 @@
 {
-  "posts": [
-    {
-      "test": "test",
-      "id": 1
-    }
-  ]
+   "connect": { "internet_connection_status": "Inactive", "internet_clients_connected": "1" }
 }

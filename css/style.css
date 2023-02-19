@@ -1,73 +1,88 @@
 @font-face {
-  font-family: Consolas;
-  src: url(../assets/font/CONSOLA.TTF);
+   font-family: Consolas;
+   src: url(../assets/font/CONSOLA.TTF);
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Consolas;
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+   font-family: Consolas;
 }
 
 .container {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: hsl(223, 31%, 20%);
+   width: 100%;
+   min-height: 100vh;
+   display: flex;
+   justify-content: space-around;
+   align-items: center;
+   background-color: hsl(223, 31%, 20%);
 }
 
 .wrapper {
-  padding: 30px;
-  max-width: 90%;
-  background-color: hsl(222, 26%, 31%);
-  color: hsl(30, 25%, 89%);
-  border-radius: 10px;
-  box-shadow: rgb(240, 247, 176) 0 0 8px;
+   padding: 30px;
+   max-width: 90%;
+   background-color: hsl(222, 26%, 31%);
+   color: hsl(30, 25%, 89%);
+   border-radius: 10px;
+   box-shadow: rgb(240, 247, 176) 0 0 8px;
 }
 
 h2 {
-  margin-bottom: 20px;
+   margin-bottom: 20px;
 }
 
 p {
-  text-align: justify;
+   text-align: justify;
 }
 
 h3 {
-  margin-top: 10px;
-  margin-bottom: 10px;
+   margin-top: 10px;
+   margin-bottom: 10px;
 }
 
 button {
-  margin-top: 20px;
-  padding: 15px 60px;
-  border-radius: 10px;
-  cursor: pointer;
-  background-color: rgb(216, 84, 84);
-  color: black;
-  font-size: 20px;
-  border: none;
+   display: none;
+   margin: 20px auto;
+   padding: 15px 60px;
+   border-radius: 10px;
+   cursor: pointer;
+   background-color: rgb(216, 84, 84);
+   color: black;
+   font-size: 20px;
+   border: none;
 }
 
 a {
-  cursor: pointer;
+   cursor: pointer;
+   text-decoration: none;
+}
+
+b {
+   color: black;
 }
 
 .donatlink {
-  text-decoration: none;
-  font-size: 25px;
-  color: hsl(66, 70%, 55%);
+   text-decoration: none;
+   font-size: 25px;
+   color: hsl(66, 70%, 55%);
 }
 
 .otherlink {
-  font-size: 17px;
-  text-decoration: none;
-  color: black;
+   font-size: 17px;
+   text-decoration: none;
+   color: black;
 }
 
 #testBtn {
-  text-align: center;
+   text-align: center;
+}
+
+#btnBox {
+   width: 100%;
+   display: flex;
+   justify-content: center;
+}
+
+@media screen {
 }
