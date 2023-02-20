@@ -2,8 +2,7 @@ const btn = document.querySelector('button');
 const testBnt = document.querySelector('#testBtn');
 let sec = 10;
 btn.addEventListener('click', entrance);
-// const API = '/api/v1/client';
-const API = 'http://82.146.59.228:5001/api/v1/client';
+const API = '/api/v1/client';
 
 ping(interval);
 
