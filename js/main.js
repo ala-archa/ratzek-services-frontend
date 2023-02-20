@@ -2,12 +2,12 @@ const btn = document.querySelector('button');
 const testBnt = document.querySelector('#testBtn');
 let sec = 10;
 btn.addEventListener('click', entrance);
-const API = '/api/v1/client';
+const API_client = '/api/v1/client';
 
 ping(interval);
 
 function ping(interval) {
-  fetch('http://82.146.59.228:5001/api/v1/client')
+  fetch(API_client)
     .then((resp) => resp.json())
     .then((resp) => {
       console.log(resp);
@@ -45,7 +45,7 @@ function interval() {
 }
 
 function entrance() {
-  fetch('http://82.146.59.228:5001/api/v1/client', {
+  fetch(API_client, {
     method: 'POST',
     headers: {
       'content-type': 'application/json; charset=utf-8',
