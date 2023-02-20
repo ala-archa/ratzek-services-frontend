@@ -11,20 +11,42 @@ function ping(interval) {
     .then((resp) => resp.json())
     .then((resp) => {
       console.log(resp);
-      if (resp.is_internet_available) {
-        btn.style.display = 'block';
-        interval();
-      } else if (
-        resp.is_internet_available ||
-        resp.internet_connection_status.Connected.bytes_sent > 0
-      ) {
-        btn.style.display = 'block';
-        btn.innerText = `Вы израсходовали ${resp.internet_connection_status.Connected.bytes_sent} из ${resp.internet_connection_status.Connected.bytes_unlimited_limit} на безлимитной скорости.`;
-        btn.style.backgroundColor = 'rgb(106, 194, 72)';
-      } else if (!resp.is_internet_available) {
+
+      // Интернета нет, всё тлен. Сообщаем об этом пользователю и больше ничего не делаем.
+      if (!resp.is_internet_available) {
         btn.style.display = 'block';
         btn.innerText = `К сожалению доступа в данный момент нет`;
+
+        return;
       }
+
+      // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
+      if (resp.internet_connection_status == "Inactive") {
+        btn.style.display = 'block';
+        interval();
+
+        return;
+      }
+
+      // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
+      if (!resp.internet_connection_status.Connected) {
+        console.log("Что-то пошло не так, нет ожидаемого статуса");
+
+        return;
+      }
+
+      // У нас статус Connected, показываем статистику
+      const mb_spent = Math.floor(resp.internet_connection_status.Connected.bytes_sent / 1024 / 1024);
+      const mb_limit = Math.floor(resp.internet_connection_status.Connected.bytes_unlimited_limit / 1024 / 1024);
+
+      var date = new Date(0);
+      date.setSeconds(resp.internet_connection_status.Connected.shaper_reset_secs);
+      const drop_duration = date.toISOString().substring(11, 19);
+
+      btn.style.display = 'block';
+      btn.innerText = `Вы израсходовали ${mb_spent} MB из ${mb_limit} на безлимитной скорости. `
+        + `До сброса счетчика осталось ${drop_duration}`;
+      btn.style.backgroundColor = 'rgb(106, 194, 72)';
     })
     .catch((error) => {
       console.error(error);
