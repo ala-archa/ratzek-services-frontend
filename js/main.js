@@ -8,14 +8,17 @@ const API = 'http://82.146.59.228:5001/api/v1/client';
 ping(interval);
 
 function ping(interval) {
-   fetch(API)
+   fetch('http://localhost:8000/connect')
       .then((resp) => resp.json())
       .then((resp) => {
+         console.log(resp);
          if (resp.internet_connection_status === 'Inactive') {
             btn.style.display = 'block';
             interval();
          } else if (resp.internet_connection_status === 'Connected') {
-            btn.innerText = ``;
+            btn.style.display = 'block';
+            btn.innerText = `Вы израсходовали ${resp.bytes_sent} из ${resp.bytes_unlimited_limit} на безлимитной скорости.`;
+            btn.style.backgroundColor = 'rgb(106, 194, 72)';
          }
       })
       .catch((error) => {
@@ -37,13 +40,9 @@ function interval() {
 }
 
 function entrance() {
-   fetch(API, {
-      method: 'POST',
-      headers: {
-         'content-type': 'application/json; charset=utf-8',
-      },
-      body: '',
-   }).catch((error) => {
-      console.error(error);
-   });
+   fetch('http://localhost:8000/connect')
+      .then(() => console.log('ыы'))
+      .catch((error) => {
+         console.error(error);
+      });
 }

@@ -1,58 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Интернет на хижине Рацека</title>
-    <link rel="stylesheet" href="./css/style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <div class="wrapper">
-        <h2>Интернет на хижине Рацека</h2>
-        <p>
-            В возможность появления здесь интернета было вложено порядка 300 человеко-часов работы и около 50.000 сом в ценах 2022-2023
-            годов. В проекте принимали участие:
-            <ul>
-                <li>Василий Царевский — проектировщик контроллеров электроснабжения.</li>
-                <li>Владимир Вакурин — создание монтажных конструкций.</li>
-                <li>Евгений Глазунов — монтаж оборудования на месте, помощь с доставкой.</li>
-                <li>Евгений Лепихин — автор идеи, исследование на местности, программирование и настройка.</li>
-                <li>Святослав Деев — создатель сайта, где вы сейчас находитесь.</li>
+   <head>
+      <meta charset="UTF-8" />
+      <meta
+         http-equiv="X-UA-Compatible"
+         content="IE=edge" />
+      <meta
+         name="viewport"
+         content="width=device-width, initial-scale=1.0" />
+      <title>Интернет на хижине Рацека</title>
+      <link
+         rel="stylesheet"
+         href="./css/style.css" />
+   </head>
+   <body>
+      <div class="container">
+         <div class="wrapper">
+            <h2>Интернет на хижине Рацека</h2>
+            <p>
+               В возможность появления здесь интернета было вложено порядка 300 человеко-часов
+               работы и около 50.000 сом в ценах 2022-2023 годов. В проекте принимали участие:
+            </p>
+            <ul id="name">
+               <li>Василий Царевский — проектировщик контроллеров электроснабжения.</li>
+               <li>Владимир Вакурин — создание монтажных конструкций.</li>
+               <li>Евгений Глазунов — монтаж оборудования на месте, помощь с доставкой.</li>
+               <li>
+                  Евгений Лепихин — автор идеи, исследование на местности, программирование и
+                  настройка.
+               </li>
+               <li>Святослав Деев — создатель сайта, где вы сейчас находитесь.</li>
             </ul>
-            <a href="/how-its-done.html"><b>Более подробно о том, как это создавалось</b></a>
-        </p>
-        <p>
-            <span>Будем благодарны за частичную компенсацию расходов.</span> Спасибо можно сказать донатом:
-            <a class="donatlink" href="">сюда</a> или
-            <a class="donatlink" href="">сюда</a>
-        </p>
-        <h3>Всегда доступно без интернета:</h3>
+            <a
+               id="about"
+               href="/how-its-done.html"
+               ><b>Более подробно о том, как это создавалось</b></a
+            >
 
-        <ul>
-            <li>
-                <a class="otherlink" href="http://grafana.ratzek/d/KFSJjSWRz/meteostantsiia?orgId=2&refresh=30s">
-                    Данные с метеостанции
-                </a>
-            </li>
-            <li><a class="otherlink" href="/forecasts/mountain-forecast/">Прогноз погоды от Mountain Forecast</a></li>
-            <li><a class="otherlink" href="/guides/pavlenko">Видео-гайд от Дмитрия Павленко</a></li>
-            <li>
-                <a class="otherlink" href="/guides/lepikhin-guidebook/lepikhin-guidebook.pdf">
-                    Созданный сообществом гайдбук
-                </a>
-            </li>
-        </ul>
-        <div id="btnBox">
-          <button disabled onClick="click">...</button>
-        </div>
+            <p>
+               <span>Будем благодарны за частичную компенсацию расходов.</span> Спасибо можно
+               сказать донатом:
+               <a
+                  class="donatlink"
+                  href=""
+                  >сюда</a
+               >
+               или
+               <a
+                  class="donatlink"
+                  href=""
+                  >сюда</a
+               >
+            </p>
+            <h3>Всегда доступно без интернета:</h3>
 
-        
+            <ul>
+               <li>
+                  <a
+                     class="otherlink"
+                     href="http://grafana.ratzek/d/KFSJjSWRz/meteostantsiia?orgId=2&refresh=30s">
+                     Данные с метеостанции
+                  </a>
+               </li>
+               <li>
+                  <a
+                     class="otherlink"
+                     href="/forecasts/mountain-forecast/"
+                     >Прогноз погоды от Mountain Forecast</a
+                  >
+               </li>
+               <li>
+                  <a
+                     class="otherlink"
+                     href="/guides/pavlenko"
+                     >Видео-гайд от Дмитрия Павленко</a
+                  >
+               </li>
+               <li>
+                  <a
+                     class="otherlink"
+                     href="/guides/lepikhin-guidebook/lepikhin-guidebook.pdf">
+                     Созданный сообществом гайдбук
+                  </a>
+               </li>
+            </ul>
+            <div id="btnBox">
+               <button
+                  disabled
+                  onClick="click">
+                  ...
+               </button>
+            </div>
+         </div>
       </div>
-    </div>
 
-  
-    <script src="./js/main.js"></script>
-  </body>
+      <script src="./js/main.js"></script>
+   </body>
 </html>
