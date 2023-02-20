@@ -4,9 +4,16 @@ let sec = 10;
 btn.addEventListener('click', entrance);
 const API_client = '/api/v1/client';
 
-ping(interval);
+autoPing();
 
-function ping(interval) {
+function autoPing() {
+  ping(null);
+  const int = setInterval(() => {
+    ping(int);
+  }, 5 * 1000);
+}
+
+function ping(autoping_interval) {
   fetch(API_client)
     .then((resp) => resp.json())
     .then((resp) => {
@@ -23,7 +30,12 @@ function ping(interval) {
       // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
       if (resp.internet_connection_status == "Inactive") {
         btn.style.display = 'block';
-        interval();
+
+        // Если нам передали какой-то идентификатор интервала - отменяем его перед вызовом тикера кнопки
+        if (autoping_interval != null) {
+          clearInterval(autoping_interval);
+        }
+        tickButton();
 
         return;
       }
@@ -53,7 +65,7 @@ function ping(interval) {
     });
 }
 
-function interval() {
+function tickButton() {
   const int = setInterval(() => {
     sec -= 1;
     btn.innerText = `до входа осталось ${sec}`;
@@ -74,7 +86,11 @@ function entrance() {
     },
     body: '',
   })
-    .then(() => console.log('ыы'))
+    .then(() => {
+      console.log('Logged in');
+      ping();
+      autoPing();
+    })
     .catch((error) => {
       console.error(error);
     });
