@@ -40,7 +40,7 @@ function ping(autoping_interval) {
         return;
       }
 
-      // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
+      // Если не Inactive, то ожидалось Connected. Но не получили его. Ругаемся в консоль, ничего не делаем.
       if (!resp.internet_connection_status.Connected) {
         console.log("Что-то пошло не так, нет ожидаемого статуса");
 
