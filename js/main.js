@@ -69,7 +69,7 @@ function tickButton() {
   const int = setInterval(() => {
     sec -= 1;
     btn.innerText = `до входа осталось ${sec}`;
-    if (sec === 0) {
+    if (sec <= 0) {
       btn.innerText = 'МОЖНО ВОЙТИ';
       btn.style.backgroundColor = 'rgb(106, 194, 72)';
       btn.removeAttribute('disabled');
