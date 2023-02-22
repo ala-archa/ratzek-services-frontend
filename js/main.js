@@ -1,19 +1,17 @@
-const btn = document.querySelector('button');
-const testBnt = document.querySelector('#testBtn');
-let sec = 10;
-btn.addEventListener('click', entrance);
 const API_client = '/api/v1/client';
+const btn = document.querySelector('button');
 
-autoPing();
+let currentStateIntervalTicker = null;
 
-function autoPing() {
-  ping(null);
-  const int = setInterval(() => {
-    ping(int);
-  }, 5 * 1000);
+function startNewStateTicker(interval, fn) {
+  if (currentStateIntervalTicker) {
+    clearInterval(currentStateIntervalTicker);
+  }
+  fn();
+  currentStateIntervalTicker = setInterval(fn, interval);
 }
 
-function ping(autoping_interval) {
+function mainButtonTicker() {
   fetch(API_client)
     .then((resp) => resp.json())
     .then((resp) => {
@@ -21,27 +19,23 @@ function ping(autoping_interval) {
 
       // Интернета нет, всё тлен. Сообщаем об этом пользователю и больше ничего не делаем.
       if (!resp.is_internet_available) {
-        btn.style.display = 'block';
-        btn.innerText = `К сожалению доступа в данный момент нет`;
+        btn.classList = 'buttonNoAccess';
+        btn.innerText = `К сожалению, интернета в данный момент нет`;
 
         return;
       }
 
       // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
       if (resp.internet_connection_status == "Inactive") {
-        btn.style.display = 'block';
-
         // Если нам передали какой-то идентификатор интервала - отменяем его перед вызовом тикера кнопки
-        if (autoping_interval != null) {
-          clearInterval(autoping_interval);
-        }
-        tickButton();
+        waitforEnterance()();
 
         return;
       }
 
       // Если не Inactive, то ожидалось Connected. Но не получили его. Ругаемся в консоль, ничего не делаем.
       if (!resp.internet_connection_status.Connected) {
+        btn.classList = 'buttonNoAccess';
         console.log("Что-то пошло не так, нет ожидаемого статуса");
 
         return;
@@ -55,30 +49,31 @@ function ping(autoping_interval) {
       date.setSeconds(resp.internet_connection_status.Connected.shaper_reset_secs);
       const drop_duration = date.toISOString().substring(11, 19);
 
-      btn.style.display = 'block';
+      btn.classList = 'buttonAccessGranted'
       btn.innerText = `Вы израсходовали ${mb_spent} MB из ${mb_limit} на безлимитной скорости. `
         + `До сброса счетчика осталось ${drop_duration}`;
-      btn.style.backgroundColor = 'rgb(106, 194, 72)';
     })
     .catch((error) => {
       console.error(error);
+      btn.classList = 'buttonNoAccess';
     });
 }
 
-function tickButton() {
-  const int = setInterval(() => {
-    sec -= 1;
-    btn.innerText = `до входа осталось ${sec}`;
+function waitforEnterance() {
+  let sec = 10;
+  startNewStateTicker(1000, () => {
+    btn.innerText = `до входа осталось ${sec} сек`;
     if (sec <= 0) {
-      btn.innerText = 'МОЖНО ВОЙТИ';
-      btn.style.backgroundColor = 'rgb(106, 194, 72)';
+      btn.innerText = 'МОЖНО ВОЙТИ, ЖМИ';
+      btn.classList = 'buttonRequestAccess';
       btn.removeAttribute('disabled');
-      clearInterval(int);
+      clearInterval(currentStateIntervalTicker);
     }
-  }, 1000);
+    sec -= 1;
+  });
 }
 
-function entrance() {
+function requestAccess() {
   fetch(API_client, {
     method: 'POST',
     headers: {
@@ -88,10 +83,13 @@ function entrance() {
   })
     .then(() => {
       console.log('Logged in');
-      ping();
-      autoPing();
+      startNewStateTicker(5000, mainButtonTicker);
     })
     .catch((error) => {
       console.error(error);
     });
 }
+
+btn.addEventListener('click', requestAccess);
+
+startNewStateTicker(5000, mainButtonTicker);

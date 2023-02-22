@@ -42,13 +42,35 @@ h3 {
    margin-bottom: 0.7em;
 }
 
-button {
-   display: none;
+.buttonNoAccess {
+   display: block;
+   margin: 20px auto;
+   padding: 15px 60px;
+   border-radius: 10px;
+   background-color: rgb(216, 84, 84);
+   color: black;
+   font-size: 20px;
+   border: none;
+}
+
+.buttonRequestAccess {
+   display: block;
    margin: 20px auto;
    padding: 15px 60px;
    border-radius: 10px;
    cursor: pointer;
-   background-color: rgb(216, 84, 84);
+   background-color: hsl(66, 70%, 55%);
+   color: black;
+   font-size: 20px;
+   border: none;
+}
+
+.buttonAccessGranted {
+   display: block;
+   margin: 20px auto;
+   padding: 15px 60px;
+   border-radius: 10px;
+   background-color: rgb(106, 194, 72);
    color: black;
    font-size: 20px;
    border: none;
