@@ -95,9 +95,21 @@ b {
    color: hsl(66, 70%, 55%);
 }
 
+.attention {
+   display: block;
+   padding: 5px 5px;
+   margin-bottom: 1em;
+   border-radius: 10px;
+   background-color: hsl(66, 70%, 55%);
+   color: black;
+}
+
+.attention a {
+    font-weight: 800;
+}
+
 .otherlink {
    font-size: 17px;
-   text-decoration: none;
    color: black;
 }
 
