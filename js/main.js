@@ -28,7 +28,7 @@ function mainButtonTicker() {
       // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
       if (resp.internet_connection_status == "Inactive") {
         // Если нам передали какой-то идентификатор интервала - отменяем его перед вызовом тикера кнопки
-        waitforEnterance()();
+        waitforEnterance();
 
         return;
       }
