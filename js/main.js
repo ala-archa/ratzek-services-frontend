@@ -33,6 +33,14 @@ function mainButtonTicker() {
         return;
       }
 
+      // Пользователь в черном списке. Запрещаем любые действия.
+      if (resp.internet_connection_status == "ClientBlacklisted") {
+        btn.classList = 'buttonNoAccess';
+        btn.innerText = `К сожалению, для вас ограничена возможность выхода в интернет`;
+
+        return;
+      }
+
       // Если не Inactive, то ожидалось Connected. Но не получили его. Ругаемся в консоль, ничего не делаем.
       if (!resp.internet_connection_status.Connected) {
         btn.classList = 'buttonNoAccess';
