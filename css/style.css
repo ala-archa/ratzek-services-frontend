@@ -12,6 +12,8 @@
 
 ul {
     margin-left: 2em;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 body {
@@ -130,11 +132,6 @@ b {
 
 .buttonBox > a {
     text-decoration: none;
-}
-
-ul {
-   margin-top: 10px;
-   margin-bottom: 10px;
 }
 
 @media all and (max-width: 425px) {
