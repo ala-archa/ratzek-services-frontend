@@ -26,6 +26,8 @@ body {
    display: flex;
    margin-left: auto;
    margin-right: auto;
+   margin-top: 1em;
+   margin-bottom: 1em;
    align-items: center;
    background-color: #132141;
 }
