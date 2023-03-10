@@ -14,27 +14,33 @@ ul {
     margin-left: 2em;
 }
 
+body {
+   background-color: #132141;
+}
+
 .container {
-   width: 100%;
+   max-width: 80rem;
    min-height: 100vh;
    display: flex;
-   justify-content: space-around;
+   margin-left: auto;
+   margin-right: auto;
    align-items: center;
-   background-color: hsl(223, 31%, 20%);
+   background-color: #132141;
 }
 
 .wrapper {
    padding: 30px;
    max-width: 90%;
-   background-color: hsl(222, 26%, 31%);
+   background-color: #3a4764;
    color: hsl(30, 25%, 89%);
    border-radius: 10px;
-   box-shadow: rgb(240, 247, 176) 0 0 8px;
+   box-shadow: #cab283 0 0 8px;
 }
 
 h2 {
    margin-top: 1em;
    margin-bottom: 1em;
+   color: #70acac;
 }
 
 p {
@@ -44,6 +50,7 @@ p {
 h3 {
    margin-top: 0.7em;
    margin-bottom: 0.7em;
+   color: #70acac;
 }
 
 .buttonNoAccess {
@@ -51,8 +58,8 @@ h3 {
    margin: 20px auto;
    padding: 15px 60px;
    border-radius: 10px;
-   background-color: rgb(216, 84, 84);
-   color: black;
+   background-color: #132141;
+   color: white;
    font-size: 20px;
    border: none;
 }
@@ -63,8 +70,8 @@ h3 {
    padding: 15px 60px;
    border-radius: 10px;
    cursor: pointer;
-   background-color: hsl(66, 70%, 55%);
-   color: black;
+   background-color: #61491a;
+   color: white;
    font-size: 20px;
    border: none;
 }
@@ -74,8 +81,8 @@ h3 {
    margin: 20px auto;
    padding: 15px 60px;
    border-radius: 10px;
-   background-color: rgb(106, 194, 72);
-   color: black;
+   background-color: #0f3a3a;
+   color: white;
    font-size: 20px;
    border: none;
 }
@@ -83,6 +90,8 @@ h3 {
 a {
    cursor: pointer;
    text-decoration: none;
+   color: #cab996;
+   text-decoration: underline;
 }
 
 b {
@@ -91,16 +100,16 @@ b {
 
 .important {
    text-decoration: none;
-   font-size: 25px;
-   color: hsl(66, 70%, 55%);
+   color: #948ab3;
+   font-weight: 800;
 }
 
 .attention {
    display: block;
-   padding: 5px 5px;
+   padding: 10px 15px;
    margin-bottom: 1em;
    border-radius: 10px;
-   background-color: hsl(66, 70%, 55%);
+   background-color: #948ab3;
    color: black;
 }
 
@@ -113,22 +122,17 @@ b {
    color: black;
 }
 
-#testBtn {
-   text-align: center;
-}
-
-#btnBox {
+.buttonBox {
    width: 100%;
    display: flex;
    justify-content: center;
 }
 
-#name {
-   margin-top: 10px;
-   margin-bottom: 10px;
+.buttonBox > a {
+    text-decoration: none;
 }
 
-#about {
+ul {
    margin-top: 10px;
    margin-bottom: 10px;
 }

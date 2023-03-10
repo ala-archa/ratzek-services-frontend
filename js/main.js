@@ -1,5 +1,5 @@
 const API_client = '/api/v1/client';
-const btn = document.querySelector('button');
+const btn = document.getElementById('ap-control');
 
 let currentStateIntervalTicker = null;
 
