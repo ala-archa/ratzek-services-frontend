@@ -1,13 +1,13 @@
 @font-face {
-   font-family: Consolas;
-   src: url(../assets/font/CONSOLA.TTF);
+    font-family: Consolas;
+    src: url(../assets/font/CONSOLA.TTF);
 }
 
 * {
-   margin: 0;
-   padding: 0;
-   box-sizing: border-box;
-   font-family: Consolas;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Consolas;
 }
 
 ul {
@@ -17,106 +17,94 @@ ul {
 }
 
 body {
-   background-color: #132141;
+    background-color: #132141;
 }
 
 .container {
-   max-width: 80rem;
-   min-height: 100vh;
-   display: flex;
-   margin-left: auto;
-   margin-right: auto;
-   margin-top: 1em;
-   margin-bottom: 1em;
-   align-items: center;
-   background-color: #132141;
+    max-width: 80rem;
+    min-height: 100vh;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    align-items: center;
+    background-color: #132141;
 }
 
 .wrapper {
-   padding: 2em;
-   margin-left: auto;
-   margin-right: auto;
-   max-width: 90%;
-   background-color: #3a4764;
-   color: hsl(30, 25%, 89%);
-   border-radius: 10px;
-   box-shadow: #cab283 0 0 8px;
+    padding: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 90%;
+    background-color: #3a4764;
+    color: hsl(30, 25%, 89%);
+    border-radius: 10px;
+    box-shadow: #cab283 0 0 8px;
 }
 
 h2 {
-   margin-top: 1em;
-   margin-bottom: 1em;
-   color: #70acac;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    color: #70acac;
 }
 
 p {
-   text-align: justify;
+    text-align: justify;
 }
 
 h3 {
-   margin-top: 0.7em;
-   margin-bottom: 0.7em;
-   color: #70acac;
+    margin-top: 0.7em;
+    margin-bottom: 0.7em;
+    color: #70acac;
 }
 
-.buttonNoAccess {
-   display: block;
-   margin: 20px auto;
-   padding: 15px 60px;
-   border-radius: 10px;
-   background-color: #132141;
-   color: white;
-   font-size: 20px;
-   border: none;
+.buttonNoAccess,
+.buttonRequestAccess,
+.buttonAccessGranted {
+    display: block;
+    margin: 20px auto;
+    padding: 15px 60px;
+    border-radius: 10px;
+    background-color: #132141;
+    color: white;
+    font-size: 20px;
+    border: none;
 }
 
 .buttonRequestAccess {
-   display: block;
-   margin: 20px auto;
-   padding: 15px 60px;
-   border-radius: 10px;
-   cursor: pointer;
-   background-color: #61491a;
-   color: white;
-   font-size: 20px;
-   border: none;
+    cursor: pointer;
+    background-color: #61491a;
 }
 
 .buttonAccessGranted {
-   display: block;
-   margin: 20px auto;
-   padding: 15px 60px;
-   border-radius: 10px;
-   background-color: #0f3a3a;
-   color: white;
-   font-size: 20px;
-   border: none;
+    background-color: #0f3a3a;
 }
 
 a {
-   cursor: pointer;
-   text-decoration: none;
-   color: #cab996;
-   text-decoration: underline;
+    cursor: pointer;
+    text-decoration: none;
+    color: #cab996;
+    text-decoration: underline;
 }
 
 b {
-   color: black;
+    color: black;
 }
 
 .important {
-   text-decoration: none;
-   color: #948ab3;
-   font-weight: 800;
+    text-decoration: none;
+    color: #948ab3;
+    font-weight: 800;
 }
 
 .attention {
-   display: block;
-   padding: 10px 15px;
-   margin-bottom: 1em;
-   border-radius: 10px;
-   background-color: #948ab3;
-   color: black;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: 1em;
+    border-radius: 10px;
+    background-color: #948ab3;
+    color: black;
 }
 
 .attention a {
@@ -124,14 +112,14 @@ b {
 }
 
 .otherlink {
-   font-size: 17px;
-   color: black;
+    font-size: 17px;
+    color: black;
 }
 
 .buttonBox {
-   width: 100%;
-   display: flex;
-   justify-content: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .buttonBox > a {
@@ -139,18 +127,18 @@ b {
 }
 
 @media all and (max-width: 425px) {
-   button {
-      font-size: 16px;
-   }
-   .donatlink {
-      font-size: 20px;
-   }
-   h2 {
-      font-size: 18px;
-   }
+    button {
+        font-size: 16px;
+    }
+    .donatlink {
+        font-size: 20px;
+    }
+    h2 {
+        font-size: 18px;
+    }
 
-   p,
-   li {
-      font-size: 14px;
-   }
+    p,
+    li {
+        font-size: 14px;
+    }
 }
