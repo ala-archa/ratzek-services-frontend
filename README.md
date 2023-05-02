@@ -22,11 +22,11 @@
 
 ## Ссылки  
 
-[Публикация в местных СМИ](https://economist.kg/novosti/2023/04/14/alpinist-iz-rossii-za-svoj-schet-provel-internet-v-alplager-v-kyrgyzstane-potratil-100-tysyach-somov/)
+- [Публикация в местных СМИ](https://economist.kg/novosti/2023/04/14/alpinist-iz-rossii-za-svoj-schet-provel-internet-v-alplager-v-kyrgyzstane-potratil-100-tysyach-somov/)
 
-["Как это делалось" - от автора проекта Евгения Лепихина](https://disk.yandex.ru/i/tH-vM4GqW4HDlA)
+- ["Как это делалось" - от автора проекта Евгения Лепихина](https://disk.yandex.ru/i/tH-vM4GqW4HDlA)
 
-[Все ресурсы портала](https://github.com/orgs/ala-archa/repositories)
+- [Все ресурсы портала](https://github.com/orgs/ala-archa/repositories)
 
 
 ## Команда проекта
