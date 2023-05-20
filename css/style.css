@@ -16,6 +16,11 @@ ul {
     margin-bottom: 10px;
 }
 
+ul > li {
+    font-size: 18px;
+    padding-top: 3px;
+}
+
 body {
     background-color: #132141;
 }
@@ -124,6 +129,27 @@ b {
 
 .buttonBox > a {
     text-decoration: none;
+}
+
+/* див калашникова */
+h1 {
+    color: orange;
+}
+
+.alert {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid red;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 10px;
+}
+
+#alertImg {
+    width: 90%;
 }
 
 @media all and (max-width: 425px) {
