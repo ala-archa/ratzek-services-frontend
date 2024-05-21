@@ -1,0 +1,15 @@
+{
+  "name": "ratzek-services-frontend",
+  "version": "1.0.0",
+  "description": "## Проект является фронтендом к captive-порталу, предоставляющим бесплатный доступ к интернету в высокогорной зоне в Хижине Рацека — базовом лагере альпинистов в нац.парке Ала-Арча.",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.0.0-alpha.6"
+  }
+}

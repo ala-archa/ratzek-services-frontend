@@ -26,7 +26,7 @@ function mainButtonTicker() {
       }
 
       // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
-      if (resp.internet_connection_status == "Inactive") {
+      if (resp.internet_connection_status == 'Inactive') {
         // Если нам передали какой-то идентификатор интервала - отменяем его перед вызовом тикера кнопки
         waitforEnterance();
 
@@ -34,7 +34,7 @@ function mainButtonTicker() {
       }
 
       // Пользователь в черном списке. Запрещаем любые действия.
-      if (resp.internet_connection_status == "ClientBlacklisted") {
+      if (resp.internet_connection_status == 'ClientBlacklisted') {
         btn.classList = 'buttonNoAccess';
         btn.innerText = `К сожалению, для вас ограничена возможность выхода в интернет`;
 
@@ -44,22 +44,31 @@ function mainButtonTicker() {
       // Если не Inactive, то ожидалось Connected. Но не получили его. Ругаемся в консоль, ничего не делаем.
       if (!resp.internet_connection_status.Connected) {
         btn.classList = 'buttonNoAccess';
-        console.log("Что-то пошло не так, нет ожидаемого статуса");
+        console.log('Что-то пошло не так, нет ожидаемого статуса');
 
         return;
       }
 
       // У нас статус Connected, показываем статистику
-      const mb_spent = Math.floor(resp.internet_connection_status.Connected.bytes_sent / 1024 / 1024);
-      const mb_limit = Math.floor(resp.internet_connection_status.Connected.bytes_unlimited_limit / 1024 / 1024);
+      const mb_spent = Math.floor(
+        resp.internet_connection_status.Connected.bytes_sent / 1024 / 1024
+      );
+      const mb_limit = Math.floor(
+        resp.internet_connection_status.Connected.bytes_unlimited_limit /
+          1024 /
+          1024
+      );
 
       var date = new Date(0);
-      date.setSeconds(resp.internet_connection_status.Connected.shaper_reset_secs);
+      date.setSeconds(
+        resp.internet_connection_status.Connected.shaper_reset_secs
+      );
       const drop_duration = date.toISOString().substring(11, 19);
 
-      btn.classList = 'buttonAccessGranted'
-      btn.innerText = `Вы израсходовали ${mb_spent} MB из ${mb_limit} на безлимитной скорости. `
-        + `До сброса счетчика осталось ${drop_duration}`;
+      btn.classList = 'buttonAccessGranted';
+      btn.innerText =
+        `Вы израсходовали ${mb_spent} MB из ${mb_limit} на безлимитной скорости. ` +
+        `До сброса счетчика осталось ${drop_duration}`;
     })
     .catch((error) => {
       console.error(error);

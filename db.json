@@ -1,8 +1,8 @@
 {
-   "connect": {
-      "internet_connection_status": "Inactive",
-      "internet_clients_connected": "1",
-      "bytes_sent": "55",
-      "bytes_unlimited_limit": "150"
-   }
+  "connect": {
+    "internet_connection_status": "Inactive",
+    "internet_clients_connected": "1",
+    "bytes_sent": "55",
+    "bytes_unlimited_limit": "150"
+  }
 }

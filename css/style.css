@@ -1,170 +1,132 @@
 @font-face {
-    font-family: Consolas;
-    src: url(../assets/font/CONSOLA.TTF);
+  font-family: Consolas;
+  src: url(../assets/font/CONSOLA.TTF);
+  font-family: JetBrains;
+  src: url(../assets/font/JetBrains.ttf);
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Consolas;
-}
-
-ul {
-    margin-left: 2em;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-ul > li {
-    font-size: 18px;
-    padding-top: 3px;
-}
-
-body {
-    background-color: #132141;
-}
-
-.container {
-    max-width: 80rem;
-    min-height: 100vh;
-    display: flex;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    align-items: center;
-    background-color: #132141;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Consolas;
 }
 
 .wrapper {
-    padding: 2em;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 90%;
-    background-color: #3a4764;
-    color: hsl(30, 25%, 89%);
-    border-radius: 10px;
-    box-shadow: #cab283 0 0 8px;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
-h2 {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    color: #70acac;
+a {
+  cursor: pointer;
+  text-decoration: none;
+  color: orange;
 }
 
-p {
-    text-align: justify;
+/*! header */
+.header {
+  display: flex;
+  align-items: center;
+  height: 4rem;
+  background-color: rgb(31, 48, 104);
 }
 
-h3 {
-    margin-top: 0.7em;
-    margin-bottom: 0.7em;
-    color: #70acac;
+.header_title {
+  font-size: 0.8rem;
+  color: whitesmoke;
+  font-family: JetBrains;
+}
+
+/*!  main */
+.main_content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main_link {
+  color: orange;
+  font-weight: 900;
+  font-family: JetBrains;
+}
+
+.section {
+  border: 1px solid rgb(31, 48, 104);
+  box-shadow: 8px 8px 8px 0px rgba(34, 60, 80, 0.2);
+  border-radius: 5px;
+  padding: 1rem;
+}
+
+.section_title {
+  font-family: JetBrains;
+  font-weight: normal;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.section_list {
+  list-style-position: inside;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.section_attention,
+.section_signIn,
+.section_about {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section_attention__text,
+.section_signIn__text {
+  font-size: 0.8rem;
+}
+
+.section_attention__button,
+.section_about__button,
+.section_signIn__button {
+  text-decoration: none;
+  color: orange;
+  border-radius: 5px;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid orange;
+  text-align: center;
+  cursor: pointer;
+}
+
+.section_signIn__button {
+  background-color: orange;
+  color: white;
+}
+
+.section_attention__button:hover {
+  background-color: orange;
+  color: white;
+  transition: 0.5s;
 }
 
 .buttonNoAccess,
 .buttonRequestAccess,
 .buttonAccessGranted {
-    display: block;
-    margin: 20px auto;
-    padding: 15px 60px;
-    border-radius: 10px;
-    background-color: #132141;
-    color: white;
-    font-size: 20px;
-    border: none;
+  display: block;
+  margin: 20px auto;
+  padding: 1rem 5rem;
+  border-radius: 5px;
+  background-color: rgb(31, 48, 104);
+  color: white;
+  font-size: 20px;
+  border: none;
 }
 
 .buttonRequestAccess {
-    cursor: pointer;
-    background-color: #61491a;
+  cursor: pointer;
+  background-color: #61491a;
 }
 
 .buttonAccessGranted {
-    background-color: #0f3a3a;
-}
-
-a {
-    cursor: pointer;
-    text-decoration: none;
-    color: #cab996;
-    text-decoration: underline;
-}
-
-b {
-    color: black;
-}
-
-.important {
-    text-decoration: none;
-    color: #948ab3;
-    font-weight: 800;
-}
-
-.attention {
-    display: block;
-    padding: 10px 15px;
-    margin-bottom: 1em;
-    border-radius: 10px;
-    background-color: #948ab3;
-    color: black;
-}
-
-.attention a {
-    font-weight: 800;
-}
-
-.otherlink {
-    font-size: 17px;
-    color: black;
-}
-
-.buttonBox {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-.buttonBox > a {
-    text-decoration: none;
-}
-
-/* див калашникова */
-h1 {
-    color: orange;
-}
-
-.alert {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    border: 2px solid red;
-    border-radius: 5px;
-    margin: 10px;
-    padding: 10px;
-}
-
-#alertImg {
-    width: 90%;
-}
-
-@media all and (max-width: 425px) {
-    button {
-        font-size: 16px;
-    }
-    .donatlink {
-        font-size: 20px;
-    }
-    h2 {
-        font-size: 18px;
-    }
-
-    p,
-    li {
-        font-size: 14px;
-    }
+  background-color: #0f3a3a;
 }
