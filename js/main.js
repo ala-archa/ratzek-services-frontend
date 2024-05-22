@@ -1,15 +1,38 @@
 const API_client = '/api/v1/client';
 const btn = document.getElementById('ap-control');
 const header = document.getElementById('header');
+const themeSwitch = document.querySelector('.header_theme-switcher');
+const body = document.body;
+
 let currentStateIntervalTicker = null;
 
 window.addEventListener('scroll', () => {
   if (window.scrollY > 10) {
     header.classList.add('header_scrolled');
+    console.log('header_scrolled');
   } else {
     header.classList.remove('header_scrolled');
   }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+  const currentTheme = localStorage.getItem('theme');
+  if (currentTheme === 'theme-dark') {
+    body.classList.add('theme-dark');
+  }
+});
+
+themeSwitch.addEventListener('click', function () {
+  if (body.classList.contains('theme-dark')) {
+    localStorage.setItem('theme', '');
+    body.classList.remove('theme-dark');
+  } else {
+    body.classList.add('theme-dark');
+    localStorage.setItem('theme', 'theme-dark');
+    console.log("theme is 'theme-light'");
+  }
+});
+
 function startNewStateTicker(interval, fn) {
   if (currentStateIntervalTicker) {
     clearInterval(currentStateIntervalTicker);
