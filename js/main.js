@@ -1,8 +1,15 @@
 const API_client = '/api/v1/client';
 const btn = document.getElementById('ap-control');
-
+const header = document.getElementById('header');
 let currentStateIntervalTicker = null;
 
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 10) {
+    header.classList.add('header_scrolled');
+  } else {
+    header.classList.remove('header_scrolled');
+  }
+});
 function startNewStateTicker(interval, fn) {
   if (currentStateIntervalTicker) {
     clearInterval(currentStateIntervalTicker);

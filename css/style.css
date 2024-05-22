@@ -29,7 +29,18 @@ a {
   display: flex;
   align-items: center;
   height: 4rem;
-  background-color: rgb(31, 48, 104);
+  background-color: rgba(31, 48, 104, 1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-shadow: 8px 8px 8px 0px rgba(34, 60, 80, 0.2);
+  transition: height 1s;
+}
+
+.header_scrolled {
+  height: 2rem;
+  background-color: rgba(31, 48, 104, 1);
 }
 
 .header_title {
@@ -39,6 +50,10 @@ a {
 }
 
 /*!  main */
+.main {
+  margin-top: 4rem;
+}
+
 .main_content {
   display: flex;
   flex-direction: column;
@@ -103,7 +118,8 @@ a {
   color: white;
 }
 
-.section_attention__button:hover {
+.section_attention__button:hover,
+.section_about__button:hover {
   background-color: orange;
   color: white;
   transition: 0.5s;
