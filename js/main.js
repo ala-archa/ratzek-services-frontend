@@ -1,35 +1,14 @@
-const API_client = '/api/v1/client';
-const btn = document.getElementById('ap-control');
-const header = document.getElementById('header');
-const themeSwitch = document.querySelector('.header_theme-switcher');
-const body = document.body;
+const API_client = "/api/v1/client";
+const btn = document.getElementById("ap-control");
+const header = document.getElementById("header");
 
 let currentStateIntervalTicker = null;
 
-window.addEventListener('scroll', () => {
+window.addEventListener("scroll", () => {
   if (window.scrollY > 10) {
-    header.classList.add('header_scrolled');
-    console.log('header_scrolled');
+    header.classList.add("header_scrolled");
   } else {
-    header.classList.remove('header_scrolled');
-  }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  const currentTheme = localStorage.getItem('theme');
-  if (currentTheme === 'theme-dark') {
-    body.classList.add('theme-dark');
-  }
-});
-
-themeSwitch.addEventListener('click', function () {
-  if (body.classList.contains('theme-dark')) {
-    localStorage.setItem('theme', '');
-    body.classList.remove('theme-dark');
-  } else {
-    body.classList.add('theme-dark');
-    localStorage.setItem('theme', 'theme-dark');
-    console.log("theme is 'theme-light'");
+    header.classList.remove("header_scrolled");
   }
 });
 
@@ -49,14 +28,14 @@ function mainButtonTicker() {
 
       // Интернета нет, всё тлен. Сообщаем об этом пользователю и больше ничего не делаем.
       if (!resp.is_internet_available) {
-        btn.classList = 'buttonNoAccess';
+        btn.classList = "buttonNoAccess";
         btn.innerText = `К сожалению, интернета в данный момент нет`;
 
         return;
       }
 
       // Пользователь не включил себе интернет. Показываем кнопку со счетчиком.
-      if (resp.internet_connection_status == 'Inactive') {
+      if (resp.internet_connection_status == "Inactive") {
         // Если нам передали какой-то идентификатор интервала - отменяем его перед вызовом тикера кнопки
         waitforEnterance();
 
@@ -64,8 +43,8 @@ function mainButtonTicker() {
       }
 
       // Пользователь в черном списке. Запрещаем любые действия.
-      if (resp.internet_connection_status == 'ClientBlacklisted') {
-        btn.classList = 'buttonNoAccess';
+      if (resp.internet_connection_status == "ClientBlacklisted") {
+        btn.classList = "buttonNoAccess";
         btn.innerText = `К сожалению, для вас ограничена возможность выхода в интернет`;
 
         return;
@@ -73,8 +52,8 @@ function mainButtonTicker() {
 
       // Если не Inactive, то ожидалось Connected. Но не получили его. Ругаемся в консоль, ничего не делаем.
       if (!resp.internet_connection_status.Connected) {
-        btn.classList = 'buttonNoAccess';
-        console.log('Что-то пошло не так, нет ожидаемого статуса');
+        btn.classList = "buttonNoAccess";
+        console.log("Что-то пошло не так, нет ожидаемого статуса");
 
         return;
       }
@@ -95,14 +74,14 @@ function mainButtonTicker() {
       );
       const drop_duration = date.toISOString().substring(11, 19);
 
-      btn.classList = 'buttonAccessGranted';
+      btn.classList = "buttonAccessGranted";
       btn.innerText =
         `Вы израсходовали ${mb_spent} MB из ${mb_limit} на безлимитной скорости. ` +
         `До сброса счетчика осталось ${drop_duration}`;
     })
     .catch((error) => {
       console.error(error);
-      btn.classList = 'buttonNoAccess';
+      btn.classList = "buttonNoAccess";
     });
 }
 
@@ -111,9 +90,9 @@ function waitforEnterance() {
   startNewStateTicker(1000, () => {
     btn.innerText = `до входа осталось ${sec} сек`;
     if (sec <= 0) {
-      btn.innerText = 'МОЖНО ВОЙТИ, ЖМИ';
-      btn.classList = 'buttonRequestAccess';
-      btn.removeAttribute('disabled');
+      btn.innerText = "МОЖНО ВОЙТИ, ЖМИ";
+      btn.classList = "buttonRequestAccess";
+      btn.removeAttribute("disabled");
       clearInterval(currentStateIntervalTicker);
     }
     sec -= 1;
@@ -122,14 +101,14 @@ function waitforEnterance() {
 
 function requestAccess() {
   fetch(API_client, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'content-type': 'application/json; charset=utf-8',
+      "content-type": "application/json; charset=utf-8",
     },
-    body: '',
+    body: "",
   })
     .then(() => {
-      console.log('Logged in');
+      console.log("Logged in");
       startNewStateTicker(5000, mainButtonTicker);
     })
     .catch((error) => {
@@ -137,6 +116,6 @@ function requestAccess() {
     });
 }
 
-btn.addEventListener('click', requestAccess);
+btn.addEventListener("click", requestAccess);
 
 startNewStateTicker(5000, mainButtonTicker);

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,12 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Интернет на хижине Рацека</title>
     <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/slider.css" />
+    <script src="https://unpkg.com/i18next@latest/dist/umd/i18next.min.js"></script>
   </head>
   <body>
     <header id="header" class="header">
       <div class="wrapper">
         <div class="header_content">
-          <h2 class="header_title">[Интернет на хижине Рацека]</h2>
+          <h2 class="header_title" data-i18n="header_title">
+            [Интернет на хижине Рацека]
+          </h2>
           <div class="toggle-switch">
             <label>
               <input type="checkbox" class="header_theme-switcher" />
@@ -26,40 +30,69 @@
       <div class="wrapper">
         <div class="main_content">
           <section class="section">
-            <p class="section_title">
-              Вы всегда можете вернуться на эту страницу введя адрес
-            </p>
-            <span class="main_link">http://www.ratzek 🚀</span>
+            <div class="language-switcher">
+              <div class="language-slider" id="language-slider" data-lang="ru">
+                <div class="slider-button" onclick="changeLanguage('en')">
+                  EN
+                </div>
+                <div class="slider-button" onclick="changeLanguage('ru')">
+                  RU
+                </div>
+                <div class="slider-button" onclick="changeLanguage('kg')">
+                  KG
+                </div>
+              </div>
+            </div>
           </section>
           <section class="section">
-            <h3 class="section_title">Всегда доступно, даже без интернета</h3>
-
+            <p class="section_title" data-i18n="main_address">
+              Вы всегда можете вернуться на эту страницу введя адрес
+            </p>
+            <span class="main_link" data-i18n="main_link"
+              >http://www.ratzek 🚀</span
+            >
+          </section>
+          <section class="section">
+            <h3
+              class="section_title"
+              data-i18n="section_title_always_available"
+            >
+              Всегда доступно, даже без интернета
+            </h3>
             <ul class="section_list">
               <li>
                 <a
                   href="http://grafana.ratzek/d/KFSJjSWRz/meteostantsiia?orgId=2&refresh=30s"
+                  data-i18n="data_meteostation"
+                  >Данные с метеостанции</a
                 >
-                  Данные с метеостанции
-                </a>
               </li>
               <li>
-                <a href="/library/">Библиотека фильмов и книг</a>
+                <a href="/library/" data-i18n="library"
+                  >Библиотека фильмов и книг</a
+                >
               </li>
               <li>
-                <a href="/forecasts/mountain-forecast/"
+                <a
+                  href="/forecasts/mountain-forecast/"
+                  data-i18n="weather_forecast"
                   >Прогноз погоды от Mountain Forecast</a
                 >
               </li>
               <li>
-                <a href="/guides/pavlenko">Видео-гайд от Дмитрия Павленко</a>
+                <a href="/guides/pavlenko" data-i18n="video_guide"
+                  >Видео-гайд от Дмитрия Павленко</a
+                >
               </li>
               <li>
-                <a href="/guides/lepikhin-guidebook/lepikhin-guidebook.pdf"
+                <a
+                  href="/guides/lepikhin-guidebook/lepikhin-guidebook.pdf"
+                  data-i18n="community_guide"
                   >Созданный сообществом гайдбук</a
                 >
               </li>
               <li>
-                <a href="/webcam-archive/"
+                <a href="/webcam-archive/" data-i18n="webcam_archive"
                   ><b>NEW!</b> Архив веб-камеры (2 недели)</a
                 >
               </li>
@@ -67,41 +100,52 @@
           </section>
 
           <section class="section">
-            <h3 class="section_title">Полезные сервисы в интернете</h3>
-
+            <h3 class="section_title" data-i18n="section_title_services">
+              Полезные сервисы в интернете
+            </h3>
             <ul class="section_list">
               <li>
-                <a href="https://t.me/outdoor_in_kg"
+                <a href="https://t.me/outdoor_in_kg" data-i18n="telegram_chat"
                   ><b>NEW!</b> Чат в Telegram</a
                 >
               </li>
               <li>
-                <a href="http://www.aksaionline.com/"><b>NEW!</b> Веб-камера</a>
+                <a href="http://www.aksaionline.com/" data-i18n="webcam"
+                  ><b>NEW!</b> Веб-камера</a
+                >
               </li>
             </ul>
           </section>
 
           <section class="section">
-            <h3 class="section_title">Поблагодарить</h3>
+            <h3 class="section_title" data-i18n="section_title_thank_you">
+              Поблагодарить
+            </h3>
             <div class="section_attention">
-              <p class="section_attention__text">
-                Будем благодарны за частичную компенсацию расходов.
-                <a href="/donate.html">Здесь</a> описаны способы перевода
-                донатов. В возможность появления здесь интернета было вложено
-                порядка 350 человеко-часов работы и около 60.000 сом в ценах
-                2022-2023 годов. Ежемесячно сотовому оператору мы оплачиваем
-                более 1000 сом.
+              <p
+                class="section_attention__text"
+                data-i18n="section_thank_you_text"
+              >
+                Будем благодарны за частичную компенсацию расходов. Здесь
+                описаны способы перевода донатов. В возможность появления здесь
+                интернета было вложено порядка 350 человеко-часов работы и около
+                60.000 сом в ценах 2022-2023 годов. Ежемесячно сотовому
+                оператору мы оплачиваем более 1000 сом.
               </p>
-
-              <a class="section_attention__button" href="/donate.html">
-                Поблагодарить — жми!
-              </a>
+              <a
+                class="section_attention__button"
+                href="/donate.html"
+                data-i18n="section_thank_you_button"
+                >Поблагодарить — жми!</a
+              >
             </div>
           </section>
           <section class="section">
-            <h3 class="section_title">Вход и статистика</h3>
+            <h3 class="section_title" data-i18n="section_title_login">
+              Вход и статистика
+            </h3>
             <div class="section_signIn">
-              <p class="section_signIn__text">
+              <p class="section_signIn__text" data-i18n="section_login_text">
                 Интернет предоставляется бесплатно. Чтобы его хватало всем,
                 злостным потребителям мы ограничиваем скорость. Иначе говоря,
                 если вы какой-то период времени слишком активно пользовались
@@ -109,7 +153,7 @@
                 интернет станет медленным на несколько часов, чтобы остальные
                 тоже могли воспользоваться сервисом.
               </p>
-              <p>
+              <p data-i18n="login_delay_text">
                 А чтобы с этой страницей успели ознакомиться, мы добавили
                 задержку входа.
               </p>
@@ -117,6 +161,7 @@
                 disabled
                 id="ap-control"
                 class="section_signIn__button"
+                data-i18n="sign_in_button"
                 onClick="click"
               >
                 ...
@@ -125,38 +170,48 @@
           </section>
           <section class="section">
             <div class="section_about">
-              <h3 class="section_title">О проекте</h3>
+              <h3 class="section_title" data-i18n="section_title_about">
+                О проекте
+              </h3>
               <ul class="section_list">
-                В проекте принимали участие:
-                <li>
+                <h3 data-i18n="section_about_text">
+                  В проекте принимали участие:
+                </h3>
+                <li data-i18n="participant_1">
                   Василий Царевский — проектировщик контроллеров
                   электроснабжения, а также заносил негабаритный груз на хижину.
                 </li>
-                <li>
+                <li data-i18n="participant_2">
                   Дмитрий Доброхотов — монтаж сетевого оборудования на месте.
                 </li>
-                <li>
+                <li data-i18n="participant_3">
                   Дмитрий Павленко — создатель стойки для солнечной панели,
                   помощь с закупками и доставкой негабарита.
                 </li>
-                <li>
+                <li data-i18n="participant_4">
                   Евгений Лепихин — автор идеи, исследование на местности,
                   программирование и настройка, монтаж.
                 </li>
-                <li>Максим Меш — помог с распайкой проводов.</li>
-                <li>
+                <li data-i18n="participant_5">
+                  Максим Меш — помог с распайкой проводов.
+                </li>
+                <li data-i18n="participant_6">
                   Святослав Деев — создатель сайта, где вы сейчас находитесь.
                 </li>
               </ul>
-              <a class="section_about__button" href="/how-its-done.html">
-                Более подробно о том, как это создавалось</a
+              <a
+                class="section_about__button"
+                href="/how-its-done.html"
+                data-i18n="section_about_button"
+                >Более подробно о том, как это создавалось</a
               >
             </div>
           </section>
         </div>
       </div>
     </main>
-
-    <script src="./js/main.js"></script>
+    <script src="./js/i18n.js" defer></script>
+    <script src="./js/main.js" defer></script>
+    <script src="./js/theme.js" defer></script>
   </body>
 </html>
