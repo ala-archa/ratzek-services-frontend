@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('language-slide').querySelector('.slider-button:nth-child(1)').addEventListener('click', () => changeLanguage('en'));
     document.getElementById('language-slide').querySelector('.slider-button:nth-child(2)').addEventListener('click', () => changeLanguage('ru'));
     document.getElementById('language-slide').querySelector('.slider-button:nth-child(3)').addEventListener('click', () => changeLanguage('kg'));
-  });
+});
   
   function updateContent() {
     document.querySelectorAll('[data-i18n]').forEach(function(element) {
@@ -15,13 +15,17 @@ document.addEventListener('DOMContentLoaded', function() {
     i18next.changeLanguage(lng, function(err, t) {
       if (err) return console.log('Something went wrong in loading i18n', err);
       updateContent();
+      localStorage.setItem('language', lng);
+      document.getElementById('language-slider').setAttribute('data-lang', lng);
+
     });
   }
   
-  
+  const savedLanguage = localStorage.getItem('language') || 'ru';
+
 
 i18next.init({
-  lng: 'ru',
+  lng: savedLanguage,
   resources: {
     en: {
         translation: {
