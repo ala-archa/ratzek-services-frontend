@@ -30,17 +30,35 @@
       <div class="wrapper">
         <div class="main_content">
           <section class="section">
-            <div class="language-switcher">
-              <div class="language-slider" id="language-slider" data-lang="ru">
-                <div class="slider-button" onclick="changeLanguage('en')">
+            <div class="section_language-switcher">
+              <h3
+                class="section_title"
+                data-i18n="section_language-switcher-title"
+              >
+                Выберите язык
+              </h3>
+              <div class="language-slider" id="language-slider">
+                <button
+                  data-lang="en"
+                  class="language-switcher_button"
+                  onClick="changeLanguage('en')"
+                >
                   EN
-                </div>
-                <div class="slider-button" onclick="changeLanguage('ru')">
+                </button>
+                <button
+                  data-lang="ru"
+                  class="language-switcher_button"
+                  onClick="changeLanguage('ru')"
+                >
                   RU
-                </div>
-                <div class="slider-button" onclick="changeLanguage('kg')">
+                </button>
+                <button
+                  data-lang="kg"
+                  class="language-switcher_button"
+                  onclick="changeLanguage('kg')"
+                >
                   KG
-                </div>
+                </button>
               </div>
             </div>
           </section>

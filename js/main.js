@@ -12,6 +12,15 @@ window.addEventListener("scroll", () => {
   }
 });
 
+document
+  .querySelectorAll(".section_attention__button, .section_about__button")
+  .forEach((button) => {
+    button.addEventListener("touchstart", () => button.classList.add("active"));
+    button.addEventListener("touchend", () =>
+      button.classList.remove("active")
+    );
+  });
+
 function startNewStateTicker(interval, fn) {
   if (currentStateIntervalTicker) {
     clearInterval(currentStateIntervalTicker);

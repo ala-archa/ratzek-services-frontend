@@ -1,16 +1,21 @@
-const languageSlide = document.getElementById('language-slide');
+const languageSlide = document.getElementById('language-slider');
 
-document.addEventListener('DOMContentLoaded', function() {
-    languageSlide.querySelector('.slider-button:nth-child(1)').addEventListener('click', () => changeLanguage('en'));
-    languageSlide.querySelector('.slider-button:nth-child(2)').addEventListener('click', () => changeLanguage('ru'));
-    languageSlide.querySelector('.slider-button:nth-child(3)').addEventListener('click', () => changeLanguage('kg'));
-});
-  
+
   function updateContent() {
     document.querySelectorAll('[data-i18n]').forEach(function(element) {
       const key = element.getAttribute('data-i18n');
       element.innerHTML = i18next.t(key);
     });
+  }
+
+  function updateButtons() {
+    const currentLanguage = localStorage.getItem('language') || 'ru';
+   Array.from(languageSlide.children).forEach((element) => {
+    element.classList.remove('active');
+     if (element.getAttribute('data-lang') === currentLanguage) {
+       element.classList.add('active');
+     }
+   })
   }
   
   function changeLanguage(lng) {
@@ -18,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (err) return console.log('Something went wrong in loading i18n', err);
       updateContent();
       localStorage.setItem('language', lng);
-      document.getElementById('language-slider').setAttribute('data-lang', lng);
+      updateButtons();
 
     });
   }
@@ -32,6 +37,7 @@ i18next.init({
     en: {
         translation: {
           "header_title": "[Internet at Ratsek Hut]",
+          "section_language-switcher-title" : "Choose language",
           "main_address": "You can always return to this page by entering the address",
           "main_link": "http://www.ratzek 🚀",
           "section_title_always_available": "Always available, even without internet",
@@ -65,6 +71,7 @@ i18next.init({
       ru: {
         translation: {
           "header_title": "[Интернет на хижине Рацека]",
+          "section_language-switcher-title" : "Выберите язык",
           "main_address": "Вы всегда можете вернуться на эту страницу введя адрес",
           "main_link": "http://www.ratzek 🚀",
           "section_title_always_available": "Всегда доступно, даже без интернета",
@@ -98,6 +105,7 @@ i18next.init({
       kg: {
         translation: {
           "header_title": "[Рацека Хижинасындагы Интернет]",
+          "section_language-switcher-title" : "Тил тандоо",
           "main_address": "Сиз бул бетке ар дайым кайтып келсеңиз болот",
           "main_link": "http://www.ratzek 🚀",
           "section_title_always_available": "Интернетсиз дагы ар дайым жеткиликтүү",
@@ -132,5 +140,6 @@ i18next.init({
   },
 }, function(err, t) {
   if (err) return console.log('Something went wrong in loading i18n', err);
-  updateContent();
+  updateContent(),
+  updateButtons();
 });

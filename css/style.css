@@ -12,6 +12,7 @@
   --light: #d8dbe0;
   --dark: #28292c;
   --background-color: whitesmoke;
+  --background-color-button: rgb(31, 48, 104);
   --text-color: black;
   --border-section: 1px solid rgb(31, 48, 104);
 }
@@ -146,8 +147,8 @@ body.theme-dark {
   color: white;
 }
 
-.section_attention__button:hover,
-.section_about__button:hover {
+.section_attention__button.active,
+.section_about__button.active {
   background-color: orange;
   color: white;
   transition: 0.5s;
@@ -176,7 +177,6 @@ body.theme-dark {
 }
 
 /* ! theme switch */
-
 .toggle-switch {
   position: relative;
   bottom: 8px;
@@ -228,4 +228,29 @@ input:checked ~ .slider::before {
   box-shadow: none;
 }
 
-/* language switch */
+/*! language switch */
+.section_language-switcher {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.language-switcher_title {
+  text-align: center;
+}
+
+.language-switcher_button {
+  background-color: orange;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid black;
+  text-align: center;
+  cursor: pointer;
+}
+
+.language-switcher_button.active {
+  background-color: var(--background-color-button);
+}
