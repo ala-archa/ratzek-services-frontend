@@ -1,7 +1,9 @@
+const languageSlide = document.getElementById('language-slide');
+
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('language-slide').querySelector('.slider-button:nth-child(1)').addEventListener('click', () => changeLanguage('en'));
-    document.getElementById('language-slide').querySelector('.slider-button:nth-child(2)').addEventListener('click', () => changeLanguage('ru'));
-    document.getElementById('language-slide').querySelector('.slider-button:nth-child(3)').addEventListener('click', () => changeLanguage('kg'));
+    languageSlide.querySelector('.slider-button:nth-child(1)').addEventListener('click', () => changeLanguage('en'));
+    languageSlide.querySelector('.slider-button:nth-child(2)').addEventListener('click', () => changeLanguage('ru'));
+    languageSlide.querySelector('.slider-button:nth-child(3)').addEventListener('click', () => changeLanguage('kg'));
 });
   
   function updateContent() {
