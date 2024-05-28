@@ -65,7 +65,15 @@ i18next.init({
           "participant_3": "Dmitry Pavlenko — creator of the stand for the solar panel, helped with purchases and delivery of non-standard cargo.",
           "participant_4": "Evgeny Lepikhin — author of the idea, research on site, programming and configuration, installation.",
           "participant_5": "Maxim Mesh — helped with wiring.",
-          "participant_6": "Svyatoslav Deev — creator of the site you are currently on."
+          "participant_6": "Svyatoslav Deev — creator of the site you are currently on.",
+          "no_internet": "Unfortunately, there is no internet at the moment",
+          "inactive_status": "Please wait for access",
+          "client_blacklisted": "Unfortunately, internet access is restricted for you",
+          "unexpected_status": "Something went wrong, unexpected status",
+          "data_usage": "You have used {{mb_spent}} MB out of {{mb_limit}} MB at unlimited speed. Reset in {{drop_duration}}",
+          "wait_for_entrance": "Time left for entrance: {{sec}} seconds",
+          "access_granted": "YOU CAN ENTER, CLICK",
+          "request_access": "Requesting access..."
         }
       },
       ru: {
@@ -99,7 +107,15 @@ i18next.init({
       "participant_3": "Дмитрий Павленко — создатель стойки для солнечной панели, помощь с закупками и доставкой негабарита.",
       "participant_4": "Евгений Лепихин — автор идеи, исследование на местности, программирование и настройка, монтаж.",
       "participant_5": "Максим Меш — помог с распайкой проводов.",
-      "participant_6": "Святослав Деев — создатель сайта, где вы сейчас находитесь."
+      "participant_6": "Святослав Деев — создатель сайта, где вы сейчас находитесь.",
+      "no_internet": "К сожалению, интернета в данный момент нет",
+            "inactive_status": "Пожалуйста, подождите доступа",
+            "client_blacklisted": "К сожалению, для вас ограничена возможность выхода в интернет",
+            "unexpected_status": "Что-то пошло не так, неожиданный статус",
+            "data_usage": "Вы израсходовали {{mb_spent}} MB из {{mb_limit}} MB на безлимитной скорости. До сброса счетчика осталось {{drop_duration}}",
+            "wait_for_entrance": "Осталось до входа: {{sec}} секунд",
+            "access_granted": "МОЖНО ВОЙТИ, ЖМИ",
+            "request_access": "Запрашиваем доступ..."
         }
       },
       kg: {
@@ -133,7 +149,15 @@ i18next.init({
       "participant_3": "Дмитрий Павленко — күн панели үчүн стойка түзүүчү, сатып алуу жана стандартка жатпаган жүктү жеткирүү боюнча жардам берген.",
 "participant_4": "Евгений Лепихин — идеянын автору, жеринде изилдөө, программалоо жана орнотуу, монтаждоо.",
 "participant_5": "Максим Меш — зымдарды туташтырууга жардам берген.",
-"participant_6": "Святослав Деев — сиз азыр жүргөн сайттын жаратуучусу."
+"participant_6": "Святослав Деев — сиз азыр жүргөн сайттын жаратуучусу.",
+"no_internet": "Тилекке каршы, учурда интернет жок",
+            "inactive_status": "Кирүү үчүн күтө туруңуз",
+            "client_blacklisted": "Тилекке каршы, сиз үчүн интернетке кирүү чектелген",
+            "unexpected_status": "Бир нерсе туура эмес болуп калды, күтүлбөгөн статус",
+            "data_usage": "Сиз чексиз ылдамдыкта {{mb_spent}} MB колдондуңуз {{mb_limit}} MBдан. Төртүнчү эсептегичте калды {{drop_duration}}",
+            "wait_for_entrance": "Кирүү үчүн калган убакыт: {{sec}} секунд",
+            "access_granted": "КИРСЕҢИЗ БОЛОТ, БАСЫҢЫЗ",
+            "request_access": "Кирүү суралууда..."
 
         }
       }

@@ -33,12 +33,12 @@ function mainButtonTicker() {
   fetch(API_client)
     .then((resp) => resp.json())
     .then((resp) => {
-      console.log(resp);
+      console.log("🚀 ~ .then ~ resp:", resp);
 
       // Интернета нет, всё тлен. Сообщаем об этом пользователю и больше ничего не делаем.
       if (!resp.is_internet_available) {
         btn.classList = "buttonNoAccess";
-        btn.innerText = `К сожалению, интернета в данный момент нет`;
+        btn.innerText = i18next.t("no_internet");
 
         return;
       }
@@ -54,7 +54,7 @@ function mainButtonTicker() {
       // Пользователь в черном списке. Запрещаем любые действия.
       if (resp.internet_connection_status == "ClientBlacklisted") {
         btn.classList = "buttonNoAccess";
-        btn.innerText = `К сожалению, для вас ограничена возможность выхода в интернет`;
+        btn.innerText = i18next.t("client_blacklisted");
 
         return;
       }
@@ -62,7 +62,7 @@ function mainButtonTicker() {
       // Если не Inactive, то ожидалось Connected. Но не получили его. Ругаемся в консоль, ничего не делаем.
       if (!resp.internet_connection_status.Connected) {
         btn.classList = "buttonNoAccess";
-        console.log("Что-то пошло не так, нет ожидаемого статуса");
+        console.log(i18next.t("unexpected_status"));
 
         return;
       }
@@ -84,9 +84,11 @@ function mainButtonTicker() {
       const drop_duration = date.toISOString().substring(11, 19);
 
       btn.classList = "buttonAccessGranted";
-      btn.innerText =
-        `Вы израсходовали ${mb_spent} MB из ${mb_limit} на безлимитной скорости. ` +
-        `До сброса счетчика осталось ${drop_duration}`;
+      btn.innerText = i18next.t("data_usage", {
+        mb_spent,
+        mb_limit,
+        drop_duration,
+      });
     })
     .catch((error) => {
       console.error(error);
@@ -97,9 +99,9 @@ function mainButtonTicker() {
 function waitforEnterance() {
   let sec = 10;
   startNewStateTicker(1000, () => {
-    btn.innerText = `до входа осталось ${sec} сек`;
+    btn.innerText = i18next.t("wait_for_entrance", { sec });
     if (sec <= 0) {
-      btn.innerText = "МОЖНО ВОЙТИ, ЖМИ";
+      btn.innerText = i18next.t("access_granted");
       btn.classList = "buttonRequestAccess";
       btn.removeAttribute("disabled");
       clearInterval(currentStateIntervalTicker);
