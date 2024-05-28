@@ -36,7 +36,7 @@ a {
 }
 
 b {
-  color: var(--dark);
+  color: var(--text-color);
 }
 
 body {
