@@ -37,7 +37,6 @@ i18next.init({
     en: {
         translation: {
           "header_title": "[Internet at Ratsek Hut]",
-          "section_language-switcher-title" : "Choose language",
           "main_address": "You can always return to this page by entering the address",
           "main_link": "http://www.ratzek 🚀",
           "section_title_always_available": "Always available, even without internet",
@@ -79,7 +78,6 @@ i18next.init({
       ru: {
         translation: {
           "header_title": "[Интернет на хижине Рацека]",
-          "section_language-switcher-title" : "Выберите язык",
           "main_address": "Вы всегда можете вернуться на эту страницу введя адрес",
           "main_link": "http://www.ratzek 🚀",
           "section_title_always_available": "Всегда доступно, даже без интернета",
@@ -121,7 +119,6 @@ i18next.init({
       kg: {
         translation: {
           "header_title": "[Рацека Хижинасындагы Интернет]",
-          "section_language-switcher-title" : "Тил тандоо",
           "main_address": "Сиз бул бетке ар дайым кайтып келсеңиз болот",
           "main_link": "http://www.ratzek 🚀",
           "section_title_always_available": "Интернетсиз дагы ар дайым жеткиликтүү",
