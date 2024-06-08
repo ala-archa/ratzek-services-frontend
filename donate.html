@@ -1,34 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Как создавался интернет на хижине Рацека</title>
-        <link rel="stylesheet" href="./css/style.css" />
-    </head>
-    <body>
-        <div class="container">
-            <div class="wrapper">
-                <h2>Как сказать спасибо за интернет</h2>
-                <p>
-                    Сервис и доступ в интернет были созданы полностью на собственные средства. Если хотите отблагодарить, это можно сделать переводом:
-                    <ul>
-                        <li>Россия, Raiffesen: карта 5100 6914 8277 3300 либо по номеру телефона +7(926)146-23-36 (Евгений Л.)</li>
-                        <li>Россия, СБЕР: карта 2202 2036 7774 2167 либо по номеру телефона +7(925)792-87-68 (Элиза П.)</li>
-                        <li>Кыргызстан, Компаньон: кошелек на номере 0 708-455-499</li>
-                        <li>Кыргызстан, KICB: карта 5260 5206 0068 4485</li>
-                    </ul>
-                    Если эти способы вам не подходят, можете написать на johnlepikhin@gmail.com, договоримся :)
-                </p>
-                <h3>Вход и статистика</h3>
-                <div class="buttonBox">
-                    <button disabled id="ap-control" class="buttonNoAccess" onClick="click">
-                        ...
-                    </button>
-                </div>
-            </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Интернет на хижине Рацека</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <script src="https://unpkg.com/i18next@latest/dist/umd/i18next.min.js"></script>
+  </head>
+  <body>
+    <header id="header" class="header">
+      <div class="wrapper">
+        <div class="header_content">
+          <h2 class="header_title" data-i18n="header_title">
+            [Интернет на хижине Рацека]
+          </h2>
+          <div class="toggle-switch">
+            <label>
+              <input type="checkbox" class="header_theme-switcher" />
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
-        <script src="./js/main.js"></script>
-    </body>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="wrapper">
+        <div class="main_content">
+          <section class="section">
+            <div class="section_language-switcher">
+              <h3 class="section_title">Choose language / Выберите язык</h3>
+              <div class="language-slider" id="language-slider">
+                <button
+                  data-lang="en"
+                  class="language-switcher_button"
+                  onClick="changeLanguage('en')"
+                >
+                  EN
+                </button>
+                <button
+                  data-lang="ru"
+                  class="language-switcher_button"
+                  onClick="changeLanguage('ru')"
+                >
+                  RU
+                </button>
+                <button
+                  data-lang="kg"
+                  class="language-switcher_button"
+                  onClick="changeLanguage('kg')"
+                >
+                  KG
+                </button>
+              </div>
+            </div>
+          </section>
+          <section class="section">
+            <div class="section_back">
+              <a
+                class="section_attention__button"
+                href="/index.html"
+                data-i18n="back_to_home"
+              >
+                Вернуться на главную
+              </a>
+            </div>
+          </section>
+          <section class="section">
+            <div class="section_language-switcher">
+              <h3 class="section_title" data-i18n="how_to_thank">
+                Как сказать спасибо за интернет
+              </h3>
+              <p data-i18n="thank_text1">
+                Сервис и доступ в интернет были созданы полностью на собственные
+                средства. Если хотите отблагодарить, это можно сделать
+                переводом:
+              </p>
+              <ul class="section_list">
+                <li data-i18n="thank_option1">
+                  Россия, Raiffesen: карта 5100 6914 8277 3300 либо по номеру
+                  телефона +7(926)146-23-36 (Евгений Л.)
+                </li>
+                <li data-i18n="thank_option2">
+                  Россия, СБЕР: карта 2202 2036 7774 2167 либо по номеру
+                  телефона +7(925)792-87-68 (Элиза П.)
+                </li>
+                <li data-i18n="thank_option3">
+                  Кыргызстан, Компаньон: кошелек на номере 0 708-455-499
+                </li>
+                <li data-i18n="thank_option4">
+                  Кыргызстан, KICB: карта 5260 5206 0068 4485
+                </li>
+              </ul>
+              <p data-i18n="thank_text2">
+                Если эти способы вам не подходят, можете написать на
+                johnlepikhin@gmail.com, договоримся :)
+              </p>
+            </div>
+          </section>
+          <section class="section">
+            <div class="section_donate__login">
+              <h3 class="section_title" data-i18n="section_title_login">
+                Вход и статистика
+              </h3>
+              <div class="buttonBox">
+                <button
+                  disabled
+                  id="ap-control"
+                  class="section_signIn__button"
+                  data-i18n="sign_in_button"
+                  onClick="click"
+                >
+                  ...
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <script src="./js/i18n.js" defer></script>
+    <script src="./js/main.js" defer></script>
+    <script src="./js/theme.js" defer></script>
+  </body>
 </html>

@@ -130,6 +130,13 @@ body.theme-dark {
   gap: 0.5rem;
 }
 
+.section_donate__login,
+.section_back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .section_attention__text,
 .section_signIn__text {
   font-size: 0.8rem;

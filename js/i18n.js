@@ -41,7 +41,7 @@ i18next.init(
           section_title_always_available:
             "Always available, even without internet",
           section_title_services: "Useful services on the internet",
-          section_title_thank_you: "Thank you",
+          section_title_thank_you: "DONATE",
           section_thank_you_text:
             "We would appreciate partial reimbursement of expenses. Described ways to transfer donations here. About 350 man-hours of work and about 60,000 soms in 2022-2023 prices were invested in the possibility of internet appearing here. Monthly, we pay more than 1,000 soms to the mobile operator.",
           section_thank_you_button: "Thank you — click!",
@@ -83,6 +83,19 @@ i18next.init(
           wait_for_entrance: "Time left for entrance: {{sec}} seconds",
           access_granted: "YOU CAN ENTER, CLICK",
           request_access: "Requesting access...",
+          back_to_home: "Go back to the main page",
+          how_to_thank: "How to thank for the internet",
+          thank_text1:
+            "The service and internet access were created entirely at our own expense. If you want to thank us, you can do it by transferring:",
+          thank_option1:
+            "Russia, Raiffesen: card 5100 6914 8277 3300 or by phone number +7(926)146-23-36 (Evgeniy L.)",
+          thank_option2:
+            "Russia, SBER: card 2202 2036 7774 2167 or by phone number +7(925)792-87-68 (Eliza P.)",
+          thank_option3:
+            "Kyrgyzstan, Kompanion: wallet on number 0 708-455-499",
+          thank_option4: "Kyrgyzstan, KICB: card 5260 5206 0068 4485",
+          thank_text2:
+            "If these methods do not suit you, you can write to johnlepikhin@gmail.com, we will arrange something :)",
         },
       },
       ru: {
@@ -135,6 +148,19 @@ i18next.init(
           wait_for_entrance: "Осталось до входа: {{sec}} секунд",
           access_granted: "МОЖНО ВОЙТИ, ЖМИ",
           request_access: "Запрашиваем доступ...",
+          back_to_home: "Вернуться на главную",
+          how_to_thank: "Как сказать спасибо за интернет",
+          thank_text1:
+            "Сервис и доступ в интернет были созданы полностью на собственные средства. Если хотите отблагодарить, это можно сделать переводом:",
+          thank_option1:
+            "Россия, Raiffesen: карта 5100 6914 8277 3300 либо по номеру телефона +7(926)146-23-36 (Евгений Л.)",
+          thank_option2:
+            "Россия, СБЕР: карта 2202 2036 7774 2167 либо по номеру телефона +7(925)792-87-68 (Элиза П.)",
+          thank_option3:
+            "Кыргызстан, Компаньон: кошелек на номере 0 708-455-499",
+          thank_option4: "Кыргызстан, KICB: карта 5260 5206 0068 4485",
+          thank_text2:
+            "Если эти способы вам не подходят, можете написать на johnlepikhin@gmail.com, договоримся :)",
         },
       },
       kg: {
@@ -188,6 +214,19 @@ i18next.init(
           wait_for_entrance: "Кирүү үчүн калган убакыт: {{sec}} секунд",
           access_granted: "КИРСЕҢИЗ БОЛОТ, БАСЫҢЫЗ",
           request_access: "Кирүү суралууда...",
+          back_to_home: "Башкы бетке кайтуу",
+          how_to_thank: "Интернет үчүн ыраазычылык билдирүү",
+          thank_text1:
+            "Сервис жана интернетке кирүү толугу менен өз эсебинен түзүлгөн. Эгер ыраазычылык билдиргиңиз келсе, аны которуу менен жасай аласыз:",
+          thank_option1:
+            "Россия, Raiffesen: карта 5100 6914 8277 3300 же телефон номери боюнча +7(926)146-23-36 (Евгений Л.)",
+          thank_option2:
+            "Россия, СБЕР: карта 2202 2036 7774 2167 же телефон номери боюнча +7(925)792-87-68 (Элиза П.)",
+          thank_option3:
+            "Кыргызстан, Компаньон: номеринде капчык 0 708-455-499",
+          thank_option4: "Кыргызстан, KICB: карта 5260 5206 0068 4485",
+          thank_text2:
+            "Эгер бул ыкмалар сизге ылайыктуу болбосо, johnlepikhin@gmail.com жазсаңыз болот, макулдашабыз :)",
         },
       },
     },
