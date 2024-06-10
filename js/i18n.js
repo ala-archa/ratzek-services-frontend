@@ -96,6 +96,86 @@ i18next.init(
           thank_option4: "Kyrgyzstan, KICB: card 5260 5206 0068 4485",
           thank_text2:
             "If these methods do not suit you, you can write to johnlepikhin@gmail.com, we will arrange something :)",
+          about_project_title: "About the project (by Evgeniy Lepikhin)",
+          about_project_intro:
+            "One summer in 2022, Svyatoslav Deev and I (Evgeniy Lepikhin) were given a ride to Ala-Archa by a man. During our conversation, we found out that he was the director of the Kyrgyz Hydrometeorological Center. We remembered that there was some weather station near Ratsek Hut. A reasonable question arose: 'How do you transmit data from there?'. It turned out that there is local MegaCom reception. Further field research showed that the weather station had long since ceased to function. But the very fact that it was possible to establish communication right near the hut intrigued me greatly.",
+          about_project_part1:
+            "I bought a Mikrotik LHG dish and installed various software on my phone to receive raw telemetry from a GSM receiver. I ran back and forth across the moraine for a long and painful time. The dish stubbornly showed zero, sometimes demonstrating some residual signal at a loss level. However, the phone in one place showed as much as two bars and -82 dBm. However, neither calls nor at least 2G could be squeezed out.",
+          about_project_part2:
+            "Okay. It is known that dish antennas do not get along with reflected signals — and there is, of course, no direct line of sight on the moraine. I bought a cheaper, but sector antenna. Again zero. But on the old helicopter pad, right above the stone hut, I caught as much as 3G, but no matter how much I spun — I couldn't squeeze more than 30Kbit/s. Such a speed in modern realities is suitable for the leisurely (tens of seconds) sending of text messages in Telegram and very slow (minutes) loading of simple sites. But it's shameful to offer people this.",
+          about_project_part3:
+            "And then Vasya Tsarevsky, simultaneously with my colleagues, suggested organizing a radio bridge from the 'phone booth'. I soldered mobile power for the dish and the wifi access point. I went with this junk to the phone booth. Almost losing my fingers from the December frost, without aiming much, I caught 6.5Mbit inbound and 3Mbit outbound. It's a victory! But — there is no electricity at the phone booth, and the radio bridge costs money.",
+          about_project_part4:
+            "Further research began on the emerging problems. We had the following tasks ahead of us:",
+          about_project_tasks:
+            "Organizing a radio bridge. None of us are network engineers, so we had to figure it out from scratch. Power supply for the radio bridge. Vasya, being an electronics specialist, actively joined in solving the problem. The channel is still weak, and any connected user will clog it with some torrents. I took on the task of making the service free for everyone, fairly dividing the bandwidth, and providing local services (video, guidebooks, books, forum, etc.). For local services and organizing convenient internet access, a beautiful local site was needed. Svyatoslav took care of it.",
+          about_project_part5:
+            "It took us the entire fall and winter to solve these problems. I programmed various services, automated their deployment. Created a backend that controls internet access. Vasya actively consulted on the solar panel, power supply, and soldered a whole controller on Arduino. Svyatoslav created the frontend for the captive portal and the main page.",
+          about_project_part6:
+            "Then an interesting dialogue occurred with Denis Vaulin. He explained that you can't just place and secure a solar panel on the stones. The problem crept up unexpectedly: the solar panel heats up in the sun, and mountain goats love warmth. And they also love to scratch their horns. Therefore, it was strongly recommended to raise the equipment off the ground. At this point, Dima Pavlenko unexpectedly joined our project. He took on the construction of a stand for the solar panel at the phone booth and helped a lot with the transportation of oversized cargo. In addition, there was a problem with snow accumulation, but Vasya calculated that in winter the panel should be installed at an angle of 58 degrees: this will give less energy in summer, but much more efficiently in winter when the daylight hours are very short.",
+          about_project_part7:
+            "About 30 kilograms of oversized cargo had to be carried up. Vasya and I did this together. Dima Dobrokhotov, who accidentally turned out to be in the right place at the right time with a crimper in his hands, helped with the installation on site.",
+          about_project_part8:
+            "Future plans? Currently, our repeater operates solely on solar energy. In other words, there is no internet at night. We plan to install a second panel, a battery block, and a charge controller there. Then we will have internet around the clock. The very approximate cost of equipment for the idea is 40 thousand soms.",
+          used_equipment_title: "Used equipment",
+          used_equipment_intro:
+            "The following equipment was purchased for the project:",
+          used_equipment_item1: "Mikrotik LHG6 kit — receiving dish.",
+          used_equipment_item2: "Mikrotik SXTsq Lite5 2 pcs. — radio bridge",
+          used_equipment_item3:
+            "Solar panel SM 100-12 P (100W, Polycrystalline)",
+          used_equipment_item4:
+            "Charge controller Victron BlueSolar MPPT 75/15",
+          used_equipment_item5: "Gel battery DTM 1240 L",
+          used_equipment_item6:
+            "Arduino nano, DC-DC module, high-capacity capacitors, radio components — power controller at the phone booth",
+          used_equipment_item7:
+            "Raspberry Pi 4 — local services at the hut, traffic control",
+          used_equipment_item8:
+            "Some USB Wi-Fi network card with an external antenna — distributing internet as widely as possible",
+          used_equipment_item9:
+            "256GB SSD disk — a more reliable and faster storage method compared to MicroSD, which also serves as the main disk for RPI",
+          used_equipment_item10:
+            "BMP280 — temperature, pressure, and humidity sensor",
+          used_equipment_item11:
+            "A bunch of beams, wires, corrugation, mounting corners",
+          used_equipment_additional:
+            "In addition, a sector MIMO antenna, LTE modem, a couple of DC-DC modules, and a wifi access point had to be purchased for field experiments and research.",
+          software_used_title: "Software under the hood",
+          software_used_intro:
+            "All source codes can be found in our project group on Github. If we talk in more detail:",
+          software_used_item1:
+            "Raspbian OS — operating system used on Raspberry PI",
+          software_used_item2:
+            "ipset, iptables, dhcpd, hostapd, bind — internet distribution, network traffic management",
+          software_used_item3:
+            "Custom backend and frontend for managing the captive portal",
+          software_used_item4: "Lemmy — blog",
+          software_used_item5:
+            "MiniDLNA — media file distribution for those players that support DLNA",
+          software_used_item6:
+            "Custom mirroring systems for weather forecasts, guidebooks. Based on httrack and yt-dl",
+          software_used_item7:
+            "Ansible — service deployment system on Raspberry PI",
+          software_used_item8:
+            "Grafana — displaying beautiful graphs based on weather data and monitoring the internal state of systems",
+          software_used_item9:
+            "bsbmp-exporter — delivering data from the weather station sensor to the system",
+          software_used_item10:
+            "mikrotik-exporter — delivering data from antennas to the system",
+          software_used_item11:
+            "openvpn — possibility to administer the entire system from afar",
+          section_title_thank_you: "Thank you",
+          section_thank_you_text:
+            "We would appreciate partial reimbursement of expenses. <a href='/donate.html' class='otherlink' data-i18n='donate_link'>Here</a> are described the ways to transfer donations. About 350 man-hours of work and about 60,000 soms in 2022-2023 prices were invested in the possibility of the internet appearing here. We pay the mobile operator more than 1,000 soms monthly.",
+          about_project_task1:
+            "Organizing a radio bridge. None of us are network engineers, so we had to figure it out from scratch.",
+          about_project_task2:
+            "Power supply for the radio bridge. Vasya, being an electronics specialist, actively joined in solving the problem.",
+          about_project_task3:
+            "The channel is still weak, and any connected user will clog it with some torrents. I took on the task of making the service free for everyone, fairly dividing the bandwidth, and providing local services (video, guidebooks, books, forum, etc.).",
+          about_project_task4:
+            "For local services and organizing convenient internet access, a beautiful local site was needed. Svyatoslav took care of it.",
         },
       },
       ru: {
@@ -161,6 +241,88 @@ i18next.init(
           thank_option4: "Кыргызстан, KICB: карта 5260 5206 0068 4485",
           thank_text2:
             "Если эти способы вам не подходят, можете написать на johnlepikhin@gmail.com, договоримся :)",
+
+          about_project_title: "О проекте (от Евгения Лепихина)",
+          about_project_intro:
+            "Однажды летом 2022 года нас (Святослав Деев и Евгений Лепихин) подвозил в Ала-Арчу какой-то мужик. В процессе разговоров выяснилось, что он директор Кыргызгидметеоцентра. Вспомнили, что рядом с хижиной Рацека находится какая-то метеостанция. Возник резонный вопрос: 'А как вы оттуда передаете данные?'. Оказалось, что там ловит местный Мегаком. Дальнейшие полевые исследования показали, что метеостанция давно не работает. Но сам факт возможности организации связи прямо около хижины сильно меня заинтриговал.",
+          about_project_part1:
+            "Купил тарелку Mikrotik LHG, поставил на телефон разный софт, позволяющий получать с GSM-приемника сырую телеметрию. Долго и мучительно бегал по морене туда-сюда. Тарелка упорно показывала ноль, иногда демонстрируя какой-то остаточный сигнал на уровне потери. Зато телефон в одном месте показал аж целых две палки и -82 dBm. Правда, ни звонков, ни тем более хотя бы 2G выжать никак не удавалось.",
+          about_project_part2:
+            "Ладно. Известно, что антенны типа тарелок не дружат с отраженным сигналом — а прямой видимости на морене конечно же нет. Купил антенну подешевле, зато секторную. Опять ноль. Зато на старой вертолетке, прямо над каменной хижиной, поймал аж 3G, однако сколько бы я ни крутился — скорость выше 30Kbit/s выжать не получалось. Такая скорость в современных реалиях подойдет для неспешной (десятки секунд) отправки текстовых сообщений в Telegram, и очень медленной (минуты) загрузки простых сайтов. Но такое людям предлагать стыдно.",
+          about_project_part3:
+            "И вот Вася Царевский одновременно с моими коллегами предложили организовать радиомост со 'звонилки'. Спаял мобильное питание для тарелки и wifi-точки доступа. Сходил с этим барахлом на звонилку. Чуть не лишившись пальцев от морозов декабря, особо не целясь поймал 6.5Mbit на вход и 3Mbit на выход. Это победа! Но — на звонилке нет электричества, да и радиомост стоит денег.",
+          about_project_part4:
+            "Дальше начались изыскания по возникшим проблемам. Перед нами стояли задачи:",
+          about_project_tasks:
+            "Организация радиомоста. Никто из нас не является сетевым инженером, пришлось разбираться с нуля. Питание для радиомоста. Вася, будучи электронщиком, активно подключился к решению проблемы. Канал всё равно слабый, и любой подключившийся завалит его какими-нибудь торрентами. Этой задачей занялся я. Поставил себе задачу сделать сервис, бесплатный для всех, справедливо делящий полосу, предоставляющий локальные сервисы (видео, гайдбуки, книги, форум и т.д.). Для локальных сервисов и организации удобного доступа в интернет нужен был красивый локальный сайт. Им занялся Святослав.",
+          about_project_part5:
+            "На решение этих задач у нас ушли осень и вся зима. Я напрограммировал всяких сервисов, автоматизировал их разворачивание. Создал бэкенд, управляющий доступом в интернет. Вася активно консультировал по солнечной панели, питанию, и спаял аж целый контроллер на Arduino. Святослав сделал <a href='https://github.com/ala-archa/ratzek-services-frontend'>фронтенд</a>,  для captive portal и вообще главную страницу.",
+          about_project_part6:
+            "Дальше случился интересный диалог с Денисом Ваулиным. Он пояснил, что нельзя просто так взять и поставить и закрепить солнечную панель на камнях. Проблема подкралась с неожиданной стороны: солнечная панель нагревается на солнце, а горные козлы любят тепло. А ещё они любят чесать рога. Поэтому настоятельно рекомендовано было поднять оборудование над землей. И тут к нашему проекту неожиданно присоединился Дима Павленко, который взял на себя строительство стойки для солнечной панели на звонилке и здорово помог с транспортировкой негабаритного груза. Кроме того, была проблема оседания снега, но Вася посчитал, что зимой панель надо ставить под углом 58 градусов: это даст меньше энергии летом, но куда более эффективно зимой, когда световой день очень короткий.",
+          about_project_part7:
+            "Наверх пришлось занести порядка 30 килограмм негабаритного груза. Этим занялись мы вдвоем с Васей. С монтажом на месте помог Дима Доброхотов, который случайно оказался в нужном месте в нужное время с кримпером в руках.",
+          about_project_part8:
+            "Планы дальше? Сейчас у нас ретранслятор работает исключительно на солнечной энергии. Иначе говоря, ночью интернета нет. В планах поставить туда вторую панель, блок аккумуляторов и контроллер заряда. Тогда у нас будет интернет круглосуточно. Очень ориентировочная стоимость оборудования для идеи — 40 тысяч сом.",
+          used_equipment_title: "Использованное оборудование",
+          used_equipment_intro: "Для проекта было куплено оборудование:",
+          used_equipment_item1: "Mikrotik LHG6 kit — приемная тарелка.",
+          used_equipment_item2: "Mikrotik SXTsq Lite5 2 шт. — радиомост",
+          used_equipment_item3:
+            "Солнечная панель SM 100-12 P (100Вт, Поликристалл)",
+          used_equipment_item4:
+            "Контроллер заряда Victron BlueSolar MPPT 75/15",
+          used_equipment_item5: "Гелевый аккумулятор DTM 1240 L",
+          used_equipment_item6:
+            "Arduino nano, DC-DC модуль, конденсаторы высокой емкости, рассыпуха радиодеталей — контроллер питания на звонилке",
+          used_equipment_item7:
+            "Raspberry Pi 4 — локальные сервисы в хижине, контроль трафика",
+          used_equipment_item8:
+            "Какая-то USB Wi-fi сетевая карта с внешней антенной — раздача интернета насколько возможно широко",
+          used_equipment_item9:
+            "SSD диск на 256GB — более надежный и быстрый по сравнению с MicroSD способ хранения данных, который также служит главным диском для RPI",
+          used_equipment_item10:
+            "BMP280 — датчик температуры, давления и влажности",
+          used_equipment_item11:
+            "Куча бруса, проводов, гофры, уголки для монтажа",
+          used_equipment_additional:
+            "Кроме этого, для экспериментов и изысканий на местности пришлось купить секторную MIMO антенну, LTE-модем, пару DC-DC модулей, wifi-точку доступа.",
+          software_used_title: "Софт под капотом",
+          software_used_intro:
+            "Все исходники можно найти в нашей группе проектов на <a href='https://github.com/ala-archa'>Github</a>. Если говорить подробнее:",
+          software_used_item1:
+            "Raspbian OS — использованная операционная система на Raspberry PI",
+          software_used_item2:
+            "ipset, iptables, dhcpd, hostapd, bind — раздача интернета, управление сетевым трафиком",
+          software_used_item3:
+            "Самописный бэкенд и фронтенд для управления captive порталом",
+          software_used_item4: "Lemmy — блог",
+          software_used_item5:
+            "MiniDLNA — раздача медиа-файлов для тех плееров, которые умеют DLNA",
+          software_used_item6:
+            "Самописные системы зеркалирования прогноза погоды, гайдбуков. Основаны на httrack и yt-dl",
+          software_used_item7:
+            "Ansible — система разворачивания сервисов на Raspberry PI",
+          software_used_item8:
+            "Grafana — отображение красивых графиков по данным погоды, а также мониторинг внутреннего состояния систем",
+          software_used_item9:
+            "bsbmp-exporter — поставка данных с датчика метеостанции в систему",
+          software_used_item10:
+            "mikrotik-exporter — поставка данных с антенн в систему",
+          software_used_item11:
+            "openvpn — возможность администрирования всей системой с большой земли",
+          section_title_thank_you: "Поблагодарить",
+          section_thank_you_text:
+            "Будем благодарны за частичную компенсацию расходов. <a href='/donate.html' class='otherlink' data-i18n='donate_link'>Здесь</a> описаны способы перевода донатов. В возможность появления здесь интернета было вложено порядка 350 человеко-часов работы и около 60.000 сом в ценах 2022-2023 годов. Ежемесячно сотовому оператору мы оплачиваем более 1000 сом.",
+          section_thank_you_button: "Поблагодарить — жми!",
+
+          about_project_task1:
+            "Организация радиомоста. Никто из нас не является сетевым инженером, пришлось разбираться с нуля.",
+          about_project_task2:
+            "Питание для радиомоста. Вася, будучи электронщиком, активно подключился к решению проблемы.",
+          about_project_task3:
+            "Канал всё равно слабый, и любой подключившийся завалит его какими-нибудь торрентами. Этой задачей занялся я. Поставил себе задачу сделать сервис, бесплатный для всех, справедливо делящий полосу, предоставляющий локальные сервисы (видео, гайдбуки, книги, форум и т.д.).",
+          about_project_task4:
+            "Для локальных сервисов и организации удобного доступа в интернет нужен был красивый локальный сайт. Им занялся Святослав.",
         },
       },
       kg: {
@@ -227,6 +389,85 @@ i18next.init(
           thank_option4: "Кыргызстан, KICB: карта 5260 5206 0068 4485",
           thank_text2:
             "Эгер бул ыкмалар сизге ылайыктуу болбосо, johnlepikhin@gmail.com жазсаңыз болот, макулдашабыз :)",
+          about_project_title: "Долбоор жөнүндө (Евгений Лепихин тарабынан)",
+          about_project_intro:
+            "Бир жолу 2022-жылдын жайында (Святослав Деев жана мен (Евгений Лепихин) Ала-Арчага бир киши менен барган элек. Сүйлөшүү учурунда ал Кыргызгидромет борборунун директору экенин билдик. Рацека хижинасынын жанында кандайдыр бир метеостанция бар экенин эстедик. 'Сиз андан кантип маалымат жөнөтөсүз?' деген суроо пайда болду. Ал жерде жергиликтүү Мегаком тармагы бар экен. Андан аркы талаа изилдөөлөрү метеостанциянын көптөн бери иштебей калганын көрсөттү. Бирок, хижинанын жанында байланыш уюштуруу мүмкүнчүлүгү мени абдан кызыктырды.",
+          about_project_part1:
+            "Mikrotik LHG табагын сатып алып, телефондун GSM кабылдагычынан чийки телеметрияны алууга мүмкүндүк берген ар кандай программаларды орноттум. Морена аркылуу ары-бери узак жана оор жүгүрдүм. Табак нөл көрсөткөн бойдон калды, кээде жоготуу деңгээлинде кандайдыр бир калган сигналды көрсөттү. Бирок телефон бир жерде эки сызык жана -82 dBm көрсөткөн. Бирок, чалуулар да, жок эле дегенде, 2G иштебей калды.",
+          about_project_part2:
+            "Жарайт. Белгилүү болгондой, табак антенналары чагылдырылган сигналдар менен жакшы иштешпейт — жана моренада түз көрүнүш жок. Антеннаны арзаныраак сатып алдым, бирок сектордук. Дагы нөл. Бирок, таш хижинанын үстүндөгү эски тик учак аянтында мен 3G кармадым, бирок канча кутулсам да — 30Kbit/s ашык чыкпады. Мындай ылдамдык азыркы реалдуулукта Telegram'да тексттик билдирүүлөрдү жай (бир нече секунд) жөнөтүүгө жана жөнөкөй сайттарды өтө жай (мүнөттөр) жүктөөгө ылайыктуу. Бирок адамдарга муну сунуштоо уят.",
+          about_project_part3:
+            "Андан кийин Василий Царевский жана менин кесиптештерим 'телефон бурасынан' радиокөпүрө уюштурууну сунушташты. Табакка жана Wi-Fi кирүү чекитине мобилдик кубаттуулук жасадым. Декабрдын үшүгүнөн манжаларымдан ажырап кала жаздап, 6,5Mbit кирүү жана 3Mbit чыгуу кармадым. Бул жеңиш! Бирок — телефон бурасында электр жок, жана радиокөпүрө акча талап кылат.",
+          about_project_part4:
+            "Кийинки изилдөөлөр пайда болгон көйгөйлөр боюнча башталды. Биздин алдыбызда төмөнкү милдеттер турган:",
+          about_project_tasks:
+            "Радиокөпүрөнү уюштуруу. Биздин эч кимибиз тармак инженери эмеспиз, андыктан нөлдөн түшүнүүгө туура келди. Радиокөпүрөгө кубат берүү. Василий электронщик болгондуктан, көйгөйдү чечүүгө активдүү катышты. Канал дагы эле алсыз жана каалаган колдонуучу аны ар кандай торенттер менен бөгөп коёт. Мен бул кызматты бардык адамдарга адилет бөлүштүрүүчү жана жергиликтүү кызматтарды (видео, гидбуктар, китептер, форум ж.б.) камсыз кылуу максатын койгом. Жергиликтүү кызматтар жана интернетке ыңгайлуу жеткиликтүүлүктү уюштуруу үчүн кооз жергиликтүү сайт керек болчу. Аны Святослав ишке ашырды.",
+          about_project_part5:
+            "Бул маселелерди чечүү үчүн бүтүндөй күздөн кышка чейин убакыт кетти. Мен ар кандай кызматтарды программаладым, алардын жайылышын автоматташтырдым. Интернетке жетүүнү көзөмөлдөгөн backend түздүм. Василий күн панели боюнча, кубаттуулук берүү жана Arduino'да бүтүндөй контроллер жасоо боюнча активдүү консультация берди. Святослав Captive портал үчүн frontend жана башкы баракты жасады.",
+          about_project_part6:
+            "Денис Ваулин менен кызыктуу диалог болду. Ал күн панелин таштарга орнотуу жана бекитүү жөнөкөй эмес экенин түшүндүрдү. Көйгөй күтүлбөгөн жерден пайда болду: күн панел күндө ысып, тоо текелери жылуулукту жакшы көрүшөт. Анан дагы алар мүйүздөрүн тырмап жакшы көрүшөт. Ошондуктан жабдууларды жерден көтөрүү сунушталды. Бул учурда биздин долбоорго Дима Павленко күтүлбөгөн жерден кошулду. Ал телефон бурасындагы күн панели үчүн стойканы курууну өзүнө алды жана өлчөмсүз жүктү жеткирүүдө чоң жардам берди. Мындан тышкары, кардын чөгүшү көйгөйү болгон, бирок Василий кышында панелди 58 градус бурчта коюу керек деп эсептеген: бул жайында азыраак энергия берет, бирок күн кыска болгон кышында кыйла натыйжалуу болот.",
+          about_project_part7:
+            "Жогору жакка болжол менен 30 килограмм өлчөмсүз жүк көтөрүүгө туура келди. Бул ишти Василий экөөбүз бирге аткардык. Дима Доброхотов монтажда жардам берди, ал кокусунан керектүү убакта керектүү жерде кримпер менен турган.",
+          about_project_part8:
+            "Келечек пландары? Азыркы учурда биздин ретранслятор толугу менен күн энергиясында иштейт. Башкача айтканда, түнкүсүн интернет жок. Биз экинчи панелди, аккумулятор блогу жана заряддоо контроллерин орнотууну пландаштыруудабыз. Анда бизде интернет күнү-түнү болот. Идея үчүн жабдуулардын болжолдуу баасы 40 миң сом.",
+          used_equipment_title: "Колдонулган жабдуулар",
+          used_equipment_intro: "Долбоор үчүн төмөнкү жабдуулар сатып алынган:",
+          used_equipment_item1: "Mikrotik LHG6 кит — кабыл алуучу табак.",
+          used_equipment_item2: "Mikrotik SXTsq Lite5 2 даана — радиокөпүрө",
+          used_equipment_item3: "Күн панели SM 100-12 P (100Вт, поликристалл)",
+          used_equipment_item4:
+            "Заряд контроллёру Victron BlueSolar MPPT 75/15",
+          used_equipment_item5: "Гелдик аккумулятор DTM 1240 L",
+          used_equipment_item6:
+            "Arduino nano, DC-DC модул, жогорку сыйымдуулуктагы конденсаторлор, радио компоненттер — телефон бурасындагы кубат контроллеру",
+          used_equipment_item7:
+            "Raspberry Pi 4 — хижинадагы жергиликтүү кызматтар, трафикти көзөмөлдөө",
+          used_equipment_item8:
+            "Кайсы бир USB Wi-Fi тармак картасы тышкы антеннасы менен — интернетти мүмкүн болушунча кеңири таратуу",
+          used_equipment_item9:
+            "256GB SSD диски — MicroSD менен салыштырганда ишенимдүү жана ылдам сактоо ыкмасы, ошондой эле RPI үчүн негизги диск болуп кызмат кылат",
+          used_equipment_item10:
+            "BMP280 — температура, басым жана нымдуулук сенсору",
+          used_equipment_item11:
+            "Көптөгөн брус, зымдар, гофр, монтаждоо бурчтары",
+          used_equipment_additional:
+            "Мындан тышкары, талаа эксперименттери жана изилдөөлөр үчүн сектордук MIMO антенна, LTE модем, бир жуп DC-DC модул жана Wi-Fi кирүү чекити сатып алынды.",
+          software_used_title: "Колдонулган программалык камсыздоо",
+          software_used_intro:
+            "Бардык баштапкы коддорду биздин долбоорлор топтомунда табууга болот <a href='https://github.com/ala-archa'>Github'да</a>. Эгерде кененирээк айтсак:",
+          software_used_item1:
+            "Raspbian OS — Raspberry PIде колдонулган операциялык система",
+          software_used_item2:
+            "ipset, iptables, dhcpd, hostapd, bind — интернетти таратуу, тармактык трафикти башкаруу",
+          software_used_item3:
+            "Колдонулган backend жана frontend captive порталды башкаруу үчүн",
+          software_used_item4: "Lemmy — блог",
+          software_used_item5:
+            "MiniDLNA — DLNA колдогон плеерлер үчүн медиа-файлдарды таратуу",
+          software_used_item6:
+            "Аба ырайынын божомолу, гидбуктарды айландыруу үчүн колдонулган тутумдар. httrack жана yt-dl негизделген",
+          software_used_item7:
+            "Ansible — Raspberry PIде кызматтарды жайылтуу тутуму",
+          software_used_item8:
+            "Grafana — аба ырайынын маалыматтары боюнча кооз графиктерди көрсөтүү, ошондой эле системалардын ички абалын көзөмөлдөө",
+          software_used_item9:
+            "bsbmp-exporter — метеостанциянын сенсорунан маалымат берүү тутумга",
+          software_used_item10:
+            "mikrotik-exporter — антенналардан маалымат берүү тутумга",
+          software_used_item11:
+            "openvpn — чоң жерден бүткүл системаны башкаруу мүмкүнчүлүгү",
+          section_title_thank_you: "Ыраазычылык билдирүү",
+          section_thank_you_text:
+            "Чыгымдарды жарым-жартылай жабууга жардам бергениңизге ыраазы болобуз. Донорлук кылуунун жолдору <a href='/donate.html' class='otherlink' data-i18n='donate_link'>бул жерде</a> сүрөттөлгөн. Бул жерде интернеттин пайда болуу мүмкүнчүлүгүнө болжол менен 350 адам-саат жумуш жана 2022-2023-жылдардагы баалар менен 60,000 сом салынган. Биз айына мобилдик операторго 1,000 сомдон ашык төлөйбүз.",
+
+          about_project_task1:
+            "Радиокөпүрөнү уюштуруу. Биздин эч кимибиз тармак инженери эмеспиз, андыктан нөлдөн түшүнүүгө туура келди.",
+          about_project_task2:
+            "Радиокөпүрөгө кубат берүү. Василий электронщик болгондуктан, көйгөйдү чечүүгө активдүү катышты.",
+          about_project_task3:
+            "Канал дагы эле алсыз жана каалаган колдонуучу аны ар кандай торенттер менен бөгөп коёт. Мен бул кызматты бардык адамдарга адилет бөлүштүрүүчү жана жергиликтүү кызматтарды (видео, гидбуктар, китептер, форум ж.б.) камсыз кылуу максатын койгом.",
+          about_project_task4:
+            "Жергиликтүү кызматтар жана интернетке ыңгайлуу жеткиликтүүлүктү уюштуруу үчүн кооз жергиликтүү сайт керек болчу. Аны Святослав ишке ашырды.",
         },
       },
     },

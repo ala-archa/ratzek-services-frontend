@@ -124,7 +124,8 @@ body.theme-dark {
 .section_attention,
 .section_signIn,
 .section_about,
-.section_language-switcher {
+.section_language-switcher,
+.section_donate {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -135,6 +136,12 @@ body.theme-dark {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.section_how-its-done {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 .section_attention__text,
