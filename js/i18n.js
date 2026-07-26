@@ -35,6 +35,8 @@ i18next.init(
       en: {
         translation: {
           header_title: "[Internet at Ratsek Hut]",
+          entry_banner:
+            "📶 To get online, please read this page. It only takes about a minute.",
           main_address:
             "You can always return to this page by entering the address",
           main_link: "http://www.ratzek 🚀",
@@ -183,6 +185,8 @@ i18next.init(
       ru: {
         translation: {
           header_title: "[Интернет на хижине Рацека]",
+          entry_banner:
+            "📶 Чтобы войти в интернет — прочитайте эту страницу. Это займёт всего одну минуту.",
           main_address:
             "Вы всегда можете вернуться на эту страницу, введя адрес",
           main_link: "http://www.ratzek 🚀",
@@ -332,6 +336,8 @@ i18next.init(
       kg: {
         translation: {
           header_title: "[Рацек Хижинасындагы Интернет]",
+          entry_banner:
+            "📶 Интернетке кирүү үчүн бул баракты окуп чыгыңыз. Бул болгону бир мүнөт убакытты алат.",
           main_address:
             "Сиз бул бетке ар дайым төмөнкү дарек аркылуу кайтып келсеңиз болот",
           main_link: "http://www.ratzek 🚀",

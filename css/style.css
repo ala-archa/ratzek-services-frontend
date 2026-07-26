@@ -271,3 +271,20 @@ input:checked ~ .slider::before {
 .language-switcher_button.active {
   background-color: var(--background-color-button);
 }
+
+/*! entry banner */
+.banner {
+  background-color: #e8590c;
+  color: #fff;
+  border-radius: 5px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 8px 8px 8px 0px rgba(34, 60, 80, 0.2);
+}
+
+.banner_text {
+  font-family: JetBrains;
+  font-weight: 900;
+  font-size: 1.3rem;
+  line-height: 1.4;
+}
