@@ -1,0 +1,38 @@
+{
+  "contract_version": 2,
+  "generator_version": "0.3.0",
+  "issued_at_utc": "2026-07-27T13:00:00Z",
+  "issued_at_local": "2026-07-27T19:00:00+06:00",
+  "timezone": "Asia/Bishkek",
+  "base_altitude_m": 3370,
+  "age_minutes": 5,
+  "stale": false,
+  "mode": "zambretti",
+  "alarm": "deterioration",
+  "notes": [],
+  "zambretti": { "code": 25, "calibrated": true, "trend_known": true },
+  "alpine_availability": { "status": "none", "reason": "no_pressure_levels", "cape": false, "levels_600": false, "levels_500": false, "precip_prob": false, "gusts": false },
+  "current": {
+    "pressure_hpa": 680.0,
+    "temperature_c": 9.0,
+    "humidity_pct": 90,
+    "cloud_cover_pct": 60,
+    "cloud_age_minutes": 12,
+    "fog": false,
+    "tendency_hpa_per_3h": -1.2,
+    "tendency_unknown_reason": null,
+    "obs_coverage_pct": 96
+  },
+  "window": null,
+  "thunder": null,
+  "night": null,
+  "sun": {
+    "sunrise_local": "2026-07-27T05:37:00+06:00",
+    "sunset_local": "2026-07-27T20:42:00+06:00",
+    "civil_dawn_local": "2026-07-27T05:03:00+06:00",
+    "civil_dusk_local": "2026-07-27T21:15:00+06:00",
+    "daylight_hours": 15.1
+  },
+  "sources": { "obs_status": "fresh", "nwp_status": "unavailable", "models_used": [], "nwp_age_minutes": null, "bias_corrections_applied": 0 },
+  "hourly": []
+}

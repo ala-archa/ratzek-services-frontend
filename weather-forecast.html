@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title data-i18n="wf_title">Прогноз погоды — хижина Рацека</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <script src="/js/i18next.min.js"></script>
+  </head>
+  <body>
+    <header id="header" class="header">
+      <div class="wrapper">
+        <div class="header_content">
+          <div class="language-slider" id="language-slider">
+            <button
+              data-lang="en"
+              class="language-switcher_button"
+              onclick="changeLanguage('en')"
+            >
+              EN
+            </button>
+            <button
+              data-lang="ru"
+              class="language-switcher_button"
+              onclick="changeLanguage('ru')"
+            >
+              RU
+            </button>
+            <button
+              data-lang="kg"
+              class="language-switcher_button"
+              onclick="changeLanguage('kg')"
+            >
+              KG
+            </button>
+          </div>
+          <div class="toggle-switch">
+            <label>
+              <input
+                type="checkbox"
+                class="header_theme-switcher"
+                aria-label="Тёмная тема / Dark theme"
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="wrapper">
+        <div class="main_content">
+          <section class="section">
+            <div class="section_back">
+              <a
+                class="section_attention__button"
+                href="/index.html"
+                data-i18n="back_to_home"
+              >
+                Вернуться на главную
+              </a>
+            </div>
+          </section>
+
+          <!-- Заголовок страницы + строка свежести (заполняется weather.js) -->
+          <h1 class="wf-h1" data-i18n="wf_heading">Прогноз погоды на хижине Рацека</h1>
+          <p id="wf-updated" class="wf-updated" aria-live="polite"></p>
+
+          <!-- Слоты; наполняет js/weather.js -->
+          <div id="wf-banners" aria-live="polite"></div>
+          <div id="wf-current"></div>
+          <div id="wf-alpine"></div>
+          <div id="wf-window"></div>
+          <div id="wf-thunder"></div>
+          <div id="wf-night"></div>
+          <div id="wf-sun"></div>
+          <div id="wf-hourly"></div>
+          <div id="wf-sources"></div>
+        </div>
+      </div>
+    </main>
+    <script src="./js/i18n.js" defer></script>
+    <script src="./js/theme.js" defer></script>
+    <script src="./js/weather.js" defer></script>
+  </body>
+</html>

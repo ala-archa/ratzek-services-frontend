@@ -18,6 +18,9 @@
   --link-color: #c2410c; /* burnt orange: 4.7:1 on whitesmoke (WCAG AA) */
   --accent-fill: #c2410c; /* orange button fill: white text 5.2:1 */
   --on-accent: #ffffff;
+  --ok: #1b7a3d;
+  --warn: #c2410c;
+  --danger: #b00020;
 }
 
 * {
@@ -353,4 +356,202 @@ input:checked ~ .slider::before {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/*! weather forecast page */
+.wf-h1 {
+  font-family: JetBrains;
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.wf-updated {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+.wf-updated--warn {
+  color: var(--warn);
+  opacity: 1;
+}
+.wf-updated--stale {
+  color: var(--danger);
+  font-weight: 700;
+  opacity: 1;
+}
+
+.wf-banner {
+  border-radius: 5px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.wf-banner--info {
+  background-color: rgb(31, 48, 104);
+}
+.wf-banner--warn {
+  background-color: var(--warn);
+}
+.wf-banner--danger {
+  background-color: var(--danger);
+}
+
+.wf-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+.wf-sub {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+.wf-note {
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+.wf-strong {
+  font-weight: 700;
+}
+.wf-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-bottom: 1px dotted rgba(127, 127, 127, 0.35);
+  padding-bottom: 0.2rem;
+}
+.wf-kv__k {
+  opacity: 0.8;
+}
+.wf-kv__v {
+  font-family: JetBrains;
+  text-align: right;
+}
+
+.wf-warnbox {
+  border-color: var(--warn);
+}
+
+.wf-chip {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 0.1rem 0.5rem;
+  color: #fff;
+  font-size: 0.78rem;
+}
+.wf-q-ok {
+  background-color: var(--ok);
+}
+.wf-q-warn {
+  background-color: var(--warn);
+}
+.wf-q-bad {
+  background-color: var(--danger);
+}
+.wf-q-unknown {
+  background-color: #6b7280;
+}
+
+.wf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.wf-table th,
+.wf-table td {
+  text-align: right;
+  padding: 0.15rem 0.3rem;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.25);
+}
+.wf-table th:first-child,
+.wf-table td:first-child {
+  text-align: left;
+}
+
+.wf-risk {
+  display: inline-block;
+  background-color: var(--warn);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.7rem;
+  margin: 0.1rem 0.1rem 0 0;
+}
+.wf-risk--unknown {
+  background-color: #6b7280;
+}
+
+/* altitude selector: reuse the segmented language-switcher look, smaller */
+.wf-altsel {
+  margin: 0.4rem 0;
+}
+.wf-altsel .language-switcher_button {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+/* hourly timeline scrolls INSIDE itself — the page never scrolls sideways */
+.wf-timeline {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  -webkit-overflow-scrolling: touch;
+}
+.wf-hour {
+  flex: 0 0 auto;
+  width: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-radius: 5px;
+  padding: 0.2rem 0.15rem;
+  font-size: 0.72rem;
+}
+.wf-hour__q {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+}
+.wf-hour__t {
+  font-family: JetBrains;
+  font-weight: 700;
+}
+.wf-hour__sky {
+  font-size: 1rem;
+  line-height: 1;
+}
+.wf-hour__temp {
+  font-family: JetBrains;
+  font-weight: 700;
+}
+.wf-hour__prob {
+  opacity: 0.8;
+}
+.wf-hour__wind {
+  white-space: nowrap;
+}
+.wf-hour__fl {
+  opacity: 0.7;
+  font-size: 0.65rem;
+}
+.wf-uncertain {
+  opacity: 0.55;
+  font-style: italic;
+}
+.wf-hour__risks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.wf-sources {
+  opacity: 0.85;
+}
+.wf-sources .wf-card__body {
+  font-size: 0.78rem;
 }

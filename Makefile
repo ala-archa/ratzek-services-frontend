@@ -22,6 +22,8 @@ RSYNC_FLAGS = -rlptvz --checksum --delete \
 	--exclude='.gitignore' \
 	--exclude='Makefile' \
 	--exclude='README.md' \
+	--exclude='dev/' \
+	--exclude='.claude/' \
 	--exclude='*.log'
 
 .PHONY: all help dry-run deploy
