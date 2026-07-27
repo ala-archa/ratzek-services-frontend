@@ -136,7 +136,7 @@ i18next.init(
           wf_quality_caution: "caution",
           wf_quality_bad: "bad",
           wf_windowstatus_found: "window found",
-          wf_windowstatus_none_in_24h: "no window in the next 24 h",
+          wf_windowstatus_none_in_48h: "no window in the next 48 h",
           wf_windowstatus_insufficient_data:
             "not enough data to find a window",
           wf_confidence_low: "low confidence (no ensemble)",
@@ -453,7 +453,7 @@ i18next.init(
           wf_quality_caution: "осторожно",
           wf_quality_bad: "плохо",
           wf_windowstatus_found: "окно найдено",
-          wf_windowstatus_none_in_24h: "окна в ближайшие сутки нет",
+          wf_windowstatus_none_in_48h: "окна в ближайшие 48 ч нет",
           wf_windowstatus_insufficient_data:
             "данных не хватило, чтобы найти окно",
           wf_confidence_low: "низкая уверенность (без ансамбля)",
@@ -774,7 +774,7 @@ i18next.init(
           wf_quality_caution: "этият",
           wf_quality_bad: "начар",
           wf_windowstatus_found: "терезе табылды",
-          wf_windowstatus_none_in_24h: "жакынкы суткада терезе жок",
+          wf_windowstatus_none_in_48h: "жакынкы 48 саатта терезе жок",
           wf_windowstatus_insufficient_data:
             "терезе табууга маалымат жетишсиз",
           wf_confidence_low: "төмөн ишеним (ансамблсиз)",
