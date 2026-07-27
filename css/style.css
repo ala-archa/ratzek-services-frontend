@@ -71,7 +71,7 @@ body.theme-dark {
 }
 
 .header_scrolled {
-  height: 2.5rem;
+  height: 3rem; /* gentle shrink that still fits the header controls */
   background-color: rgba(31, 48, 104, 1);
 }
 
@@ -84,6 +84,8 @@ body.theme-dark {
 .header_content {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /*!  main */
@@ -228,8 +230,9 @@ body.theme-dark {
 /* ! theme switch */
 .toggle-switch {
   position: relative;
-  bottom: 8px;
   width: 66.67px;
+  height: 33.33px;
+  flex-shrink: 0;
 }
 
 label {
@@ -306,19 +309,23 @@ input:checked ~ .slider::before {
   justify-content: center;
 }
 
+/* Language switcher lives in the dark header — a compact segmented control. */
 .language-switcher_button {
-  background-color: var(--accent-fill);
-  color: var(--on-accent);
+  background-color: transparent;
+  color: #fff;
   text-decoration: none;
   border-radius: 5px;
-  padding: 0.75rem 1.5rem; /* >=44px tap target */
-  border: 1px solid black;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
   text-align: center;
   cursor: pointer;
 }
 
+/* Current language = filled accent so it stands out against the dark header. */
 .language-switcher_button.active {
-  background-color: var(--background-color-button);
+  background-color: var(--accent-fill);
+  border-color: var(--accent-fill);
 }
 
 /*! entry banner */

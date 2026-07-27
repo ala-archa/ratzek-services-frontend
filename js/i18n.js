@@ -67,8 +67,8 @@ i18next.init(
           webcam_archive: "Webcam archive (2 weeks)",
           telegram_chat: "Telegram chat",
           webcam: "Webcam",
-          summitx_aksay: '<a href="https://summitx.info/en/objects/ranges/64824505/about">Ak-Say on SummitX.info</a>',
-          summitx_routes: '<a href="https://summitx.info/en/routes?region=64824505">Ak-Say routes on SummitX.info</a>',
+          summitx_aksay: '<a href="https://summitx.info/en/objects/ranges/64824505/about">Ak-Sai on SummitX.info</a>',
+          summitx_routes: '<a href="https://summitx.info/en/routes?region=64824505">Ak-Sai routes on SummitX.info</a>',
           sign_in_button: "Sign in",
           participant_1:
             "Vasily Tsarevsky — designer of power supply controllers, also carried non-standard cargo to the hut.",

@@ -13,9 +13,29 @@
     <header id="header" class="header">
       <div class="wrapper">
         <div class="header_content">
-          <h2 class="header_title" data-i18n="header_title">
-            [Интернет на хижине Рацека]
-          </h2>
+          <div class="language-slider" id="language-slider">
+            <button
+              data-lang="en"
+              class="language-switcher_button"
+              onclick="changeLanguage('en')"
+            >
+              EN
+            </button>
+            <button
+              data-lang="ru"
+              class="language-switcher_button"
+              onclick="changeLanguage('ru')"
+            >
+              RU
+            </button>
+            <button
+              data-lang="kg"
+              class="language-switcher_button"
+              onclick="changeLanguage('kg')"
+            >
+              KG
+            </button>
+          </div>
           <div class="toggle-switch">
             <label>
               <input
@@ -33,34 +53,6 @@
     <main class="main">
       <div class="wrapper">
         <div class="main_content">
-          <section class="section">
-            <div class="section_language-switcher">
-              <h3 class="section_title">Choose language / Выберите язык</h3>
-              <div class="language-slider" id="language-slider">
-                <button
-                  data-lang="en"
-                  class="language-switcher_button"
-                  onClick="changeLanguage('en')"
-                >
-                  EN
-                </button>
-                <button
-                  data-lang="ru"
-                  class="language-switcher_button"
-                  onClick="changeLanguage('ru')"
-                >
-                  RU
-                </button>
-                <button
-                  data-lang="kg"
-                  class="language-switcher_button"
-                  onClick="changeLanguage('kg')"
-                >
-                  KG
-                </button>
-              </div>
-            </div>
-          </section>
           <section class="section">
             <div class="section_back">
               <a
