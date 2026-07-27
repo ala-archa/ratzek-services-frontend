@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const currentTheme = localStorage.getItem("theme");
   if (currentTheme === "theme-dark") {
     body.classList.add("theme-dark");
+    themeSwitch.checked = true; // keep the toggle position in sync with the saved theme
   }
 });
 

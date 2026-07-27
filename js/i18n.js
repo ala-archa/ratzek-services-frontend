@@ -22,11 +22,13 @@ function changeLanguage(lng) {
     if (err) return console.log("Something went wrong in loading i18n", err);
     updateContent();
     localStorage.setItem("language", lng);
+    document.documentElement.lang = lng; // keep <html lang> in sync for a11y/translation
     updateButtons();
   });
 }
 
 const savedLanguage = localStorage.getItem("language") || "ru";
+document.documentElement.lang = savedLanguage;
 
 i18next.init(
   {
@@ -35,6 +37,8 @@ i18next.init(
       en: {
         translation: {
           header_title: "[Internet at Ratsek Hut]",
+          title: "Internet at Ratsek Hut",
+          connection_error: "Can't reach the access point. Retrying…",
           entry_banner:
             "📶 To get online, please read this page. It only takes about a minute.",
           main_address:
@@ -186,6 +190,9 @@ i18next.init(
       ru: {
         translation: {
           header_title: "[Интернет на хижине Рацека]",
+          title: "Интернет на хижине Рацека",
+          connection_error:
+            "Не удаётся связаться с точкой доступа. Пробуем ещё раз…",
           entry_banner:
             "📶 Чтобы войти в интернет — прочитайте эту страницу. Это займёт всего одну минуту.",
           main_address:
@@ -338,6 +345,9 @@ i18next.init(
       kg: {
         translation: {
           header_title: "[Рацек Хижинасындагы Интернет]",
+          title: "Рацек Хижинасындагы Интернет",
+          connection_error:
+            "Байланыш түйүнүнө жетүү мүмкүн эмес. Кайра аракет кылып жатабыз…",
           entry_banner:
             "📶 Интернетке кирүү үчүн бул баракты окуп чыгыңыз. Бул болгону бир мүнөт убакытты алат.",
           main_address:
@@ -475,7 +485,7 @@ i18next.init(
           section_title_thank_you: "Ыраазычылык билдирүү",
           section_thank_you_text:
             "Чыгымдарды жарым-жартылай жабууга жардам бергениңизге ыраазы болобуз. Донорлук кылуунун жолдору <a href='/donate.html' class='otherlink' data-i18n='donate_link'>бул жерде</a> сүрөттөлгөн. Бул жерде интернеттин пайда болуу мүмкүнчүлүгүнө болжол менен 350 адам-саат жумуш жана 2022-2023-жылдардагы баалар менен 60,000 сом салынган. Биз айына мобилдик операторго 1,000 сомдон ашык төлөйбүз.",
-          section_thank_you_button: "Поблагодарить — жми!",
+          section_thank_you_button: "Ыраазычылык билдирүү — басыңыз!",
 
           about_project_task1:
             "Радиокөпүрөнү уюштуруу. Биздин эч кимибиз тармак инженери эмеспиз, андыктан нөлдөн түшүнүүгө туура келди.",

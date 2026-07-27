@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Интернет на хижине Рацека</title>
+    <title data-i18n="title">Интернет на хижине Рацека</title>
     <link rel="stylesheet" href="./css/style.css" />
     <script src="/js/i18next.min.js"></script>
   </head>
@@ -18,7 +18,11 @@
           </h2>
           <div class="toggle-switch">
             <label>
-              <input type="checkbox" class="header_theme-switcher" />
+              <input
+              type="checkbox"
+              class="header_theme-switcher"
+              aria-label="Тёмная тема / Dark theme"
+            />
               <span class="slider"></span>
             </label>
           </div>
@@ -111,7 +115,7 @@
                   id="ap-control"
                   class="section_signIn__button"
                   data-i18n="sign_in_button"
-                  onClick="click"
+                  aria-live="polite"
                 >
                   ...
                 </button>

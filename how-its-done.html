@@ -18,7 +18,11 @@
           </h2>
           <div class="toggle-switch">
             <label>
-              <input type="checkbox" class="header_theme-switcher" />
+              <input
+              type="checkbox"
+              class="header_theme-switcher"
+              aria-label="Тёмная тема / Dark theme"
+            />
               <span class="slider"></span>
             </label>
           </div>
@@ -315,9 +319,9 @@
                 <button
                   disabled
                   id="ap-control"
-                  class="buttonNoAccess"
+                  class="section_signIn__button"
                   data-i18n="sign_in_button"
-                  onClick="click"
+                  aria-live="polite"
                 >
                   ...
                 </button>

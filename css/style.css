@@ -95,6 +95,9 @@ body.theme-dark {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto; /* keep readable line length on wide screens */
 }
 
 .main_link {
@@ -164,7 +167,7 @@ body.theme-dark {
   text-decoration: none;
   color: var(--link-color);
   border-radius: 5px;
-  padding: 0.5rem 1.5rem;
+  padding: 0.75rem 1.5rem; /* >=44px tap target */
   border: 1px solid var(--link-color);
   text-align: center;
   cursor: pointer;
@@ -187,12 +190,15 @@ body.theme-dark {
 .buttonRequestAccess,
 .buttonAccessGranted {
   display: block;
-  margin: 20px auto;
-  padding: 1rem 5rem;
+  margin: 1.25rem auto;
+  /* No wide fixed padding: it caused horizontal scroll on ~320px phones. */
+  padding: 1rem 1.5rem;
+  width: 100%;
+  max-width: 360px;
   border-radius: 5px;
   background-color: rgb(31, 48, 104);
   color: white;
-  font-size: 20px;
+  font-size: 1.25rem;
   border: none;
 }
 
@@ -235,9 +241,21 @@ label {
   cursor: pointer;
 }
 
+/* Keep the theme checkbox in the DOM (focusable/keyboard-operable) but invisible;
+   it overlays the toggle and drives the slider via the sibling selectors below. */
 input {
   position: absolute;
-  display: none;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.header_theme-switcher:focus-visible ~ .slider {
+  outline: 2px solid whitesmoke;
+  outline-offset: 2px;
 }
 
 .slider {
@@ -281,12 +299,19 @@ input:checked ~ .slider::before {
   text-align: center;
 }
 
+.language-slider {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .language-switcher_button {
   background-color: var(--accent-fill);
   color: var(--on-accent);
   text-decoration: none;
   border-radius: 5px;
-  padding: 0.5rem 2rem;
+  padding: 0.75rem 1.5rem; /* >=44px tap target */
   border: 1px solid black;
   text-align: center;
   cursor: pointer;
@@ -298,7 +323,7 @@ input:checked ~ .slider::before {
 
 /*! entry banner */
 .banner {
-  background-color: #e8590c;
+  background-color: #c2410c; /* white text ~5:1 (WCAG AA), matches --accent-fill */
   color: #fff;
   border-radius: 5px;
   padding: 1rem;
@@ -308,7 +333,17 @@ input:checked ~ .slider::before {
 
 .banner_text {
   font-family: JetBrains;
-  font-weight: 900;
-  font-size: 1.3rem;
+  font-weight: 700;
+  font-size: 1.1rem;
   line-height: 1.4;
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

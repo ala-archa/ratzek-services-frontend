@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Интернет на хижине Рацека</title>
+    <title data-i18n="title">Интернет на хижине Рацека</title>
     <link rel="stylesheet" href="./css/style.css" />
     <script src="/js/i18next.min.js"></script>
   </head>
@@ -18,7 +18,11 @@
           </h2>
           <div class="toggle-switch">
             <label>
-              <input type="checkbox" class="header_theme-switcher" />
+              <input
+              type="checkbox"
+              class="header_theme-switcher"
+              aria-label="Тёмная тема / Dark theme"
+            />
               <span class="slider"></span>
             </label>
           </div>
@@ -29,7 +33,7 @@
     <main class="main">
       <div class="wrapper">
         <div class="main_content">
-          <div class="banner" role="alert">
+          <div class="banner">
             <p class="banner_text" data-i18n="entry_banner">
               📶 Чтобы войти в интернет — прочитайте эту страницу. Это займёт
               всего одну минуту.
@@ -187,7 +191,7 @@
                 id="ap-control"
                 class="section_signIn__button"
                 data-i18n="sign_in_button"
-                onClick="click"
+                aria-live="polite"
               >
                 ...
               </button>
@@ -198,10 +202,10 @@
               <h3 class="section_title" data-i18n="section_title_about">
                 О проекте
               </h3>
+              <h3 data-i18n="section_about_text">
+                В проекте принимали участие:
+              </h3>
               <ul class="section_list">
-                <h3 data-i18n="section_about_text">
-                  В проекте принимали участие:
-                </h3>
                 <li data-i18n="participant_1">
                   Василий Царевский — проектировщик контроллеров
                   электроснабжения, а также заносил негабаритный груз на хижину.
