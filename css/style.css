@@ -15,6 +15,9 @@
   --background-color-button: rgb(31, 48, 104);
   --text-color: black;
   --border-section: 1px solid rgb(31, 48, 104);
+  --link-color: #c2410c; /* burnt orange: 4.7:1 on whitesmoke (WCAG AA) */
+  --accent-fill: #c2410c; /* orange button fill: white text 5.2:1 */
+  --on-accent: #ffffff;
 }
 
 * {
@@ -32,7 +35,7 @@
 a {
   cursor: pointer;
   text-decoration: none;
-  color: orange;
+  color: var(--link-color);
 }
 
 b {
@@ -49,6 +52,7 @@ body.theme-dark {
   --background-color: hsl(207, 26%, 17%);
   --text-color: whitesmoke;
   --border-section: 1px solid whitesmoke;
+  --link-color: #ffa500; /* bright orange: 7.2:1 on the dark background */
 }
 
 /*! header */
@@ -94,7 +98,7 @@ body.theme-dark {
 }
 
 .main_link {
-  color: orange;
+  color: var(--link-color);
   font-weight: 900;
   font-family: JetBrains;
 }
@@ -119,6 +123,11 @@ body.theme-dark {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+}
+
+/* Underline list links so they're distinguishable by more than color (WCAG 1.4.1). */
+.section_list a {
+  text-decoration: underline;
 }
 
 .section_attention,
@@ -153,23 +162,24 @@ body.theme-dark {
 .section_about__button,
 .section_signIn__button {
   text-decoration: none;
-  color: orange;
+  color: var(--link-color);
   border-radius: 5px;
   padding: 0.5rem 1.5rem;
-  border: 1px solid orange;
+  border: 1px solid var(--link-color);
   text-align: center;
   cursor: pointer;
 }
 
 .section_signIn__button {
-  background-color: orange;
-  color: white;
+  background-color: var(--accent-fill);
+  color: var(--on-accent);
+  border-color: var(--accent-fill);
 }
 
 .section_attention__button.active,
 .section_about__button.active {
-  background-color: orange;
-  color: white;
+  background-color: var(--accent-fill);
+  color: var(--on-accent);
   transition: 0.5s;
 }
 
@@ -272,8 +282,8 @@ input:checked ~ .slider::before {
 }
 
 .language-switcher_button {
-  background-color: orange;
-  color: white;
+  background-color: var(--accent-fill);
+  color: var(--on-accent);
   text-decoration: none;
   border-radius: 5px;
   padding: 0.5rem 2rem;
