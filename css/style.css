@@ -539,12 +539,23 @@ input:checked ~ .slider::before {
   font-family: JetBrains;
   border-top: 3px solid transparent;
 }
+.wf-hdate {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  font-family: JetBrains;
+  min-height: 0.72rem;
+  line-height: 0.9;
+}
 .wf-hh {
   font-weight: 700;
 }
 .wf-hsky {
   font-size: 1rem;
   line-height: 1;
+}
+/* day boundary within the 3-day hourly table */
+.wf-htable .wf-newday {
+  border-left: 2px solid rgba(127, 127, 127, 0.5);
 }
 .wf-htable thead th.wf-hq-ok {
   border-top-color: var(--ok);

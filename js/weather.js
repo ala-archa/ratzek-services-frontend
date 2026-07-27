@@ -12,7 +12,6 @@
   const FETCH_TIMEOUT_MS = 8000;
   const STALE_MIN = 40; // client-side "too old" threshold (server flag may be frozen)
   const VISIBLE_REFETCH_MIN = 10; // on tab focus, only refetch if data older than this
-  const HOURLY_COLUMNS = 24;
 
   // --- state ---
   let lastData = null; // last successfully parsed payload
@@ -78,6 +77,12 @@
     return typeof local === "string" && local.length >= 16
       ? local.slice(11, 16)
       : t("wf_no_data");
+  }
+
+  function ddmm(local) {
+    // "2026-07-28..." -> "28.07"
+    const p = typeof local === "string" ? local.slice(0, 10).split("-") : [];
+    return p.length === 3 ? p[2] + "." + p[1] : "";
   }
 
   function num(v, digits) {
@@ -445,7 +450,7 @@
       selectedAltitude = "base";
     }
     const isAlt = selectedAltitude !== "base";
-    const rows = hourly.slice(0, HOURLY_COLUMNS);
+    const rows = hourly; // show the full forecast horizon (current hour + 72)
 
     // altitude selector (theme-aware segmented control)
     const seg = el("div", { class: "wf-altsel" });
@@ -469,22 +474,41 @@
     // A table with a sticky label column so every number is self-explanatory.
     const table = el("table", { class: "wf-htable" });
 
+    // Mark day boundaries so 73 hours across ~3 days stay readable.
+    const newDayCols = new Set();
     const htr = el("tr", null, el("th", { class: "wf-htable__corner" }));
-    rows.forEach(function (h) {
+    let prevDay = null;
+    rows.forEach(function (h, i) {
+      const day =
+        typeof h.time_local === "string" ? h.time_local.slice(0, 10) : null;
+      const showDate = day && day !== prevDay;
+      if (showDate && i > 0) newDayCols.add(i);
+      prevDay = day;
       htr.appendChild(
-        el("th", { class: "wf-hq-" + (h.quality || "unknown") }, [
-          el("div", { class: "wf-hh", text: hhmm(h.time_local) }),
-          el("div", {
-            class: "wf-hsky",
-            text:
-              (SKY_GLYPH[h.sky_code] || "") + (PRECIP_GLYPH[h.precip_code] || ""),
-            title:
-              (enumLabel("sky", h.sky_code) || "") +
-              (h.precip_code && h.precip_code !== "none"
-                ? " · " + enumLabel("precip", h.precip_code)
-                : ""),
-          }),
-        ])
+        el(
+          "th",
+          {
+            class:
+              "wf-hq-" +
+              (h.quality || "unknown") +
+              (newDayCols.has(i) ? " wf-newday" : ""),
+          },
+          [
+            el("div", { class: "wf-hdate", text: showDate ? ddmm(day) : "" }),
+            el("div", { class: "wf-hh", text: hhmm(h.time_local) }),
+            el("div", {
+              class: "wf-hsky",
+              text:
+                (SKY_GLYPH[h.sky_code] || "") +
+                (PRECIP_GLYPH[h.precip_code] || ""),
+              title:
+                (enumLabel("sky", h.sky_code) || "") +
+                (h.precip_code && h.precip_code !== "none"
+                  ? " · " + enumLabel("precip", h.precip_code)
+                  : ""),
+            }),
+          ]
+        )
       );
     });
     table.appendChild(el("thead", null, htr));
@@ -492,10 +516,14 @@
     const tbody = el("tbody");
     function addRow(labelKey, cellFn) {
       const tr = el("tr", null, el("th", { text: t(labelKey) }));
-      rows.forEach(function (h) {
+      rows.forEach(function (h, i) {
         const node = cellFn(h);
         tr.appendChild(
-          el("td", null, node == null ? document.createTextNode("") : node)
+          el(
+            "td",
+            newDayCols.has(i) ? { class: "wf-newday" } : null,
+            node == null ? document.createTextNode("") : node
+          )
         );
       });
       tbody.appendChild(tr);
