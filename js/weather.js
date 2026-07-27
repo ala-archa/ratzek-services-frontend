@@ -444,14 +444,14 @@
     if (selectedAltitude !== "base" && alts.indexOf(selectedAltitude) === -1) {
       selectedAltitude = "base";
     }
+    const isAlt = selectedAltitude !== "base";
+    const rows = hourly.slice(0, HOURLY_COLUMNS);
 
-    // altitude selector (segmented control, like the language switcher)
-    const seg = el("div", { class: "wf-altsel language-slider" });
+    // altitude selector (theme-aware segmented control)
+    const seg = el("div", { class: "wf-altsel" });
     function segBtn(val, label) {
       const b = el("button", {
-        class:
-          "language-switcher_button" +
-          (selectedAltitude === val ? " active" : ""),
+        class: "wf-alt-btn" + (selectedAltitude === val ? " active" : ""),
         text: label,
         attrs: { type: "button" },
       });
@@ -466,68 +466,87 @@
       seg.appendChild(segBtn(m, m + ""));
     });
 
-    // timeline columns
-    const track = el("div", { class: "wf-timeline" });
-    hourly.slice(0, HOURLY_COLUMNS).forEach(function (h) {
-      const a = selectedAltitude === "base" ? null : altOf(h, selectedAltitude);
-      const temp =
-        selectedAltitude === "base" ? h.temp_base_c : a && a.temp_c;
-      const wind =
-        selectedAltitude === "base" ? h.wind_base_ms : a && a.wind_ms;
-      const dir = a ? a.wind_dir_deg : null;
-      const uncertain = a && (a.wind_ms_spread == null || a.wind_ms_spread > 3);
+    // A table with a sticky label column so every number is self-explanatory.
+    const table = el("table", { class: "wf-htable" });
 
-      const col = el("div", { class: "wf-hour" }, [
-        el("div", { class: "wf-hour__q " + qualityClass(h.quality) }),
-        el("div", { class: "wf-hour__t", text: hhmm(h.time_local) }),
-        el("div", {
-          class: "wf-hour__sky",
-          text: (SKY_GLYPH[h.sky_code] || "") + (PRECIP_GLYPH[h.precip_code] || ""),
-          title:
-            (enumLabel("sky", h.sky_code) || "") +
-            (h.precip_code && h.precip_code !== "none"
-              ? " · " + enumLabel("precip", h.precip_code)
-              : ""),
-        }),
-        el("div", {
-          class: "wf-hour__temp",
-          text: unit(temp, "°", 0),
-        }),
-        el("div", {
-          class: "wf-hour__prob",
-          text: h.precip_prob_pct != null ? h.precip_prob_pct + "%" : "",
-        }),
-        el("div", {
-          class: "wf-hour__wind" + (uncertain ? " wf-uncertain" : ""),
-          text:
-            unit(wind, "", 0) +
-            (dir != null ? " " + windArrow(dir) : "") +
-            (h.wind_gusts_ms != null && selectedAltitude === "base"
-              ? " ⇡" + num(h.wind_gusts_ms, 0)
-              : ""),
-          title: t("wf_wind_ms"),
-        }),
-        el("div", {
-          class: "wf-hour__fl",
-          text: h.freezing_level_m != null ? "0°" + num(h.freezing_level_m, 0) : "",
-          title: t("wf_freezing_level"),
-        }),
-      ]);
-      // risks
-      if (Array.isArray(h.risks) && h.risks.length) {
-        const rr = el("div", { class: "wf-hour__risks" });
-        h.risks.forEach(function (code) {
-          rr.appendChild(riskBadge(code));
-        });
-        col.appendChild(rr);
-      }
-      track.appendChild(col);
+    const htr = el("tr", null, el("th", { class: "wf-htable__corner" }));
+    rows.forEach(function (h) {
+      htr.appendChild(
+        el("th", { class: "wf-hq-" + (h.quality || "unknown") }, [
+          el("div", { class: "wf-hh", text: hhmm(h.time_local) }),
+          el("div", {
+            class: "wf-hsky",
+            text:
+              (SKY_GLYPH[h.sky_code] || "") + (PRECIP_GLYPH[h.precip_code] || ""),
+            title:
+              (enumLabel("sky", h.sky_code) || "") +
+              (h.precip_code && h.precip_code !== "none"
+                ? " · " + enumLabel("precip", h.precip_code)
+                : ""),
+          }),
+        ])
+      );
     });
+    table.appendChild(el("thead", null, htr));
+
+    const tbody = el("tbody");
+    function addRow(labelKey, cellFn) {
+      const tr = el("tr", null, el("th", { text: t(labelKey) }));
+      rows.forEach(function (h) {
+        const node = cellFn(h);
+        tr.appendChild(
+          el("td", null, node == null ? document.createTextNode("") : node)
+        );
+      });
+      tbody.appendChild(tr);
+    }
+    const txt = function (s) {
+      return document.createTextNode(s);
+    };
+
+    addRow("wf_row_temp", function (h) {
+      const v = isAlt ? (altOf(h, selectedAltitude) || {}).temp_c : h.temp_base_c;
+      return txt(unit(v, "°", 0));
+    });
+    addRow("wf_row_prob", function (h) {
+      return txt(h.precip_prob_pct != null ? String(h.precip_prob_pct) : "—");
+    });
+    addRow("wf_row_wind", function (h) {
+      if (isAlt) {
+        const a = altOf(h, selectedAltitude) || {};
+        const uncertain = a.wind_ms_spread == null || a.wind_ms_spread > 3;
+        const s =
+          unit(a.wind_ms, "", 0) +
+          (a.wind_dir_deg != null ? " " + windArrow(a.wind_dir_deg) : "");
+        return uncertain ? el("span", { class: "wf-uncertain", text: s }) : txt(s);
+      }
+      return txt(
+        unit(h.wind_base_ms, "", 0) +
+          (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "")
+      );
+    });
+    if (isAlt) {
+      addRow("wf_row_chill", function (h) {
+        return txt(unit((altOf(h, selectedAltitude) || {}).wind_chill_c, "°", 0));
+      });
+    }
+    addRow("wf_row_freezing", function (h) {
+      return txt(h.freezing_level_m != null ? num(h.freezing_level_m, 0) : "—");
+    });
+    addRow("wf_row_risks", function (h) {
+      if (!Array.isArray(h.risks) || !h.risks.length) return null;
+      const wrap = el("div", { class: "wf-hrisks" });
+      h.risks.forEach(function (code) {
+        wrap.appendChild(riskBadge(code));
+      });
+      return wrap;
+    });
+    table.appendChild(tbody);
 
     return card("wf_hourly", [
       el("p", { class: "wf-sub", text: t("wf_alt_select") }),
       seg,
-      track,
+      el("div", { class: "wf-timeline" }, table),
     ]);
   }
 

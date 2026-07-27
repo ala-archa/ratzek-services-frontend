@@ -483,70 +483,90 @@ input:checked ~ .slider::before {
   background-color: #6b7280;
 }
 
-/* altitude selector: reuse the segmented language-switcher look, smaller */
+/* altitude selector — theme-aware segmented control (visible in both themes) */
 .wf-altsel {
-  margin: 0.4rem 0;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 0.6rem;
 }
-.wf-altsel .language-switcher_button {
-  padding: 0.35rem 0.6rem;
+.wf-alt-btn {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--link-color);
+  border-radius: 5px;
+  padding: 0.35rem 0.7rem;
   font-size: 0.8rem;
+  cursor: pointer;
+}
+.wf-alt-btn.active {
+  background-color: var(--accent-fill);
+  color: var(--on-accent);
+  border-color: var(--accent-fill);
 }
 
-/* hourly timeline scrolls INSIDE itself — the page never scrolls sideways */
+/* hourly table scrolls INSIDE itself — the page never scrolls sideways */
 .wf-timeline {
-  display: flex;
-  gap: 0.35rem;
   overflow-x: auto;
-  padding-bottom: 0.4rem;
   -webkit-overflow-scrolling: touch;
 }
-.wf-hour {
-  flex: 0 0 auto;
-  width: 4rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  border: 1px solid rgba(127, 127, 127, 0.3);
-  border-radius: 5px;
-  padding: 0.2rem 0.15rem;
-  font-size: 0.72rem;
+.wf-htable {
+  border-collapse: collapse;
+  font-size: 0.75rem;
 }
-.wf-hour__q {
-  width: 100%;
-  height: 4px;
-  border-radius: 2px;
+.wf-htable th,
+.wf-htable td {
+  padding: 0.25rem 0.45rem;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.2);
 }
-.wf-hour__t {
+.wf-htable td {
   font-family: JetBrains;
+}
+/* sticky label column stays in view while the hours scroll */
+.wf-htable tbody th,
+.wf-htable__corner {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: var(--background-color);
+  text-align: left;
+  font-weight: normal;
+  opacity: 0.9;
+}
+.wf-htable thead th {
+  font-family: JetBrains;
+  border-top: 3px solid transparent;
+}
+.wf-hh {
   font-weight: 700;
 }
-.wf-hour__sky {
+.wf-hsky {
   font-size: 1rem;
   line-height: 1;
 }
-.wf-hour__temp {
-  font-family: JetBrains;
-  font-weight: 700;
+.wf-htable thead th.wf-hq-ok {
+  border-top-color: var(--ok);
 }
-.wf-hour__prob {
-  opacity: 0.8;
+.wf-htable thead th.wf-hq-caution {
+  border-top-color: var(--warn);
 }
-.wf-hour__wind {
-  white-space: nowrap;
+.wf-htable thead th.wf-hq-bad {
+  border-top-color: var(--danger);
 }
-.wf-hour__fl {
-  opacity: 0.7;
-  font-size: 0.65rem;
+.wf-htable thead th.wf-hq-unknown {
+  border-top-color: #6b7280;
 }
 .wf-uncertain {
   opacity: 0.55;
   font-style: italic;
 }
-.wf-hour__risks {
+.wf-hrisks {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  gap: 0.1rem;
 }
 
 .wf-sources {
