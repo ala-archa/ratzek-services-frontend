@@ -192,7 +192,21 @@ body.theme-dark {
 }
 
 .buttonAccessGranted {
-  background-color: #0f3a3a;
+  background-color: #1b7a3d; /* positive green; contrast vs white ~4.5:1 (WCAG AA) */
+}
+
+.btn_status {
+  display: block;
+  font-weight: 900;
+  font-size: 1.05em;
+  margin-bottom: 0.4rem;
+}
+
+.btn_details {
+  display: block;
+  font-size: 0.7em;
+  font-weight: normal;
+  opacity: 0.92;
 }
 
 /* ! theme switch */

@@ -84,11 +84,13 @@ function mainButtonTicker() {
       const drop_duration = date.toISOString().substring(11, 19);
 
       btn.classList = "buttonAccessGranted";
-      btn.innerText = i18next.t("data_usage", {
-        mb_spent,
-        mb_limit,
-        drop_duration,
-      });
+      btn.innerHTML =
+        `<span class="btn_status">${i18next.t("access_active")}</span>` +
+        `<span class="btn_details">${i18next.t("data_usage", {
+          mb_spent,
+          mb_limit,
+          drop_duration,
+        })}</span>`;
     })
     .catch((error) => {
       console.error(error);
