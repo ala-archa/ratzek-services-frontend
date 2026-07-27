@@ -22,6 +22,7 @@ RSYNC_FLAGS = -rlptvz --checksum --delete \
 	--exclude='.gitignore' \
 	--exclude='Makefile' \
 	--exclude='README.md' \
+	--exclude='DEPLOY.md' \
 	--exclude='dev/' \
 	--exclude='.claude/' \
 	--exclude='*.log'
