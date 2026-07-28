@@ -118,18 +118,6 @@
     return dirs[Math.round(deg / 45) % 8];
   }
 
-  // Standard wind chill (Environment Canada). The JSON gives wind_chill_c only
-  // for altitudes, so compute it for the base station from its temp + wind.
-  // Applies for T<=10°C and wind>4.8 km/h; otherwise not meaningful → null ("—"),
-  // matching how the backend leaves wind_chill_c null when inapplicable.
-  function windChill(tempC, windMs) {
-    if (tempC == null || windMs == null) return null;
-    const kmh = windMs * 3.6;
-    if (tempC > 10 || kmh < 4.8) return null;
-    const w = Math.pow(kmh, 0.16);
-    return 13.12 + 0.6215 * tempC - 11.37 * w + 0.3965 * tempC * w;
-  }
-
   const SKY_GLYPH = { clear: "☀️", partly: "⛅", cloudy: "☁️", overcast: "☁️" };
   const PRECIP_GLYPH = {
     none: "",
@@ -578,13 +566,23 @@
           (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "")
       );
     });
-    // "Feels like": altitudes carry wind_chill_c; for the base we compute it.
-    addRow("wf_row_chill", function (h) {
-      const v = isAlt
+    // "Feels like": altitudes carry wind_chill_c, base carries wind_chill_base_c.
+    // null = formula inapplicable (warm/calm), not "no data" — so show the row
+    // only when at least one hour has a value (summer days are mostly null).
+    const feels = function (h) {
+      return isAlt
         ? (altOf(h, selectedAltitude) || {}).wind_chill_c
-        : windChill(h.temp_base_c, h.wind_base_ms);
-      return txt(unit(v, "°", 0));
-    });
+        : h.wind_chill_base_c;
+    };
+    if (
+      rows.some(function (h) {
+        return feels(h) != null;
+      })
+    ) {
+      addRow("wf_row_chill", function (h) {
+        return txt(unit(feels(h), "°", 0));
+      });
+    }
     addRow("wf_row_freezing", function (h) {
       return txt(h.freezing_level_m != null ? num(h.freezing_level_m, 0) : "—");
     });

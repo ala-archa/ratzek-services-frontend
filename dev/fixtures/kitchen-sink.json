@@ -83,6 +83,7 @@
       "temp_base_p90_c": 10.7,
       "wind_base_ms": 12.1,
       "wind_gusts_ms": 22.5,
+      "wind_chill_base_c": -3.0,
       "alt": [
         { "altitude_m": 3900, "temp_c": 4.1, "wind_ms": 13.2, "wind_dir_deg": 323, "wind_chill_c": -3.3, "n_models": 3, "wind_ms_spread": 5.5 },
         { "altitude_m": 4200, "temp_c": 1.7, "wind_ms": 15.0, "wind_dir_deg": 323, "wind_chill_c": -7.5, "n_models": 3, "wind_ms_spread": 5.5 },
