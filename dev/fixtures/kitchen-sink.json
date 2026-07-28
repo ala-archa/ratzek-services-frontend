@@ -50,7 +50,7 @@
     "tendency_unknown_reason": "FrozenSensor",
     "obs_coverage_pct": 55
   },
-  "window": { "status": "insufficient_data", "best": null, "closes_at_local": null },
+  "window": { "status": "found", "best": { "from_local": "2026-07-28T12:00:00+06:00", "to_local": "2026-07-30T13:00:00+06:00", "hours": 49, "quality": "ok" }, "closes_at_local": null },
   "thunder": { "first_likely_local": null, "first_possible_local": "2026-07-27T22:00:00+06:00", "confidence": "unknown" },
   "night": {
     "from_local": "2026-07-27T20:42:00+06:00",

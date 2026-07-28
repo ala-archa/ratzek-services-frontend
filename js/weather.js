@@ -384,26 +384,59 @@
     ]);
   }
 
+  // Humanize a span in hours: "12 ч" / "2 сут" / "2 сут 1 ч". "49 ч" alone reads
+  // as an error to most users; days+hours matches how people think about it.
+  function humanDuration(hours) {
+    if (hours == null) return null;
+    if (hours < 24) return t("wf_dur_h", { h: hours });
+    const d = Math.floor(hours / 24);
+    const h = hours % 24;
+    return h ? t("wf_dur_dh", { d: d, h: h }) : t("wf_dur_d", { d: d });
+  }
+
+  // The window's from/to are full timestamps but hhmm() drops the date, so a
+  // multi-day window looked like a 1-hour one ("12:00–13:00 (49 ч)"). Show the
+  // date whenever the window crosses midnight.
+  function windowSpan(best) {
+    const fromD = typeof best.from_local === "string" ? best.from_local.slice(0, 10) : "";
+    const toD = typeof best.to_local === "string" ? best.to_local.slice(0, 10) : "";
+    if (fromD && fromD === toD) {
+      return t("wf_window_span_sameday", {
+        date: ddmm(best.from_local),
+        from: hhmm(best.from_local),
+        to: hhmm(best.to_local),
+      });
+    }
+    return t("wf_window_span_multiday", {
+      fromDate: ddmm(best.from_local),
+      from: hhmm(best.from_local),
+      toDate: ddmm(best.to_local),
+      to: hhmm(best.to_local),
+    });
+  }
+
   function renderWindow(f) {
     const w = f.window;
     if (!w) return null;
-    const body = [];
+    // "Window" is climber jargon — lead with a plain-language explanation so
+    // casual users understand what the card is for, whatever the status.
+    const body = [el("p", { class: "wf-sub", text: t("wf_window_intro") })];
     if (w.status === "found" && w.best) {
-      body.push(
-        el("p", {
-          class: "wf-strong",
-          text: t("wf_window_best", {
-            from: hhmm(w.best.from_local),
-            to: hhmm(w.best.to_local),
-            hours: w.best.hours == null ? "?" : w.best.hours,
-          }),
-        })
-      );
+      body.push(el("p", { class: "wf-strong", text: windowSpan(w.best) }));
+      if (w.best.hours != null)
+        body.push(
+          el("p", {
+            class: "wf-note",
+            text: t("wf_window_duration", { dur: humanDuration(w.best.hours) }),
+          })
+        );
       if (w.best.quality)
         body.push(
           el("span", {
             class: "wf-chip " + qualityClass(w.best.quality),
-            text: enumLabel("quality", w.best.quality),
+            text: t("wf_window_quality", {
+              q: enumLabel("quality", w.best.quality),
+            }),
           })
         );
       if (w.closes_at_local)
