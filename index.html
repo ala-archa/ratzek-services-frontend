@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -61,9 +61,12 @@
           </div>
           <section class="section">
             <p class="section_title" data-i18n="main_address">
-              Вы всегда можете вернуться на эту страницу введя адрес
+              Вы всегда можете вернуться на эту страницу, введя адрес
             </p>
-            <span class="main_link" data-i18n="main_link"
+            <span
+              class="main_link"
+              data-i18n="main_link"
+              aria-label="http://www.ratzek"
               >http://www.ratzek 🚀</span
             >
           </section>
@@ -89,28 +92,21 @@
               </li>
               <li>
                 <a
-                  href="/forecasts/mountain-forecast/"
-                  data-i18n="weather_forecast"
-                  >Прогноз погоды от Mountain Forecast</a
-                >
-              </li>
-              <li>
-                <a
                   href="/weather-forecast.html"
                   data-i18n="weather_forecast_local"
-                  >Локальный горный прогноз (хижина Рацека)</a
+                  >Прогноз погоды (хижина Рацека)</a
                 >
               </li>
               <li>
-                <a href="/guides/pavlenko" data-i18n="video_guide"
-                  >Видео-гайд от Дмитрия Павленко</a
+                <a href="/guides/pavlenko/" data-i18n="video_guide"
+                  >Видеогайд от Дмитрия Павленко</a
                 >
               </li>
               <li>
                 <a
                   href="/guides/lepikhin-guidebook/lepikhin-guidebook.pdf"
                   data-i18n="community_guide"
-                  >Созданный сообществом гайдбук</a
+                  >Созданный сообществом гайдбук (PDF)</a
                 >
               </li>
               <li>
@@ -125,21 +121,34 @@
             <h3 class="section_title" data-i18n="section_title_services">
               Полезные сервисы в интернете
             </h3>
+            <p class="section_note" data-i18n="services_need_internet">
+              Откроются после входа в интернет.
+            </p>
             <ul class="section_list">
               <li data-i18n="summitx_aksay">
-                <a href="https://summitx.info/ru/objects/ranges/64824505/about">Ак-Сай на сайте SummitX.info</a>
+                <a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/ru/objects/ranges/64824505/about">Ак-Сай на сайте SummitX.info</a>
               </li>
               <li data-i18n="summitx_routes">
-                <a href="https://summitx.info/ru/routes?region=64824505">Маршруты Ак-Сая на сайте SummitX.info</a>
+                <a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/ru/routes?region=64824505">Маршруты Ак-Сая на сайте SummitX.info</a>
               </li>
               <li>
-                <a href="https://t.me/outdoor_in_kg" data-i18n="telegram_chat"
+                <a
+                  class="ext"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://t.me/outdoor_in_kg"
+                  data-i18n="telegram_chat"
                   >Чат в Telegram</a
                 >
               </li>
               <li>
-                <a href="http://www.aksaionline.com/" data-i18n="webcam"
-                  >Веб-камера</a
+                <a
+                  class="ext"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="http://www.aksaionline.com/"
+                  data-i18n="webcam"
+                  >Веб-камера Ак-Сай (онлайн)</a
                 >
               </li>
             </ul>
@@ -201,9 +210,9 @@
               <h3 class="section_title" data-i18n="section_title_about">
                 О проекте
               </h3>
-              <h3 data-i18n="section_about_text">
+              <p class="section_subtitle" data-i18n="section_about_text">
                 В проекте принимали участие:
-              </h3>
+              </p>
               <ul class="section_list">
                 <li data-i18n="participant_1">
                   Василий Царевский — проектировщик контроллеров

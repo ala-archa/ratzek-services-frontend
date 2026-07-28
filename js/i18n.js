@@ -10,10 +10,10 @@ function updateContent() {
 function updateButtons() {
   const currentLanguage = localStorage.getItem("language") || "ru";
   Array.from(languageSlide.children).forEach((element) => {
-    element.classList.remove("active");
-    if (element.getAttribute("data-lang") === currentLanguage) {
-      element.classList.add("active");
-    }
+    const isActive = element.getAttribute("data-lang") === currentLanguage;
+    element.classList.toggle("active", isActive);
+    // Expose selection state to assistive tech (buttons act as a radio group).
+    element.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 }
 
@@ -40,7 +40,7 @@ i18next.init(
           header_title: "[Internet at Ratsek Hut]",
           title: "Internet at Ratsek Hut",
           connection_error: "Can't reach the access point. Retrying…",
-          weather_forecast_local: "Local mountain forecast (Ratzek hut)",
+          weather_forecast_local: "Weather forecast (Ratzek hut)",
           wf_title: "Weather forecast — Ratzek hut",
           wf_heading: "Weather forecast at Ratzek hut",
           wf_no_data: "—",
@@ -265,14 +265,14 @@ i18next.init(
           library: "Library of movies and books",
           login_delay_text:
             "And to give you time to read this page, we have added an entry delay",
-          weather_forecast: "Weather forecast from Mountain Forecast",
           video_guide: "Video guide by Dmitry Pavlenko",
-          community_guide: "Community-created guidebook",
+          community_guide: "Community-created guidebook (PDF)",
           webcam_archive: "Webcam archive (2 weeks)",
           telegram_chat: "Telegram chat",
-          webcam: "Webcam",
-          summitx_aksay: '<a href="https://summitx.info/en/objects/ranges/64824505/about">Ak-Sai on SummitX.info</a>',
-          summitx_routes: '<a href="https://summitx.info/en/routes?region=64824505">Ak-Sai routes on SummitX.info</a>',
+          webcam: "Ak-Sai webcam (online)",
+          services_need_internet: "These open after you go online.",
+          summitx_aksay: '<a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/en/objects/ranges/64824505/about">Ak-Sai on SummitX.info</a>',
+          summitx_routes: '<a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/en/routes?region=64824505">Ak-Sai routes on SummitX.info</a>',
           sign_in_button: "Sign in",
           participant_1:
             "Vasily Tsarevsky — designer of power supply controllers, also carried non-standard cargo to the hut.",
@@ -399,7 +399,7 @@ i18next.init(
           title: "Интернет на хижине Рацека",
           connection_error:
             "Не удаётся связаться с точкой доступа. Пробуем ещё раз…",
-          weather_forecast_local: "Локальный горный прогноз (хижина Рацека)",
+          weather_forecast_local: "Прогноз погоды (хижина Рацека)",
           wf_title: "Прогноз погоды — хижина Рацека",
           wf_heading: "Прогноз погоды на хижине Рацека",
           wf_no_data: "—",
@@ -625,14 +625,14 @@ i18next.init(
           library: "Библиотека фильмов и книг",
           login_delay_text:
             "А чтобы успели ознакомиться с этой страницей, мы добавили задержку входа.",
-          weather_forecast: "Прогноз погоды от Mountain Forecast",
           video_guide: "Видеогайд от Дмитрия Павленко",
-          community_guide: "Созданный сообществом гайдбук",
+          community_guide: "Созданный сообществом гайдбук (PDF)",
           webcam_archive: "Архив веб-камеры (2 недели)",
           telegram_chat: "Чат в Telegram",
-          webcam: "Веб-камера",
-          summitx_aksay: '<a href="https://summitx.info/ru/objects/ranges/64824505/about">Ак-Сай на сайте SummitX.info</a>',
-          summitx_routes: '<a href="https://summitx.info/ru/routes?region=64824505">Маршруты Ак-Сая на сайте SummitX.info</a>',
+          webcam: "Веб-камера Ак-Сай (онлайн)",
+          services_need_internet: "Откроются после входа в интернет.",
+          summitx_aksay: '<a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/ru/objects/ranges/64824505/about">Ак-Сай на сайте SummitX.info</a>',
+          summitx_routes: '<a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/ru/routes?region=64824505">Маршруты Ак-Сая на сайте SummitX.info</a>',
           sign_in_button: "Войти",
           participant_1:
             "Василий Царевский — проектировщик контроллеров электроснабжения, а также заносил негабаритный груз на хижину.",
@@ -761,8 +761,7 @@ i18next.init(
           title: "Рацек Хижинасындагы Интернет",
           connection_error:
             "Байланыш түйүнүнө жетүү мүмкүн эмес. Кайра аракет кылып жатабыз…",
-          weather_forecast_local:
-            "Жергиликтүү тоо аба ырайы божомолу (Рацек хижинасы)",
+          weather_forecast_local: "Аба ырайы божомолу (Рацек хижинасы)",
           wf_title: "Аба ырайы божомолу — Рацек хижинасы",
           wf_heading: "Рацек хижинасындагы аба ырайы божомолу",
           wf_no_data: "—",
@@ -987,14 +986,14 @@ i18next.init(
           library: "Китептер жана тасмалар китепканасы",
           login_delay_text:
             "Жана алардын бул баракча менен таанышууга убактысы болушу үчүн, биз кирүү кечигүүсүн коштук.",
-          weather_forecast: "Mountain Forecast боюнча аба ырайынын божомолу",
           video_guide: "Дмитрий Павленконун видеогиди",
-          community_guide: "Жамаат тарабынан түзүлгөн гидбук",
+          community_guide: "Жамаат тарабынан түзүлгөн гидбук (PDF)",
           webcam_archive: "Веб-камера архиви (2 жума)",
           telegram_chat: "Telegram чат",
-          webcam: "Веб-камера",
-          summitx_aksay: '<a href="https://summitx.info/ky/objects/ranges/64824505/about">SummitX.info сайтындагы Ак-Сай</a>',
-          summitx_routes: '<a href="https://summitx.info/ky/routes?region=64824505">SummitX.info сайтындагы Ак-Сай маршруттары</a>',
+          webcam: "Ак-Сай веб-камерасы (онлайн)",
+          services_need_internet: "Интернетке киргенден кийин ачылат.",
+          summitx_aksay: '<a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/ky/objects/ranges/64824505/about">SummitX.info сайтындагы Ак-Сай</a>',
+          summitx_routes: '<a class="ext" target="_blank" rel="noopener noreferrer" href="https://summitx.info/ky/routes?region=64824505">SummitX.info сайтындагы Ак-Сай маршруттары</a>',
           sign_in_button: "Кирүү",
           participant_1:
             "Василий Царевский — электр жабдууларын долбоорлоочу, ошондой эле хижинага оор жүктү алып келген.",
