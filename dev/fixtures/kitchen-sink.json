@@ -12,7 +12,9 @@
   "notes": [
     { "code": "station_fog", "severity": "warn" },
     { "code": "convection_possible", "severity": "warn", "params": { "cape_j_kg": 900, "humidity_pct": 95 } },
-    { "code": "cloud_from_lux", "severity": "info", "params": { "cloud_pct": 40 } }
+    { "code": "cloud_from_lux", "severity": "info", "params": { "cloud_pct": 40 } },
+    { "code": "lux_sensor_suspect", "severity": "warn", "params": { "lux": 0, "sun_elevation_deg": 35 } },
+    { "code": "cloud_from_webcam_stale", "severity": "info", "params": { "cloud_pct": 40, "age_minutes": 90 } }
   ],
   "zambretti": { "code": 19, "calibrated": false, "trend_known": true },
   "alpine_availability": {

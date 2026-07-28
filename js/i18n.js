@@ -57,6 +57,10 @@ i18next.init(
             "Conditions for convection/thunder (CAPE {{cape_j_kg}}, humidity {{humidity_pct}}%)",
           wf_note_cloud_from_lux:
             "Cloud cover estimated from the light sensor ({{cloud_pct}}%)",
+          wf_note_lux_sensor_suspect:
+            "Station light sensor faulty — cloud cover taken from the webcam and models.",
+          wf_note_cloud_from_webcam_stale:
+            "Cloud cover {{cloud_pct}}% from a webcam frame {{age_minutes}} min old.",
           wf_now: "Now at the station",
           wf_at_station: "Station, {{alt}} m",
           wf_temp: "Temperature",
@@ -377,6 +381,10 @@ i18next.init(
             "Условия для конвекции/гроз (CAPE {{cape_j_kg}}, влажность {{humidity_pct}}%)",
           wf_note_cloud_from_lux:
             "Облачность оценена по датчику освещённости ({{cloud_pct}}%)",
+          wf_note_lux_sensor_suspect:
+            "Датчик света на станции неисправен — облачность взята с камеры и моделей.",
+          wf_note_cloud_from_webcam_stale:
+            "Облачность {{cloud_pct}}% по кадру камеры {{age_minutes}} мин назад.",
           wf_now: "Сейчас на станции",
           wf_at_station: "Станция, {{alt}} м",
           wf_temp: "Температура",
@@ -701,6 +709,10 @@ i18next.init(
             "Конвекция/чагылган шарттары (CAPE {{cape_j_kg}}, нымдуулук {{humidity_pct}}%)",
           wf_note_cloud_from_lux:
             "Булуттуулук жарык сенсору боюнча бааланган ({{cloud_pct}}%)",
+          wf_note_lux_sensor_suspect:
+            "Станциядагы жарык сенсору бузук — булуттуулук камерадан жана моделдерден алынды.",
+          wf_note_cloud_from_webcam_stale:
+            "Булуттуулук {{cloud_pct}}% — {{age_minutes}} мүнөт мурунку камера кадры боюнча.",
           wf_now: "Азыр станцияда",
           wf_at_station: "Станция, {{alt}} м",
           wf_temp: "Температура",
