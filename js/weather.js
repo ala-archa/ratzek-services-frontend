@@ -155,6 +155,45 @@
     return "wf-q-unknown";
   }
 
+  // Expected visibility across models (median). Falls back to the single-model
+  // worst case for pre-0.7.2 data that has no median. null = no data.
+  function visMeters(h) {
+    return h.visibility_median_m != null
+      ? h.visibility_median_m
+      : h.visibility_min_m;
+  }
+
+  // Visibility as a display node: the expected (median) value in km, with the
+  // worst-case model and fog-model agreement tucked into a tooltip. The actual
+  // fog *warning* is the whiteout risk badge (≥2-model consensus), NOT this
+  // cell — so a scary red highlight only fires when the expected value is low,
+  // never on a lone model's outlier.
+  function visNode(h) {
+    const m = visMeters(h);
+    if (m == null) return el("span", { text: "—" });
+    const km = num(m / 1000, 1);
+    const parts = [];
+    if (h.visibility_min_m != null && h.visibility_min_m !== m) {
+      parts.push(t("wf_vis_worst", { km: num(h.visibility_min_m / 1000, 1) }));
+    }
+    if (
+      h.visibility_low_models != null &&
+      h.visibility_low_models > 0 &&
+      h.visibility_models != null
+    ) {
+      parts.push(
+        t("wf_vis_fog_models", {
+          low: h.visibility_low_models,
+          total: h.visibility_models,
+        })
+      );
+    }
+    const opts = { text: km };
+    if (parts.length) opts.title = parts.join(" · ");
+    if (m < 1000) opts.class = "wf-vis-low";
+    return el("span", opts);
+  }
+
   // --- section helpers ---
   function card(titleKey, children) {
     return el("section", { class: "section wf-card" }, [
@@ -284,16 +323,8 @@
     ];
     // "Now" visibility + snow from the current hour (navigation / conditions).
     const h0 = (Array.isArray(f.hourly) && f.hourly[0]) || {};
-    if (h0.visibility_min_m != null) {
-      const vkm = num(h0.visibility_min_m / 1000, 1);
-      rows.push(
-        kv(
-          "wf_row_visibility",
-          h0.visibility_min_m < 1000
-            ? el("span", { class: "wf-vis-low", text: vkm })
-            : vkm
-        )
-      );
+    if (visMeters(h0) != null) {
+      rows.push(kv("wf_row_visibility", visNode(h0)));
     }
     if (h0.snow_depth_cm != null && h0.snow_depth_cm > 0) {
       rows.push(kv("wf_snow_depth", num(h0.snow_depth_cm, 0)));
@@ -695,16 +726,15 @@
         return txt(unit(feels(h), "°", 0));
       });
     }
-    // Visibility (km). null -> "—"; 0 is a valid whiteout (highlight, NOT hidden).
+    // Visibility (km) = expected (median) value; worst-case model + fog-model
+    // agreement live in the cell tooltip. null -> "—". Fog *warnings* come from
+    // the whiteout risk badge, not this number.
     const visShown = rows.some(function (h) {
-      return h.visibility_min_m != null;
+      return visMeters(h) != null;
     });
     if (visShown) {
       addRow("wf_row_visibility", function (h) {
-        const v = h.visibility_min_m;
-        if (v == null) return txt("—");
-        const km = num(v / 1000, 1);
-        return v < 1000 ? el("span", { class: "wf-vis-low", text: km }) : txt(km);
+        return visNode(h);
       });
     }
     addRow("wf_row_freezing", function (h) {
