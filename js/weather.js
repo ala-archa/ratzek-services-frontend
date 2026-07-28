@@ -194,6 +194,38 @@
     return el("span", opts);
   }
 
+  // Ensemble 10–90% spread (°C) at/above which a temperature is "shaky" and gets
+  // the muted-italic marker. Wind uses a similar spread cue (wf-uncertain).
+  const TEMP_BAND_WIDE_C = 6;
+
+  // Temperature cell: the value in whole degrees, with the ensemble corridor
+  // (p10…p90) in a tooltip and a non-colour "shaky" marker (.wf-uncertain, same
+  // as uncertain wind) when the band is wide. `inCloud === true` adds a neutral
+  // cloud glyph (informational, not a warning). null-safe: no corridor -> plain
+  // number; inCloud null/false -> no glyph.
+  function tempNode(temp, p10, p90, inCloud) {
+    const main = unit(temp, "°", 0);
+    const lo = num(p10, 1);
+    const hi = num(p90, 1);
+    const opts = { text: main };
+    if (lo != null && hi != null) {
+      opts.title = t("wf_temp_band", { lo: lo, hi: hi });
+      if (Number(hi) - Number(lo) >= TEMP_BAND_WIDE_C) opts.class = "wf-uncertain";
+    }
+    const span = el("span", opts);
+    if (inCloud === true) {
+      span.appendChild(
+        el("span", {
+          class: "wf-incloud",
+          text: " ☁",
+          title: t("wf_incloud"),
+          attrs: { "aria-hidden": "true" },
+        })
+      );
+    }
+    return span;
+  }
+
   // --- section helpers ---
   function card(titleKey, children) {
     return el("section", { class: "section wf-card" }, [
@@ -355,6 +387,7 @@
     const missing = [];
     [
       "cape",
+      "levels_700",
       "levels_600",
       "levels_500",
       "precip_prob",
@@ -722,8 +755,11 @@
     };
 
     addRow("wf_row_temp", function (h) {
-      const v = isAlt ? (altOf(h, selectedAltitude) || {}).temp_c : h.temp_base_c;
-      return txt(unit(v, "°", 0));
+      if (isAlt) {
+        const a = altOf(h, selectedAltitude) || {};
+        return tempNode(a.temp_c, a.temp_p10_c, a.temp_p90_c, a.in_cloud);
+      }
+      return tempNode(h.temp_base_c, h.temp_base_p10_c, h.temp_base_p90_c, null);
     });
     addRow("wf_row_prob", function (h) {
       return txt(h.precip_prob_pct != null ? String(h.precip_prob_pct) : "—");
@@ -757,6 +793,20 @@
     if (feelsShown) {
       addRow("wf_row_chill", function (h) {
         return txt(unit(feels(h), "°", 0));
+      });
+    }
+    // Relative humidity at altitude (free-air mode; null until the backend
+    // switches anchors on). Alt-only, shown only when some hour has a value.
+    const rhAt = function (h) {
+      return isAlt ? (altOf(h, selectedAltitude) || {}).rh_pct : null;
+    };
+    const rhShown = isAlt && rows.some(function (h) {
+      return rhAt(h) != null;
+    });
+    if (rhShown) {
+      addRow("wf_row_rh", function (h) {
+        const v = rhAt(h);
+        return txt(v != null ? String(v) : "—");
       });
     }
     // Visibility (km) = expected (median) value; worst-case model + fog-model
@@ -808,6 +858,16 @@
       seg,
       el("div", { class: "wf-timeline" }, table),
     ];
+    // Temp corridor legend — only when some cell actually carries a p10/p90 band.
+    const bandShown = rows.some(function (h) {
+      const a = isAlt ? altOf(h, selectedAltitude) || {} : h;
+      const p10 = isAlt ? a.temp_p10_c : h.temp_base_p10_c;
+      const p90 = isAlt ? a.temp_p90_c : h.temp_base_p90_c;
+      return p10 != null && p90 != null;
+    });
+    if (bandShown) {
+      cardKids.push(el("p", { class: "wf-note", text: t("wf_temp_band_legend") }));
+    }
     if (feelsShown) {
       cardKids.push(el("p", { class: "wf-note", text: t("wf_feels_note") }));
     }
@@ -835,6 +895,12 @@
         (s.obs_status || "?") + " / " + (s.nwp_status || "?")
       )
     );
+    // How altitude temperatures were anchored this cycle (station vs free-air).
+    if (typeof s.free_air_anchors === "boolean") {
+      parts.push(
+        kv("wf_freeair", t(s.free_air_anchors ? "wf_freeair_700" : "wf_freeair_station"))
+      );
+    }
     if (f.zambretti && f.zambretti.code != null) {
       const zt = enumLabel("zambretti", f.zambretti.code);
       parts.push(

@@ -618,6 +618,11 @@ input:checked ~ .slider::before {
   opacity: 0.55;
   font-style: italic;
 }
+/* Neutral "inside cloud" indicator on altitude temps — informational, muted. */
+.wf-incloud {
+  opacity: 0.6;
+  font-style: normal;
+}
 .wf-hrisks {
   display: flex;
   flex-wrap: wrap;
