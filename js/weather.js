@@ -127,6 +127,27 @@
     snow: "🌨️",
   };
 
+  const MOON_GLYPH = {
+    new: "🌑",
+    waxing_crescent: "🌒",
+    first_quarter: "🌓",
+    waxing_gibbous: "🌔",
+    full: "🌕",
+    waning_gibbous: "🌖",
+    last_quarter: "🌗",
+    waning_crescent: "🌘",
+  };
+
+  // WHO UV-index scale → localized level key + highlight class (fill, dark-safe).
+  function uvInfo(uv) {
+    if (uv == null) return null;
+    if (uv >= 11) return { level: "wf_uv_extreme", cls: "wf-uv-very-high" };
+    if (uv >= 8) return { level: "wf_uv_very_high", cls: "wf-uv-very-high" };
+    if (uv >= 6) return { level: "wf_uv_high", cls: "wf-uv-high" };
+    if (uv >= 3) return { level: "wf_uv_moderate", cls: "" };
+    return { level: "wf_uv_low", cls: "" };
+  }
+
   function qualityClass(q) {
     if (q === "ok") return "wf-q-ok";
     if (q === "caution") return "wf-q-warn";
@@ -228,10 +249,15 @@
     }
     (f.notes || []).forEach(function (nte) {
       if (!nte || !nte.code) return;
+      const key = "wf_note_" + nte.code;
+      const text = t(key, nte.params || {});
+      if (text === key) {
+        // Unknown code — never show a raw i18n key to the user.
+        console.warn("[weather] missing note translation:", key);
+        return;
+      }
       const kind = nte.severity === "warn" ? "warn" : "info";
-      host.appendChild(
-        banner(kind, t("wf_note_" + nte.code, (nte.params || {})))
-      );
+      host.appendChild(banner(kind, text));
     });
   }
 
@@ -256,6 +282,22 @@
           (c.fog ? " · " + t("wf_fog") : "")
       ),
     ];
+    // "Now" visibility + snow from the current hour (navigation / conditions).
+    const h0 = (Array.isArray(f.hourly) && f.hourly[0]) || {};
+    if (h0.visibility_min_m != null) {
+      const vkm = num(h0.visibility_min_m / 1000, 1);
+      rows.push(
+        kv(
+          "wf_row_visibility",
+          h0.visibility_min_m < 1000
+            ? el("span", { class: "wf-vis-low", text: vkm })
+            : vkm
+        )
+      );
+    }
+    if (h0.snow_depth_cm != null && h0.snow_depth_cm > 0) {
+      rows.push(kv("wf_snow_depth", num(h0.snow_depth_cm, 0)));
+    }
     if (c.obs_coverage_pct != null && c.obs_coverage_pct < 80) {
       rows.push(
         el("p", {
@@ -280,11 +322,19 @@
     if (!a) return null;
     if (a.status === "full") return null; // nothing to warn about
     const missing = [];
-    ["cape", "levels_600", "levels_500", "precip_prob", "gusts"].forEach(
-      function (k) {
-        if (a[k] === false) missing.push(t("wf_alpine_" + k));
-      }
-    );
+    [
+      "cape",
+      "levels_600",
+      "levels_500",
+      "precip_prob",
+      "gusts",
+      "visibility",
+      "lifted_index",
+      "convective_inhibition",
+      "uv_index",
+    ].forEach(function (k) {
+      if (a[k] === false) missing.push(t("wf_alpine_" + k));
+    });
     return el("section", { class: "section wf-card wf-warnbox" }, [
       el("h3", { class: "section_title", text: t("wf_alpine_title") }),
       el("p", {
@@ -384,6 +434,41 @@
       kv("wf_night_min", unit(n.min_temp_base_c, "°C", 1)),
       kv("wf_freezing_level", unit(n.freezing_level_min_m, " m")),
     ];
+    // Moon — light for a pre-dawn start. Isolated so a moon defect can't wipe
+    // the safety data (refreeze / rockfall / min temps) of this card.
+    try {
+      const m = n.moon;
+      if (m) {
+        const glyph = MOON_GLYPH[m.phase_code] || "";
+        const phaseTxt = m.phase_code ? enumLabel("moonphase", m.phase_code) : null;
+        const parts = [];
+        if (phaseTxt) parts.push(phaseTxt);
+        if (m.illumination_pct != null) parts.push(num(m.illumination_pct, 0) + "%");
+        const moonRow = el("div", { class: "wf-kv" }, [
+          el("span", { class: "wf-kv__k", text: t("wf_moon") }),
+          el("span", { class: "wf-kv__v" }, [
+            glyph
+              ? el("span", { text: glyph + " ", attrs: { "aria-hidden": "true" } })
+              : null,
+            document.createTextNode(parts.join(" · ") || t("wf_no_data")),
+          ]),
+        ]);
+        const rise = m.moonrise_local;
+        const set = m.moonset_local;
+        let avail = null;
+        if (rise && set)
+          avail = t("wf_moon_riseset", { rise: hhmm(rise), set: hhmm(set) });
+        else if (set) avail = t("wf_moon_sets", { time: hhmm(set) });
+        else if (rise) avail = t("wf_moon_rises", { time: hhmm(rise) });
+        else if (m.up_at_night_start === true) avail = t("wf_moon_allnight");
+        else if (m.up_at_night_start === false) avail = t("wf_moon_none");
+        const moonNodes = [moonRow];
+        if (avail) moonNodes.push(el("p", { class: "wf-note", text: avail }));
+        body.splice(1, 0, ...moonNodes); // just under the refreeze/rockfall line
+      }
+    } catch (e) {
+      console.error("[weather] moon render failed", e);
+    }
     if (Array.isArray(n.min_temp_alt) && n.min_temp_alt.length) {
       // Show a range "colder … milder" instead of the jargon "p90" column:
       // min_temp_c is the expected low, p90_c the milder (warmer) case.
@@ -422,7 +507,7 @@
   function renderSun(f) {
     const s = f.sun;
     if (!s) return null;
-    return card("wf_sun", [
+    const kids = [
       kv("wf_sunrise", hhmm(s.sunrise_local)),
       kv("wf_sunset", hhmm(s.sunset_local)),
       kv(
@@ -430,8 +515,36 @@
         hhmm(s.civil_dawn_local) + " – " + hhmm(s.civil_dusk_local)
       ),
       kv("wf_daylight", unit(s.daylight_hours, " " + t("wf_hours"), 1)),
-      el("p", { class: "wf-note", text: t("wf_ridge_note") }),
-    ]);
+    ];
+    // Peak UV over the day (glacier sun hazard). Hidden entirely if no data
+    // (null peak is NOT "moderate/safe").
+    let peak = null;
+    let peakTime = null;
+    (f.hourly || []).forEach(function (h) {
+      if (h.uv_index != null && (peak == null || h.uv_index > peak)) {
+        peak = h.uv_index;
+        peakTime = h.time_local;
+      }
+    });
+    if (peak != null) {
+      const info = uvInfo(peak);
+      kids.push(
+        el(
+          "p",
+          { class: "wf-strong" },
+          el("span", {
+            class: info.cls,
+            text: t("wf_uv_peak", {
+              uv: num(peak, 0),
+              level: t(info.level),
+              time: hhmm(peakTime),
+            }),
+          })
+        )
+      );
+    }
+    kids.push(el("p", { class: "wf-note", text: t("wf_ridge_note") }));
+    return card("wf_sun", kids);
   }
 
   // Altitudes present in the data, mapped by altitude_m (never by index).
@@ -582,9 +695,41 @@
         return txt(unit(feels(h), "°", 0));
       });
     }
+    // Visibility (km). null -> "—"; 0 is a valid whiteout (highlight, NOT hidden).
+    const visShown = rows.some(function (h) {
+      return h.visibility_min_m != null;
+    });
+    if (visShown) {
+      addRow("wf_row_visibility", function (h) {
+        const v = h.visibility_min_m;
+        if (v == null) return txt("—");
+        const km = num(v / 1000, 1);
+        return v < 1000 ? el("span", { class: "wf-vis-low", text: km }) : txt(km);
+      });
+    }
     addRow("wf_row_freezing", function (h) {
       return txt(h.freezing_level_m != null ? num(h.freezing_level_m, 0) : "—");
     });
+    // UV index. Shown only when some hour has a value (null = night, not "no data").
+    // ≥8 also carries a non-colour marker ("!") and a title, not colour alone.
+    const uvShown = rows.some(function (h) {
+      return h.uv_index != null;
+    });
+    if (uvShown) {
+      addRow("wf_row_uv", function (h) {
+        const v = h.uv_index;
+        if (v == null) return txt("—");
+        const info = uvInfo(v);
+        const label = t(info.level);
+        return info.cls
+          ? el("span", {
+              class: info.cls,
+              text: num(v, 0) + (v >= 8 ? "!" : ""),
+              title: label,
+            })
+          : el("span", { text: num(v, 0), title: label });
+      });
+    }
     addRow("wf_row_risks", function (h) {
       if (!Array.isArray(h.risks) || !h.risks.length) return null;
       const wrap = el("div", { class: "wf-hrisks" });
@@ -602,6 +747,9 @@
     ];
     if (feelsShown) {
       cardKids.push(el("p", { class: "wf-note", text: t("wf_feels_note") }));
+    }
+    if (visShown) {
+      cardKids.push(el("p", { class: "wf-note", text: t("wf_vis_legend") }));
     }
     return card("wf_hourly", cardKids);
   }
@@ -635,6 +783,14 @@
     }
     if (f.generator_version)
       parts.push(kv("wf_version", "gen " + f.generator_version));
+    // Mandatory data attribution (CC BY 4.0), small print.
+    if (Array.isArray(f.attribution) && f.attribution.length) {
+      const attr = el("p", { class: "wf-attribution" }, [
+        document.createTextNode(t("wf_attribution") + " "),
+      ]);
+      attr.appendChild(document.createTextNode(f.attribution.join(" · ")));
+      parts.push(attr);
+    }
     return el("section", { class: "section wf-card wf-sources" }, [
       el("h3", { class: "section_title", text: t("wf_sources") }),
       el("div", { class: "wf-card__body" }, parts),

@@ -586,3 +586,27 @@ input:checked ~ .slider::before {
 .wf-sources .wf-card__body {
   font-size: 0.78rem;
 }
+
+/* UV / visibility highlights: fill + fixed white text (readable in both themes) */
+.wf-uv-high,
+.wf-uv-very-high,
+.wf-vis-low {
+  color: #fff;
+  border-radius: 3px;
+  padding: 0 0.3rem;
+  font-weight: 700;
+}
+.wf-uv-high {
+  background-color: var(--warn);
+}
+.wf-uv-very-high,
+.wf-vis-low {
+  background-color: var(--danger);
+}
+
+.wf-attribution {
+  font-size: 0.68rem;
+  opacity: 0.7;
+  margin-top: 0.3rem;
+  overflow-wrap: anywhere;
+}

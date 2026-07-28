@@ -1,6 +1,12 @@
 {
   "contract_version": 2,
-  "generator_version": "0.3.0",
+  "contract_minor": 2,
+  "generator_version": "0.7.0",
+  "attribution": [
+    "Weather data by Open-Meteo.com (CC BY 4.0)",
+    "ECMWF IFS and AIFS forecasts (CC BY 4.0)",
+    "MET Norway Locationforecast (NLOD 2.0 / CC BY 4.0)"
+  ],
   "issued_at_utc": "2026-07-27T13:00:00Z",
   "issued_at_local": "2026-07-27T19:00:00+06:00",
   "timezone": "Asia/Bishkek",
@@ -14,7 +20,10 @@
     { "code": "convection_possible", "severity": "warn", "params": { "cape_j_kg": 900, "humidity_pct": 95 } },
     { "code": "cloud_from_lux", "severity": "info", "params": { "cloud_pct": 40 } },
     { "code": "lux_sensor_suspect", "severity": "warn", "params": { "lux": 0, "sun_elevation_deg": 35 } },
-    { "code": "cloud_from_webcam_stale", "severity": "info", "params": { "cloud_pct": 40, "age_minutes": 90 } }
+    { "code": "cloud_from_webcam_stale", "severity": "info", "params": { "cloud_pct": 40, "age_minutes": 90 } },
+    { "code": "thunder_suppressed_by_cin", "severity": "info" },
+    { "code": "thunder_raised_by_li", "severity": "info" },
+    { "code": "totally_unknown_note", "severity": "info" }
   ],
   "zambretti": { "code": 19, "calibrated": false, "trend_known": true },
   "alpine_availability": {
@@ -24,7 +33,11 @@
     "levels_600": true,
     "levels_500": true,
     "precip_prob": true,
-    "gusts": false
+    "gusts": false,
+    "visibility": false,
+    "lifted_index": false,
+    "convective_inhibition": true,
+    "uv_index": true
   },
   "current": {
     "pressure_hpa": 681.9,
@@ -52,7 +65,8 @@
     ],
     "freezing_level_min_m": 4550,
     "refreeze": "no",
-    "rockfall_risk": "high"
+    "rockfall_risk": "high",
+    "moon": { "illumination_pct": 96, "phase_code": "waning_gibbous", "moonrise_local": null, "moonset_local": null, "up_at_night_start": true }
   },
   "sun": {
     "sunrise_local": "2026-07-27T05:37:00+06:00",
@@ -84,6 +98,9 @@
       "wind_base_ms": 12.1,
       "wind_gusts_ms": 22.5,
       "wind_chill_base_c": -3.0,
+      "uv_index": 9.2,
+      "visibility_min_m": 600,
+      "snow_depth_cm": 12,
       "alt": [
         { "altitude_m": 3900, "temp_c": 4.1, "wind_ms": 13.2, "wind_dir_deg": 323, "wind_chill_c": -3.3, "n_models": 3, "wind_ms_spread": 5.5 },
         { "altitude_m": 4200, "temp_c": 1.7, "wind_ms": 15.0, "wind_dir_deg": 323, "wind_chill_c": -7.5, "n_models": 3, "wind_ms_spread": 5.5 },
@@ -110,6 +127,9 @@
       "temp_base_p90_c": 5.0,
       "wind_base_ms": 4.0,
       "wind_gusts_ms": 8.0,
+      "uv_index": 5.0,
+      "visibility_min_m": 8000,
+      "snow_depth_cm": 12,
       "alt": [
         { "altitude_m": 3900, "temp_c": 0.1, "wind_ms": 4.2, "wind_dir_deg": 10, "wind_chill_c": -4.0, "n_models": 3, "wind_ms_spread": 1.0 },
         { "altitude_m": 4200, "temp_c": -2.0, "wind_ms": 5.0, "wind_dir_deg": 10, "wind_chill_c": -8.0, "n_models": 3, "wind_ms_spread": 1.0 },
