@@ -41,6 +41,42 @@ Apply: `nginx -t && systemctl reload nginx`, then verify:
   (rsync overwrites deterministically).
 - nginx: remove the `location` block + `nginx -t && systemctl reload nginx`.
 
+## Public access (internet gateway, port 8080)
+
+The mountain prod (`10.11.5.1`) is internet-facing only through a public gateway
+VPS `82.146.59.228` (`vpn.lepikhin.site`) over a **narrow satellite VPN**. The
+gateway's `:80` serves Grafana; the forecast page is published on a **dedicated
+port 8080**:
+
+    http://82.146.59.228:8080/   →  302  /weather-forecast.html
+
+Config lives on the GATEWAY (ssh `root@82.146.59.228` port 22), source of truth
+is `deploy/gateway/ratzek-portal-public.conf` in this repo. It is an nginx
+`server{listen 8080}` that proxies to the mountain portal (`10.8.0.10:80`,
+`Host: www.ratzek`) over the VPN, with an **allowlist**: only
+`/weather-forecast.html`, `/js/`, `/css/`, `/assets/`, `/weather/latest.json`
+(and `/`→redirect). Everything else → 404, so `/api`, `/ap-admin`, `donate.html`
+(bank details), the captive index and the media dirs stay private. Static assets
+are cached on the gateway; `latest.json` is not (freshness). `limit_req`/
+`limit_conn` + short proxy timeouts protect the shared VPN from abuse.
+
+Apply / update on the gateway:
+
+    scp deploy/gateway/ratzek-portal-public.conf \
+        root@82.146.59.228:/etc/nginx/sites-enabled/ratzek-portal-public.conf   # port 22
+    ssh root@82.146.59.228 'install -d -o www-data -g www-data /var/cache/nginx-ratzek \
+        && nginx -t && systemctl reload nginx'
+
+Verify from OUTSIDE the VPN (public internet, e.g. LTE): `curl -sI
+http://82.146.59.228:8080/weather-forecast.html` (200); `/api/v1/client`,
+`/donate.html` → 404; `http://82.146.59.228/` (Grafana) still 200.
+
+Caveats: no TLS (plain HTTP over IP:port — that's why bank details are NOT
+exposed); the config is not under config-management (keep it in sync with the
+repo copy); after a big asset change flush the gateway cache
+(`rm -rf /var/cache/nginx-ratzek/*`). Rollback: delete the file on the gateway →
+`nginx -t && systemctl reload nginx`.
+
 ## Notes
 
 - Contract: `js/weather.js` requires `contract_version === 2`; a future v3 shows

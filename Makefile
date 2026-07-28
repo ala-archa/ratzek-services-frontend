@@ -24,6 +24,7 @@ RSYNC_FLAGS = -rlptvz --checksum --delete \
 	--exclude='README.md' \
 	--exclude='DEPLOY.md' \
 	--exclude='dev/' \
+	--exclude='deploy/' \
 	--exclude='.claude/' \
 	--exclude='*.log'
 
