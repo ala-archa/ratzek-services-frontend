@@ -574,11 +574,10 @@
         ? (altOf(h, selectedAltitude) || {}).wind_chill_c
         : h.wind_chill_base_c;
     };
-    if (
-      rows.some(function (h) {
-        return feels(h) != null;
-      })
-    ) {
+    const feelsShown = rows.some(function (h) {
+      return feels(h) != null;
+    });
+    if (feelsShown) {
       addRow("wf_row_chill", function (h) {
         return txt(unit(feels(h), "°", 0));
       });
@@ -596,11 +595,15 @@
     });
     table.appendChild(tbody);
 
-    return card("wf_hourly", [
+    const cardKids = [
       el("p", { class: "wf-sub", text: t("wf_alt_select") }),
       seg,
       el("div", { class: "wf-timeline" }, table),
-    ]);
+    ];
+    if (feelsShown) {
+      cardKids.push(el("p", { class: "wf-note", text: t("wf_feels_note") }));
+    }
+    return card("wf_hourly", cardKids);
   }
 
   function renderHourlyInto(f) {

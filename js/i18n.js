@@ -113,6 +113,8 @@ i18next.init(
           wf_row_chill: "Feels like, °C",
           wf_row_freezing: "Freezing level, m",
           wf_row_risks: "Risks",
+          wf_feels_note:
+            "«Feels like» shows only when wind adds noticeable chill; a dash means it feels like the air temperature.",
           wf_sources: "Sources",
           wf_mode: "Mode",
           wf_models: "Models",
@@ -437,6 +439,8 @@ i18next.init(
           wf_row_chill: "Ощущается, °C",
           wf_row_freezing: "Изотерма 0°, м",
           wf_row_risks: "Риски",
+          wf_feels_note:
+            "«Ощущается» показывается только когда ветер заметно холодит; прочерк — ощущается как температура воздуха.",
           wf_sources: "Источники",
           wf_mode: "Режим",
           wf_models: "Модели",
@@ -765,6 +769,8 @@ i18next.init(
           wf_row_chill: "Сезилет, °C",
           wf_row_freezing: "0° изотерма, м",
           wf_row_risks: "Тобокелдиктер",
+          wf_feels_note:
+            "«Сезилет» шамал байкаларлык муздатканда гана көрсөтүлөт; сызык — аба температурасындай сезилет дегени.",
           wf_sources: "Булактар",
           wf_mode: "Режим",
           wf_models: "Моделдер",
