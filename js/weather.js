@@ -87,7 +87,8 @@
 
   function num(v, digits) {
     if (v == null || (typeof v === "number" && !isFinite(v))) return null;
-    const f = digits == null ? v : Number(v).toFixed(digits);
+    let f = digits == null ? Number(v) : Number(Number(v).toFixed(digits));
+    if (f === 0) f = 0; // normalize -0 -> 0
     return String(f);
   }
 
@@ -115,6 +116,18 @@
     if (deg == null) return "";
     const dirs = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]; // arrow points where wind goes
     return dirs[Math.round(deg / 45) % 8];
+  }
+
+  // Standard wind chill (Environment Canada). The JSON gives wind_chill_c only
+  // for altitudes, so compute it for the base station from its temp + wind.
+  // Applies for T<=10°C and wind>4.8 km/h; otherwise not meaningful → null ("—"),
+  // matching how the backend leaves wind_chill_c null when inapplicable.
+  function windChill(tempC, windMs) {
+    if (tempC == null || windMs == null) return null;
+    const kmh = windMs * 3.6;
+    if (tempC > 10 || kmh < 4.8) return null;
+    const w = Math.pow(kmh, 0.16);
+    return 13.12 + 0.6215 * tempC - 11.37 * w + 0.3965 * tempC * w;
   }
 
   const SKY_GLYPH = { clear: "☀️", partly: "⛅", cloudy: "☁️", overcast: "☁️" };
@@ -539,7 +552,7 @@
     addRow("wf_row_prob", function (h) {
       return txt(h.precip_prob_pct != null ? String(h.precip_prob_pct) : "—");
     });
-    addRow("wf_row_wind", function (h) {
+    addRow(isAlt ? "wf_row_wind_alt" : "wf_row_wind", function (h) {
       if (isAlt) {
         const a = altOf(h, selectedAltitude) || {};
         const uncertain = a.wind_ms_spread == null || a.wind_ms_spread > 3;
@@ -548,16 +561,19 @@
           (a.wind_dir_deg != null ? " " + windArrow(a.wind_dir_deg) : "");
         return uncertain ? el("span", { class: "wf-uncertain", text: s }) : txt(s);
       }
+      // Base station: no direction in the data, but it has gusts.
       return txt(
         unit(h.wind_base_ms, "", 0) +
           (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "")
       );
     });
-    if (isAlt) {
-      addRow("wf_row_chill", function (h) {
-        return txt(unit((altOf(h, selectedAltitude) || {}).wind_chill_c, "°", 0));
-      });
-    }
+    // "Feels like": altitudes carry wind_chill_c; for the base we compute it.
+    addRow("wf_row_chill", function (h) {
+      const v = isAlt
+        ? (altOf(h, selectedAltitude) || {}).wind_chill_c
+        : windChill(h.temp_base_c, h.wind_base_ms);
+      return txt(unit(v, "°", 0));
+    });
     addRow("wf_row_freezing", function (h) {
       return txt(h.freezing_level_m != null ? num(h.freezing_level_m, 0) : "—");
     });
