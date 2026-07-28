@@ -397,25 +397,36 @@
       kv("wf_freezing_level", unit(n.freezing_level_min_m, " m")),
     ];
     if (Array.isArray(n.min_temp_alt) && n.min_temp_alt.length) {
+      // Show a range "colder … milder" instead of the jargon "p90" column:
+      // min_temp_c is the expected low, p90_c the milder (warmer) case.
       const rows = n.min_temp_alt.map(function (a) {
+        const lo = num(a.min_temp_c, 1);
+        const hi = num(a.p90_c, 1);
+        const range =
+          lo == null
+            ? t("wf_no_data")
+            : hi == null
+            ? lo + "°"
+            : lo + "…" + hi + "°";
         return el("tr", null, [
           el("td", { text: unit(a.altitude_m, " m") }),
-          el("td", { text: unit(a.min_temp_c, "°C", 1) }),
-          el("td", { text: unit(a.p90_c, "°C", 1) }),
+          el("td", { text: range }),
         ]);
       });
       body.push(
         el("table", { class: "wf-table" }, [
-          el("thead", null,
+          el(
+            "thead",
+            null,
             el("tr", null, [
               el("th", { text: t("wf_altitude") }),
-              el("th", { text: t("wf_min") }),
-              el("th", { text: "p90" }),
+              el("th", { text: t("wf_night_min_col") }),
             ])
           ),
           el("tbody", null, rows),
         ])
       );
+      body.push(el("p", { class: "wf-note", text: t("wf_night_range_note") }));
     }
     return card("wf_night", body);
   }
