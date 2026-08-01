@@ -27,13 +27,24 @@
   let detailHour = null; // time_utc of the hour whose detail panel is open, or null
   let started = false;
 
-  // Move focus/scroll to the just-opened hour-detail panel (accessibility).
+  function prefersReducedMotion() {
+    return (
+      typeof matchMedia === "function" &&
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+  }
+
+  // On opening an hour, glide to the start of the hourly block (the detail panel
+  // sits at its top) and move focus into the panel without a second scroll.
   function focusDetail() {
+    const host = document.getElementById("wf-hourly");
+    if (host)
+      host.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
+      });
     const d = document.getElementById("wf-hdetail");
-    if (d) {
-      d.scrollIntoView({ block: "nearest" });
-      d.focus();
-    }
+    if (d) d.focus({ preventScroll: true });
   }
 
   // --- data source (dev hook: ?data=<relative-path> only) ---
@@ -1235,15 +1246,54 @@
 
       const when = ddmm(h.time_local) + " " + hhmm(h.time_local);
       const backTo = h.time_utc;
+      const idx = rows.findIndex(function (x) {
+        return x.time_utc === h.time_utc;
+      });
+      // Safe attribute-selector value (time_utc is same-origin data, but may hold
+      // characters that break a CSS selector).
+      const cssEsc =
+        typeof CSS !== "undefined" && CSS.escape
+          ? CSS.escape
+          : function (s) {
+              return String(s).replace(/["\\]/g, "\\$&");
+            };
+      function colFor(tu) {
+        return document.querySelector(
+          '#wf-hourly .wf-hcol[data-h="' + cssEsc(tu) + '"]'
+        );
+      }
       // Single close action, shared by the ✕, the bottom button and Esc; returns
       // focus to the column that opened the panel.
       function doClose() {
         detailHour = null;
         if (lastData) {
           renderHourlyInto(lastData);
-          const b = document.querySelector('#wf-hourly .wf-hcol[data-h="' + backTo + '"]');
+          const b = colFor(backTo);
           if (b) b.focus();
         }
+      }
+      // Prev/next hour — targeted update: swap only the panel node and the two
+      // columns' open state, WITHOUT rebuilding the 73-column table (which would
+      // jank on key-repeat). No re-scroll (panel already at the block top).
+      function go(delta) {
+        if (idx < 0 || !lastData) return;
+        const tgt = rows[idx + delta];
+        if (!tgt) return;
+        const oldC = colFor(detailHour);
+        detailHour = tgt.time_utc;
+        const oldPanel = document.getElementById("wf-hdetail");
+        const newPanel = renderHourDetail(tgt, isAlt);
+        if (oldPanel) oldPanel.replaceWith(newPanel);
+        if (oldC) {
+          oldC.classList.remove("wf-hcol--open");
+          oldC.setAttribute("aria-expanded", "false");
+        }
+        const newC = colFor(tgt.time_utc);
+        if (newC) {
+          newC.classList.add("wf-hcol--open");
+          newC.setAttribute("aria-expanded", "true");
+        }
+        newPanel.focus({ preventScroll: true });
       }
       const closeBtn = el("button", {
         class: "wf-hd__close",
@@ -1251,10 +1301,36 @@
         attrs: { type: "button", "aria-label": t("wf_detail_close") },
       });
       closeBtn.addEventListener("click", doClose);
+      const prevBtn = el("button", {
+        class: "wf-hd__nav wf-hd__prev",
+        text: "‹",
+        attrs: {
+          type: "button",
+          "aria-label": t("wf_detail_prev"),
+          title: t("wf_detail_prev"),
+        },
+      });
+      if (idx <= 0) prevBtn.disabled = true;
+      else prevBtn.addEventListener("click", function () { go(-1); });
+      const nextBtn = el("button", {
+        class: "wf-hd__nav wf-hd__next",
+        text: "›",
+        attrs: {
+          type: "button",
+          "aria-label": t("wf_detail_next"),
+          title: t("wf_detail_next"),
+        },
+      });
+      if (idx < 0 || idx >= rows.length - 1) nextBtn.disabled = true;
+      else nextBtn.addEventListener("click", function () { go(1); });
       const head = el("div", { class: "wf-hd__head wf-hq-" + hq }, [
-        verdictMark(hq),
-        el("span", { class: "wf-hd__when", text: when }),
-        el("span", { class: "wf-hd__verdict", text: t("wf_quality_" + hq) }),
+        prevBtn,
+        el("span", { class: "wf-hd__when" }, [
+          verdictMark(hq),
+          document.createTextNode(" " + when + " · "),
+          el("span", { class: "wf-hd__verdict", text: t("wf_quality_" + hq) }),
+        ]),
+        nextBtn,
       ]);
       // Full-width bottom close — a big thumb-reachable target so users don't
       // have to stretch to the top-right ✕ on a large phone.
@@ -1272,8 +1348,19 @@
         },
         [closeBtn, head, body, closeBtm]
       );
+      // Arrows navigate hours while focus is inside the panel (scoped, so they
+      // don't hijack the timeline's horizontal scroll); preventDefault stops the
+      // page from scrolling on the key.
       panel.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") doClose();
+        if (e.key === "Escape") {
+          doClose();
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          go(-1);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          go(1);
+        }
       });
       return panel;
     }
@@ -1285,14 +1372,24 @@
       el("div", { class: "wf-timeline" }, table),
     ];
     // Hour-detail panel (tap a column) — all the per-cell detail that used to be
-    // hover-only tooltips, in plain language, for the selected altitude. Rendered
-    // right under the timeline; survives re-render via the detailHour state.
+    // hover-only tooltips, in plain language, for the selected altitude. Placed
+    // at the TOP of the block (right under the title) so tapping an hour glides
+    // to it; survives re-render via the detailHour state. Isolated in try/catch
+    // so a panel failure can't take down the whole timeline.
     if (detailHour != null) {
       const dh = rows.find(function (h) {
         return h.time_utc === detailHour;
       });
-      if (dh) cardKids.push(renderHourDetail(dh, isAlt));
-      else detailHour = null; // hour no longer in data
+      if (dh) {
+        try {
+          cardKids.unshift(renderHourDetail(dh, isAlt));
+        } catch (e) {
+          console.error("[weather] hour detail failed", e);
+          detailHour = null;
+        }
+      } else {
+        detailHour = null; // hour no longer in data
+      }
     }
     // Quality colour-scale legend — the primary at-a-glance code (the header
     // top-border colour) is otherwise unexplained. Swatch + glyph + label.
@@ -1341,12 +1438,23 @@
     // altitude switch) so a user reading +50h isn't yanked back to the start.
     const prev = document.querySelector("#wf-hourly .wf-timeline");
     const savedScroll = prev ? prev.scrollLeft : 0;
+    // If the detail panel currently has focus (arrow-key navigation), the full
+    // re-render below destroys it — remember so we can restore focus, otherwise
+    // a background poll/language re-render would silently kill the arrow keys.
+    const oldPanel = document.getElementById("wf-hdetail");
+    const panelHadFocus = !!(
+      oldPanel && oldPanel.contains(document.activeElement)
+    );
     section("wf-hourly", function () {
       return renderHourly(f);
     });
     if (savedScroll) {
       const next = document.querySelector("#wf-hourly .wf-timeline");
       if (next) next.scrollLeft = savedScroll;
+    }
+    if (panelHadFocus) {
+      const np = document.getElementById("wf-hdetail");
+      if (np) np.focus({ preventScroll: true });
     }
   }
 

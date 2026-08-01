@@ -819,9 +819,37 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 .wf-hd__head.wf-hq-unknown {
   border-bottom-color: #6b7280;
 }
+.wf-hd__when {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  text-align: center;
+}
 .wf-hd__verdict {
   text-transform: uppercase;
   font-size: 0.85rem;
+}
+/* Prev/next hour navigation — neutral, 44px tap targets flanking the header. */
+.wf-hd__nav {
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid var(--link-color);
+  color: var(--link-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.wf-hd__nav:hover:not(:disabled) {
+  background: rgba(127, 127, 127, 0.14);
+}
+.wf-hd__nav:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 .wf-hd__reason {
   margin: 0 0 0.4rem;
