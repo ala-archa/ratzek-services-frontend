@@ -660,6 +660,13 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 .wf-htable {
   border-collapse: collapse;
   font-size: 0.75rem;
+  /* Containing block for the .wf-sr (visually-hidden verdict) spans and the
+     sr caption. Without a positioned ancestor their containing block is the
+     document root, so — sitting at static positions deep inside this wide,
+     horizontally-scrolled table — they escape the .wf-timeline overflow clip
+     and stretch the whole page's scrollWidth (huge horizontal scroll). With
+     position:relative they resolve against the table and get clipped normally. */
+  position: relative;
 }
 .wf-htable th,
 .wf-htable td {
