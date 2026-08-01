@@ -1,0 +1,20 @@
+{
+  "contract_version": 3,
+  "contract_minor": 0,
+  "generator_version": "0.12.0",
+  "attribution": ["Weather data by Open-Meteo.com (CC BY 4.0)"],
+  "issued_at_local": "2026-07-27T19:00:00+06:00",
+  "timezone": "Asia/Bishkek",
+  "base_altitude_m": 3370,
+  "mode": "hybrid",
+  "window": {
+    "status": "none_in_48h",
+    "best": null,
+    "closes_at_local": null,
+    "latest_start_local": null,
+    "turnaround_at_local": null,
+    "route_hours": 8
+  },
+  "sources": { "obs_status": "fresh", "nwp_status": "fresh", "models_used": ["ecmwf_ifs025"] },
+  "hourly": []
+}

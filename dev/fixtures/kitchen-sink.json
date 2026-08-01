@@ -1,7 +1,7 @@
 {
-  "contract_version": 2,
-  "contract_minor": 6,
-  "generator_version": "0.11.0",
+  "contract_version": 3,
+  "contract_minor": 0,
+  "generator_version": "0.12.0",
   "attribution": [
     "Weather data by Open-Meteo.com (CC BY 4.0)",
     "ECMWF IFS and AIFS forecasts (CC BY 4.0)",
@@ -18,12 +18,7 @@
   "notes": [
     { "code": "station_fog", "severity": "warn" },
     { "code": "convection_possible", "severity": "warn", "params": { "cape_j_kg": 900, "humidity_pct": 95 } },
-    { "code": "cloud_from_lux", "severity": "info", "params": { "cloud_pct": 40 } },
-    { "code": "lux_sensor_suspect", "severity": "warn", "params": { "lux": 0, "sun_elevation_deg": 35 } },
-    { "code": "cloud_from_webcam_stale", "severity": "info", "params": { "cloud_pct": 40, "age_minutes": 90 } },
     { "code": "thunder_suppressed_by_cin", "severity": "info" },
-    { "code": "thunder_raised_by_li", "severity": "info" },
-    { "code": "precip_suppressed_by_ensemble", "severity": "info" },
     { "code": "precip_raised_by_ensemble", "severity": "info" },
     { "code": "totally_unknown_note", "severity": "info" }
   ],
@@ -42,6 +37,18 @@
     "convective_inhibition": true,
     "uv_index": true
   },
+  "avalanche": {
+    "status": "unknown",
+    "flags": {
+      "new_snow_24h": 1,
+      "new_snow_48h": 0,
+      "wind_transport": 1,
+      "rain_on_snow": 0,
+      "no_overnight_refreeze": -1,
+      "rapid_warming": 0,
+      "high_freezing_level": 1
+    }
+  },
   "current": {
     "pressure_hpa": 681.9,
     "temperature_c": 11.3,
@@ -53,7 +60,14 @@
     "tendency_unknown_reason": "FrozenSensor",
     "obs_coverage_pct": 55
   },
-  "window": { "status": "found", "best": { "from_local": "2026-07-28T12:00:00+06:00", "to_local": "2026-07-30T13:00:00+06:00", "hours": 49, "quality": "ok" }, "closes_at_local": null },
+  "window": {
+    "status": "found",
+    "best": { "from_local": "2026-07-28T12:00:00+06:00", "to_local": "2026-07-30T13:00:00+06:00", "hours": 49, "quality": "caution" },
+    "closes_at_local": null,
+    "latest_start_local": "2026-07-30T07:00:00+06:00",
+    "turnaround_at_local": "2026-07-28T16:00:00+06:00",
+    "route_hours": 8
+  },
   "thunder": { "first_likely_local": null, "first_possible_local": "2026-07-27T22:00:00+06:00", "confidence": "unknown" },
   "night": {
     "from_local": "2026-07-27T20:42:00+06:00",
@@ -101,6 +115,8 @@
       "temp_base_p90_c": 10.7,
       "wind_base_ms": 12.1,
       "wind_gusts_ms": 22.5,
+      "wind_base_p90_ms": 16.0,
+      "wind_gusts_p90_ms": 28.0,
       "wind_chill_base_c": -3.0,
       "uv_index": 9.2,
       "visibility_min_m": 200,
@@ -109,14 +125,16 @@
       "visibility_low_models": 5,
       "snow_depth_cm": 12,
       "alt": [
-        { "altitude_m": 3900, "temp_c": 4.1, "temp_p10_c": 2.0, "temp_p90_c": 6.5, "rh_pct": 88, "in_cloud": false, "wind_ms": 13.2, "wind_dir_deg": 323, "wind_chill_c": -3.3, "n_models": 3, "wind_ms_spread": 5.5 },
-        { "altitude_m": 4200, "temp_c": 1.7, "temp_p10_c": -3.0, "temp_p90_c": 4.5, "rh_pct": 97, "in_cloud": true, "wind_ms": 15.0, "wind_dir_deg": 323, "wind_chill_c": -7.5, "n_models": 3, "wind_ms_spread": 5.5 },
-        { "altitude_m": 4500, "temp_c": -0.5, "temp_p10_c": -2.0, "temp_p90_c": 1.0, "rh_pct": null, "in_cloud": null, "wind_ms": 18.1, "wind_dir_deg": 294, "wind_chill_c": null, "n_models": 3, "wind_ms_spread": 6.0 },
-        { "altitude_m": 4800, "temp_c": -2.2, "temp_p10_c": -9.0, "temp_p90_c": -1.0, "rh_pct": 96, "in_cloud": true, "wind_ms": 20.5, "wind_dir_deg": 294, "wind_chill_c": -18.6, "n_models": 3, "wind_ms_spread": 6.0 }
+        { "altitude_m": 3900, "temp_c": 4.1, "temp_p10_c": 2.0, "temp_p90_c": 6.5, "rh_pct": 88, "in_cloud": false, "wind_ms": 13.2, "wind_dir_deg": 323, "wind_chill_c": -3.3, "n_models": 3, "wind_ms_spread": 5.5, "risks": [], "quality": "ok" },
+        { "altitude_m": 4200, "temp_c": 1.7, "temp_p10_c": -3.0, "temp_p90_c": 4.5, "rh_pct": 97, "in_cloud": true, "wind_ms": 15.0, "wind_dir_deg": 323, "wind_chill_c": -7.5, "n_models": 3, "wind_ms_spread": 5.5, "risks": ["wind"], "quality": "bad" },
+        { "altitude_m": 4500, "temp_c": -0.5, "temp_p10_c": -2.0, "temp_p90_c": 1.0, "rh_pct": null, "in_cloud": null, "wind_ms": 18.1, "wind_dir_deg": 294, "wind_chill_c": null, "n_models": 3, "wind_ms_spread": 6.0, "risks": ["wind", "wind_severe"], "quality": "bad" },
+        { "altitude_m": 4800, "temp_c": -2.2, "temp_p10_c": -9.0, "temp_p90_c": -1.0, "rh_pct": 96, "in_cloud": true, "wind_ms": 20.5, "wind_dir_deg": 294, "wind_chill_c": -18.6, "n_models": 3, "wind_ms_spread": 6.0, "risks": ["wind", "wind_severe"], "quality": "bad" }
       ],
       "freezing_level_m": 4350,
+      "freezing_level_source": "interpolated",
       "cape_j_kg": 900,
-      "risks": ["thunder_possible", "wind_severe", "cold_unknown", "whiteout"],
+      "critical_altitude_m": 4200,
+      "risks": ["wind_severe", "whiteout", "precip"],
       "quality": "bad",
       "quality_reason": "severe_wind"
     },
@@ -134,6 +152,8 @@
       "temp_base_p90_c": 5.0,
       "wind_base_ms": 4.0,
       "wind_gusts_ms": 8.0,
+      "wind_base_p90_ms": 6.0,
+      "wind_gusts_p90_ms": 12.0,
       "uv_index": 5.0,
       "visibility_min_m": 300,
       "visibility_median_m": 9000,
@@ -141,16 +161,92 @@
       "visibility_low_models": 1,
       "snow_depth_cm": 12,
       "alt": [
-        { "altitude_m": 3900, "temp_c": 0.1, "temp_p10_c": -1.5, "temp_p90_c": 2.0, "rh_pct": 70, "in_cloud": false, "wind_ms": 4.2, "wind_dir_deg": 10, "wind_chill_c": -4.0, "n_models": 3, "wind_ms_spread": 1.0 },
-        { "altitude_m": 4200, "temp_c": -2.0, "temp_p10_c": -4.0, "temp_p90_c": 0.5, "rh_pct": 80, "in_cloud": false, "wind_ms": 5.0, "wind_dir_deg": 10, "wind_chill_c": -8.0, "n_models": 3, "wind_ms_spread": 1.0 },
-        { "altitude_m": 4500, "temp_c": -4.0, "temp_p10_c": -6.0, "temp_p90_c": -2.0, "rh_pct": 90, "in_cloud": false, "wind_ms": 6.0, "wind_dir_deg": 20, "wind_chill_c": -11.0, "n_models": 3, "wind_ms_spread": 1.2 },
-        { "altitude_m": 4800, "temp_c": -6.0, "temp_p10_c": -8.0, "temp_p90_c": -4.0, "rh_pct": 92, "in_cloud": false, "wind_ms": 7.0, "wind_dir_deg": 20, "wind_chill_c": -14.0, "n_models": 3, "wind_ms_spread": 1.2 }
+        { "altitude_m": 3900, "temp_c": 0.1, "temp_p10_c": -1.5, "temp_p90_c": 2.0, "rh_pct": 70, "in_cloud": false, "wind_ms": 4.2, "wind_dir_deg": 10, "wind_chill_c": -4.0, "n_models": 3, "wind_ms_spread": 1.0, "risks": ["cold_unknown"], "quality": "ok" },
+        { "altitude_m": 4200, "temp_c": -2.0, "temp_p10_c": -4.0, "temp_p90_c": 0.5, "rh_pct": 80, "in_cloud": false, "wind_ms": 5.0, "wind_dir_deg": 10, "wind_chill_c": -8.0, "n_models": 3, "wind_ms_spread": 1.0, "risks": ["wind_unknown"], "quality": "ok" },
+        { "altitude_m": 4500, "temp_c": -4.0, "temp_p10_c": -6.0, "temp_p90_c": -2.0, "rh_pct": 90, "in_cloud": false, "wind_ms": 6.0, "wind_dir_deg": 20, "wind_chill_c": -11.0, "n_models": 3, "wind_ms_spread": 1.2, "risks": ["wind_unknown"], "quality": "ok" },
+        { "altitude_m": 4800, "temp_c": -6.0, "temp_p10_c": -8.0, "temp_p90_c": -4.0, "rh_pct": 92, "in_cloud": false, "wind_ms": 7.0, "wind_dir_deg": 20, "wind_chill_c": -14.0, "n_models": 3, "wind_ms_spread": 1.2, "risks": ["wind_unknown"], "quality": "ok" }
       ],
       "freezing_level_m": 3800,
+      "freezing_level_source": "raw_blend",
       "cape_j_kg": null,
-      "risks": ["precip_unknown", "cold"],
+      "critical_altitude_m": null,
+      "risks": ["wind_unknown", "gust_unknown", "freezing_rain"],
+      "quality": "unknown",
+      "quality_reason": "unknown_inputs"
+    },
+    {
+      "time_utc": "2026-07-27T15:00:00Z",
+      "time_local": "2026-07-27T21:00:00+06:00",
+      "sky_code": "cloudy",
+      "precip_code": "rain",
+      "cloud_cover_pct": 70,
+      "precip_mm": 1.2,
+      "precip_prob_pct": 60,
+      "snowfall_cm": 0,
+      "temp_base_c": 2.0,
+      "temp_base_p10_c": 0.0,
+      "temp_base_p90_c": 4.0,
+      "wind_base_ms": 18.0,
+      "wind_gusts_ms": 33.0,
+      "wind_base_p90_ms": 24.0,
+      "wind_gusts_p90_ms": 40.0,
+      "wind_chill_base_c": -12.0,
+      "uv_index": 1.0,
+      "visibility_min_m": 500,
+      "visibility_median_m": 1200,
+      "visibility_models": 5,
+      "visibility_low_models": 3,
+      "snow_depth_cm": 14,
+      "alt": [
+        { "altitude_m": 3900, "temp_c": -1.0, "temp_p10_c": -3.0, "temp_p90_c": 1.0, "rh_pct": null, "in_cloud": null, "wind_ms": 19.0, "wind_dir_deg": 300, "wind_chill_c": -15.0, "n_models": 3, "wind_ms_spread": 7.0, "risks": ["wind", "wet_cold"], "quality": null },
+        { "altitude_m": 4200, "temp_c": -3.5, "temp_p10_c": -6.0, "temp_p90_c": -1.0, "rh_pct": null, "in_cloud": null, "wind_ms": 22.0, "wind_dir_deg": 300, "wind_chill_c": -20.0, "n_models": 3, "wind_ms_spread": 7.0, "risks": ["wind", "wind_severe"], "quality": null },
+        { "altitude_m": 4500, "temp_c": -6.0, "temp_p10_c": -9.0, "temp_p90_c": -3.0, "rh_pct": null, "in_cloud": null, "wind_ms": 25.0, "wind_dir_deg": 310, "wind_chill_c": -25.0, "n_models": 3, "wind_ms_spread": 8.0, "risks": ["wind", "wind_severe", "wet_cold"], "quality": null },
+        { "altitude_m": 4800, "temp_c": -8.5, "temp_p10_c": -12.0, "temp_p90_c": -5.0, "rh_pct": null, "in_cloud": null, "wind_ms": 28.0, "wind_dir_deg": 310, "wind_chill_c": -30.0, "n_models": 3, "wind_ms_spread": 8.0, "risks": ["wind", "wind_severe", "wet_cold"], "quality": null }
+      ],
+      "freezing_level_m": 3600,
+      "freezing_level_source": "missing",
+      "cape_j_kg": null,
+      "critical_altitude_m": null,
+      "risks": ["gust_severe", "wind_severe", "freezing_rain_unknown", "wet_cold_unknown", "pressure_alarm"],
+      "quality": "severe",
+      "quality_reason": "severe_gust"
+    },
+    {
+      "time_utc": "2026-07-27T16:00:00Z",
+      "time_local": "2026-07-27T22:00:00+06:00",
+      "sky_code": "cloudy",
+      "precip_code": "rain",
+      "cloud_cover_pct": 65,
+      "precip_mm": 0.8,
+      "precip_prob_pct": 55,
+      "snowfall_cm": 0,
+      "temp_base_c": 4.0,
+      "temp_base_p10_c": 2.5,
+      "temp_base_p90_c": 5.5,
+      "wind_base_ms": 9.0,
+      "wind_gusts_ms": 16.0,
+      "wind_base_p90_ms": 12.0,
+      "wind_gusts_p90_ms": 20.0,
+      "wind_chill_base_c": null,
+      "uv_index": null,
+      "visibility_min_m": 8000,
+      "visibility_median_m": 12000,
+      "visibility_models": 5,
+      "visibility_low_models": 0,
+      "snow_depth_cm": 12,
+      "alt": [
+        { "altitude_m": 3900, "temp_c": 1.0, "temp_p10_c": -0.5, "temp_p90_c": 2.5, "rh_pct": null, "in_cloud": null, "wind_ms": 9.5, "wind_dir_deg": 280, "wind_chill_c": -2.0, "n_models": 4, "wind_ms_spread": 2.0, "risks": [], "quality": "ok" },
+        { "altitude_m": 4200, "temp_c": -1.0, "temp_p10_c": -2.5, "temp_p90_c": 0.5, "rh_pct": null, "in_cloud": null, "wind_ms": 11.0, "wind_dir_deg": 280, "wind_chill_c": -6.0, "n_models": 4, "wind_ms_spread": 2.0, "risks": ["cold"], "quality": "ok" },
+        { "altitude_m": 4500, "temp_c": -3.0, "temp_p10_c": -5.0, "temp_p90_c": -1.0, "rh_pct": null, "in_cloud": null, "wind_ms": 14.0, "wind_dir_deg": 290, "wind_chill_c": -11.0, "n_models": 4, "wind_ms_spread": 2.5, "risks": ["wind", "cold"], "quality": "bad" },
+        { "altitude_m": 4800, "temp_c": -5.0, "temp_p10_c": -7.0, "temp_p90_c": -3.0, "rh_pct": null, "in_cloud": null, "wind_ms": 16.0, "wind_dir_deg": 290, "wind_chill_c": -15.0, "n_models": 4, "wind_ms_spread": 2.5, "risks": ["wind", "cold"], "quality": "bad" }
+      ],
+      "freezing_level_m": 4100,
+      "freezing_level_source": null,
+      "cape_j_kg": null,
+      "critical_altitude_m": 4500,
+      "risks": ["wind", "precip", "gust"],
       "quality": "caution",
-      "quality_reason": "two_risks"
+      "quality_reason": "wind_and_precip_on_ridge"
     }
   ]
 }

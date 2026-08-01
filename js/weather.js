@@ -1,12 +1,16 @@
 // Weather-forecast page renderer.
-// Consumes the station forecast JSON (contract_version 2) and renders it,
+// Consumes the station forecast JSON (contract_version 3) and renders it,
 // localized via i18next. All values from the JSON go into the DOM through
 // textContent/createElement (never innerHTML) — XSS-safe by construction.
+//
+// Invariant: new forecast i18n keys are consumed ONLY through el()/t() here,
+// never via data-i18n (i18n.js updateContent() uses innerHTML for those, which
+// must stay authored-static — never a sink for JSON-derived text).
 
 (function () {
   "use strict";
 
-  const CONTRACT = 2;
+  const CONTRACT = 3;
   const DEFAULT_URL = "/weather/latest.json";
   const REFETCH_MS = 20 * 60 * 1000; // data updates every 30 min; poll a bit finer
   const FETCH_TIMEOUT_MS = 8000;
@@ -152,7 +156,44 @@
     if (q === "ok") return "wf-q-ok";
     if (q === "caution") return "wf-q-warn";
     if (q === "bad") return "wf-q-bad";
+    if (q === "severe") return "wf-q-severe";
+    // unknown AND any unrecognised future code → off-scale grey ("no data"),
+    // never green/yellow: "no data" != "safe".
     return "wf-q-unknown";
+  }
+
+  // NO-GO marker: severe must differ from bad by shape, not just red shade
+  // (§4.2). Returns "⛔" glyph node or null. Callers add localized text.
+  function noGoGlyph(q) {
+    return q === "severe"
+      ? el("span", { class: "wf-nogo", text: "⛔", attrs: { "aria-hidden": "true" } })
+      : null;
+  }
+
+  // Per-hour altitude verdict state (§2.1). THREE distinct cases — the last two
+  // both have critical_altitude_m == null but must NOT look the same:
+  //   'bad'    → number: above this altitude the verdict is bad+
+  //   'ok'     → null but some alt has a verdict: all altitudes acceptable
+  //   'nodata' → null and every alt quality is null: no per-altitude verdict
+  //              at all ("no data", must not read as "all good").
+  function criticalAltState(h) {
+    if (h.critical_altitude_m != null)
+      return { kind: "bad", m: h.critical_altitude_m };
+    const alt = Array.isArray(h.alt) ? h.alt : [];
+    const hasVerdict = alt.some(function (a) {
+      return a && a.quality != null;
+    });
+    return { kind: hasVerdict ? "ok" : "nodata" };
+  }
+
+  // freezing_level_m is trustworthy as a fact only when anchored (§2.5). null /
+  // raw_blend / missing (and any unknown future code) → treat as estimate.
+  function freezingVerified(source) {
+    return (
+      source === "interpolated" ||
+      source === "clamped_below" ||
+      source === "clamped_above"
+    );
   }
 
   // Expected visibility across models (median). Falls back to the single-model
@@ -253,10 +294,18 @@
 
   function riskBadge(code) {
     const unknown = /_unknown$/.test(code);
-    return el("span", {
-      class: "wf-risk" + (unknown ? " wf-risk--unknown" : ""),
-      text: (unknown ? "? " : "") + enumLabel("risk", code),
-    });
+    // Hard-blocker tiers (no _unknown form exists for these — §1.4).
+    const severe = code === "wind_severe" || code === "gust_severe";
+    let cls = "wf-risk";
+    let prefix = "";
+    if (unknown) {
+      cls += " wf-risk--unknown"; // grey: "not assessed", distinct badge (§4.1)
+      prefix = "? ";
+    } else if (severe) {
+      cls += " wf-risk--severe"; // red + NO-GO glyph, distinct from normal (§4.2)
+      prefix = "⛔ ";
+    }
+    return el("span", { class: cls, text: prefix + enumLabel("risk", code) });
   }
 
   // ============================ RENDER ============================
@@ -417,6 +466,43 @@
     ]);
   }
 
+  // Avalanche block (§2.3/§4.4): a list of triggered signals, NEVER a danger
+  // scale. status is always "unknown" (no snowpack observations exist for the
+  // Tien Shan) — we say so explicitly and show flags, incl. "-1" = no data.
+  const AVALANCHE_FLAGS = [
+    "new_snow_24h",
+    "new_snow_48h",
+    "wind_transport",
+    "rain_on_snow",
+    "no_overnight_refreeze",
+    "rapid_warming",
+    "high_freezing_level",
+  ];
+  function renderAvalanche(f) {
+    const av = f.avalanche;
+    if (!av) return null;
+    const flags = av.flags || {};
+    const list = el("ul", { class: "wf-avlist" });
+    AVALANCHE_FLAGS.forEach(function (k) {
+      const v = flags[k];
+      // 1 → present; 0 → absent; -1 / null / undefined / anything else → no data.
+      const state = v === 1 ? "yes" : v === 0 ? "no" : "nodata";
+      list.appendChild(
+        el("li", { class: "wf-avflag wf-avflag--" + state }, [
+          el("span", { class: "wf-avflag__k", text: t("wf_avalanche_flag_" + k) }),
+          el("span", { class: "wf-avflag__v", text: t("wf_avalanche_" + state) }),
+        ])
+      );
+    });
+    return el("section", { class: "section wf-card wf-warnbox" }, [
+      el("h3", { class: "section_title", text: t("wf_avalanche_title") }),
+      // The one thing that must always be said: no rating is derivable.
+      el("p", { class: "wf-strong", text: t("wf_avalanche_no_rating") }),
+      el("p", { class: "wf-sub", text: t("wf_avalanche_flags_intro") }),
+      list,
+    ]);
+  }
+
   // Humanize a span in hours: "12 ч" / "2 сут" / "2 сут 1 ч". "49 ч" alone reads
   // as an error to most users; days+hours matches how people think about it.
   function humanDuration(hours) {
@@ -463,13 +549,28 @@
             text: t("wf_window_duration", { dur: humanDuration(w.best.hours) }),
           })
         );
-      if (w.best.quality)
+      if (w.best.quality) {
+        const chip = el("span", {
+          class: "wf-chip " + qualityClass(w.best.quality),
+          text:
+            (w.best.quality === "severe" ? "⛔ " : "") +
+            t("wf_window_quality", { q: enumLabel("quality", w.best.quality) }),
+        });
+        body.push(chip);
+      }
+      // Latest start that still fits the whole route — NOT "leave now" (§2.6).
+      if (w.latest_start_local)
         body.push(
-          el("span", {
-            class: "wf-chip " + qualityClass(w.best.quality),
-            text: t("wf_window_quality", {
-              q: enumLabel("quality", w.best.quality),
-            }),
+          el("p", {
+            class: "wf-note",
+            text: t("wf_window_latest_start", { time: hhmm(w.latest_start_local) }),
+          })
+        );
+      if (w.turnaround_at_local)
+        body.push(
+          el("p", {
+            class: "wf-note",
+            text: t("wf_window_turnaround", { time: hhmm(w.turnaround_at_local) }),
           })
         );
       if (w.closes_at_local)
@@ -482,6 +583,15 @@
     } else {
       body.push(el("p", { text: enumLabel("windowstatus", w.status) }));
     }
+    // route_hours is the query parameter ("we searched for an N-hour outing"),
+    // present regardless of status; null only means duration isn't configured.
+    if (w.route_hours != null)
+      body.push(
+        el("p", {
+          class: "wf-note",
+          text: t("wf_window_route_hours", { hours: w.route_hours }),
+        })
+      );
     return card("wf_window", body);
   }
 
@@ -706,16 +816,25 @@
       const showDate = day && day !== prevDay;
       if (showDate && i > 0) newDayCols.add(i);
       prevDay = day;
+      // Colour the header by the verdict of the SELECTED altitude (per-alt
+      // quality), or the whole-column worst (h.quality) in base view. Missing
+      // verdict → "unknown" (grey), never green — "no data" != "safe".
+      const hq =
+        (isAlt ? (altOf(h, selectedAltitude) || {}).quality : h.quality) ||
+        "unknown";
       htr.appendChild(
         el(
           "th",
           {
-            class:
-              "wf-hq-" +
-              (h.quality || "unknown") +
-              (newDayCols.has(i) ? " wf-newday" : ""),
+            class: "wf-hq-" + hq + (newDayCols.has(i) ? " wf-newday" : ""),
+            title: h.quality_reason
+              ? t("wf_qreason_" + h.quality_reason) === "wf_qreason_" + h.quality_reason
+                ? undefined
+                : t("wf_qreason_" + h.quality_reason)
+              : undefined,
           },
           [
+            noGoGlyph(hq),
             el("div", { class: "wf-hdate", text: showDate ? ddmm(day) : "" }),
             el("div", { class: "wf-hh", text: hhmm(h.time_local) }),
             el("div", {
@@ -773,11 +892,19 @@
           (a.wind_dir_deg != null ? " " + windArrow(a.wind_dir_deg) : "");
         return uncertain ? el("span", { class: "wf-uncertain", text: s }) : txt(s);
       }
-      // Base station: no direction in the data, but it has gusts.
-      return txt(
+      // Base station: no direction in the data, but it has gusts. Gusts +
+      // ensemble p90 are BASE-only (§4.5) — never labelled onto altitudes.
+      const s =
         unit(h.wind_base_ms, "", 0) +
-          (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "")
-      );
+        (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "");
+      const p90 = [];
+      if (h.wind_base_p90_ms != null)
+        p90.push(t("wf_wind_p90", { v: num(h.wind_base_p90_ms, 0) }));
+      if (h.wind_gusts_p90_ms != null)
+        p90.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
+      return p90.length
+        ? el("span", { text: s, title: p90.join(" · ") })
+        : txt(s);
     });
     // "Feels like": altitudes carry wind_chill_c, base carries wind_chill_base_c.
     // null = formula inapplicable (warm/calm), not "no data" — so show the row
@@ -820,9 +947,35 @@
         return visNode(h);
       });
     }
+    // Freezing level. Trustworthy as a fact only when anchored (§2.5); raw_blend
+    // / missing / null → shown muted with a source tooltip and a legend caveat.
+    let flUnverified = false;
     addRow("wf_row_freezing", function (h) {
-      return txt(h.freezing_level_m != null ? num(h.freezing_level_m, 0) : "—");
+      if (h.freezing_level_m == null) return txt("—");
+      const v = num(h.freezing_level_m, 0);
+      if (freezingVerified(h.freezing_level_source)) return txt(v);
+      flUnverified = true;
+      const src = h.freezing_level_source;
+      const key = "wf_flsource_" + src;
+      const title = src && t(key) !== key ? t(key) : t("wf_flsource_raw_blend");
+      return el("span", { class: "wf-est", text: v, title: title });
     });
+    // Critical altitude (§2.1): lowest altitude with a bad+ verdict. Shown only
+    // when some hour actually has one; three per-hour states kept distinct.
+    const critStates = rows.map(criticalAltState);
+    const critShown = critStates.some(function (s) {
+      return s.kind === "bad";
+    });
+    if (critShown) {
+      addRow("wf_row_critical_alt", function (h) {
+        const s = criticalAltState(h);
+        if (s.kind === "bad")
+          return el("span", { class: "wf-vis-low", text: num(s.m, 0) });
+        if (s.kind === "nodata")
+          return el("span", { text: "?", title: t("wf_critical_alt_nodata") });
+        return txt("·"); // 'ok': every altitude acceptable this hour
+      });
+    }
     // UV index. Shown only when some hour has a value (null = night, not "no data").
     // ≥8 also carries a non-colour marker ("!") and a title, not colour alone.
     const uvShown = rows.some(function (h) {
@@ -844,9 +997,19 @@
       });
     }
     addRow("wf_row_risks", function (h) {
-      if (!Array.isArray(h.risks) || !h.risks.length) return null;
+      // Common-hour risks; at an altitude, add that altitude's own risks
+      // (7-code subset). Empty = no verdict, NOT "no risks" — just render nothing.
+      const codes = Array.isArray(h.risks) ? h.risks.slice() : [];
+      if (isAlt) {
+        const ar = (altOf(h, selectedAltitude) || {}).risks;
+        if (Array.isArray(ar))
+          ar.forEach(function (c) {
+            if (codes.indexOf(c) === -1) codes.push(c);
+          });
+      }
+      if (!codes.length) return null;
       const wrap = el("div", { class: "wf-hrisks" });
-      h.risks.forEach(function (code) {
+      codes.forEach(function (code) {
         wrap.appendChild(riskBadge(code));
       });
       return wrap;
@@ -868,11 +1031,17 @@
     if (bandShown) {
       cardKids.push(el("p", { class: "wf-note", text: t("wf_temp_band_legend") }));
     }
+    if (critShown) {
+      cardKids.push(el("p", { class: "wf-note", text: t("wf_critical_alt_legend") }));
+    }
     if (feelsShown) {
       cardKids.push(el("p", { class: "wf-note", text: t("wf_feels_note") }));
     }
     if (visShown) {
       cardKids.push(el("p", { class: "wf-note", text: t("wf_vis_legend") }));
+    }
+    if (flUnverified) {
+      cardKids.push(el("p", { class: "wf-note", text: t("wf_freezing_est_note") }));
     }
     return card("wf_hourly", cardKids);
   }
@@ -940,6 +1109,9 @@
     section("wf-alpine", function () {
       return renderAlpine(f);
     });
+    section("wf-avalanche", function () {
+      return renderAvalanche(f);
+    });
     section("wf-window", function () {
       return renderWindow(f);
     });
@@ -973,7 +1145,7 @@
   }
 
   function showContractError() {
-    ["wf-current","wf-alpine","wf-window","wf-thunder","wf-night","wf-sun","wf-hourly","wf-sources"].forEach(function(id){ set(id, null); });
+    ["wf-current","wf-alpine","wf-avalanche","wf-window","wf-thunder","wf-night","wf-sun","wf-hourly","wf-sources"].forEach(function(id){ set(id, null); });
     set("wf-banners", banner("danger", t("wf_contract_error")));
   }
 
@@ -1019,6 +1191,13 @@
         lastData = f;
         lastOkAt = Date.now();
         lastError = null;
+        // One-line positive signal for post-deploy verification in prod console.
+        console.info(
+          "[weather] contract",
+          f.contract_version,
+          f.contract_minor,
+          f.generator_version
+        );
         renderAll(f);
       })
       .catch(function (err) {

@@ -79,10 +79,27 @@ repo copy); after a big asset change flush the gateway cache
 
 ## Notes
 
-- Contract: `js/weather.js` requires `contract_version === 2`; a future v3 shows
-  an error banner (no silent breakage) until the page is updated.
+- Contract: `js/weather.js` requires `contract_version === 3` (v3-only); any
+  other version shows an error banner (no silent breakage) until the page is
+  updated. A future v4 will do the same and need the same coordinated deploy.
+- **Breaking-contract deploy (v3-only) — ordering matters.** The guard rejects
+  the old version, so the frontend must be deployed AFTER the backend cuts over
+  (when live `latest.json` returns `contract_version: 3`); until then the page
+  shows the contract-error banner. `js/` is cached on the gateway (and in the
+  browser — no cache-busting on `<script>`), so **flush the gateway cache on
+  every deploy AND rollback** (`find /var/cache/nginx-ratzek -mindepth 1
+  -delete`); `latest.json` is `no-store`, so there is no JSON staleness race.
+- **Rollback is fix-forward only.** `git revert` + redeploy does NOT recover
+  after the backend cutover (old `CONTRACT` vs new data = the same error). Fix
+  forward, or ask the backend to roll the generator back to the previous major.
+- To inspect the live source JSON directly: `ssh root@10.11.5.1 'cat
+  /var/lib/prometheus-weather-forecast-api/latest.json'` (this is the alias
+  target of `/weather/latest.json`; it is NOT in the rsync tree).
 - KG dictionaries (esp. the Zambretti scale and safety texts in `js/i18n.js`)
   are best-effort and need a native-speaker proofread.
 - Edge-case fixtures live in `dev/fixtures/`; open
   `weather-forecast.html?data=dev/fixtures/<name>.json` (relative path only) to
-  exercise stale/zambretti/contract-mismatch/partial branches locally.
+  exercise branches locally: `kitchen-sink` (v3, all new states — quality
+  severe/unknown, per-altitude verdicts, critical-altitude row, avalanche,
+  window fields), `window-nofit` (window `status != found`), `contract-bad`
+  (unsupported version → contract-error branch), `zambretti`, `contract3`.

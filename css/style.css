@@ -495,8 +495,27 @@ input:checked ~ .slider::before {
 .wf-q-bad {
   background-color: var(--danger);
 }
+/* severe = NO-GO: danger fill + hard dark outline so it reads differently from
+   `bad` even at a glance in sun; the ⛔ glyph (added in JS) is the primary cue. */
+.wf-q-severe {
+  background-color: var(--danger);
+  outline: 2px solid #000;
+  outline-offset: -3px;
+}
+/* unknown = off-scale "no data": grey + diagonal hatch, distinct from green AND
+   yellow so it never reads as a mild warning (§4.1). */
 .wf-q-unknown {
   background-color: #6b7280;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.25) 0,
+    rgba(255, 255, 255, 0.25) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+.wf-nogo {
+  margin-right: 0.15rem;
 }
 
 .wf-table {
@@ -526,6 +545,11 @@ input:checked ~ .slider::before {
 }
 .wf-risk--unknown {
   background-color: #6b7280;
+}
+/* severe risk tier (wind_severe / gust_severe): red + ⛔, hard blocker (§4.2). */
+.wf-risk--severe {
+  background-color: var(--danger);
+  font-weight: 700;
 }
 
 /* altitude selector — theme-aware segmented control (visible in both themes) */
@@ -613,6 +637,23 @@ input:checked ~ .slider::before {
 }
 .wf-htable thead th.wf-hq-unknown {
   border-top-color: #6b7280;
+  /* hatched top edge so "no data" hours differ from a mild warning at a glance */
+  border-top-style: dashed;
+}
+/* severe hour: thick danger top edge + the ⛔ glyph rendered in the cell */
+.wf-htable thead th.wf-hq-severe {
+  border-top-color: var(--danger);
+  border-top-width: 5px;
+}
+.wf-htable thead th .wf-nogo {
+  display: block;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+/* Freezing level shown as an unverified estimate (source not anchored, §2.5). */
+.wf-est {
+  opacity: 0.6;
+  font-style: italic;
 }
 .wf-uncertain {
   opacity: 0.55;
@@ -628,6 +669,36 @@ input:checked ~ .slider::before {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.1rem;
+}
+
+/* Avalanche: a list of triggered signs (never a danger scale). */
+.wf-avlist {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.wf-avflag {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.wf-avflag__v {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.wf-avflag--yes .wf-avflag__v {
+  color: var(--warn);
+}
+.wf-avflag--no {
+  opacity: 0.7;
+}
+.wf-avflag--nodata {
+  opacity: 0.7;
+  font-style: italic;
 }
 
 .wf-sources {
