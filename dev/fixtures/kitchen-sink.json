@@ -1,7 +1,8 @@
 {
   "contract_version": 3,
-  "contract_minor": 0,
-  "generator_version": "0.12.0",
+  "contract_minor": 1,
+  "semantics_epoch": 2,
+  "generator_version": "0.13.0",
   "attribution": [
     "Weather data by Open-Meteo.com (CC BY 4.0)",
     "ECMWF IFS and AIFS forecasts (CC BY 4.0)",
@@ -217,7 +218,7 @@
       "sky_code": "cloudy",
       "precip_code": "rain",
       "cloud_cover_pct": 65,
-      "precip_mm": 0.8,
+      "precip_mm": null,
       "precip_prob_pct": 55,
       "snowfall_cm": 0,
       "temp_base_c": 4.0,

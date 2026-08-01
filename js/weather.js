@@ -1487,6 +1487,11 @@
     }
     if (f.generator_version)
       parts.push(kv("wf_version", "gen " + f.generator_version));
+    // Semantics epoch (contract minor ≥1): the "meaning" of the values. Absence
+    // ≡ epoch 1; shown only when present so old data stays uncluttered. Surfaced
+    // here (the technical footer) so a value shift across epochs is traceable.
+    if (typeof f.semantics_epoch === "number")
+      parts.push(kv("wf_epoch", String(f.semantics_epoch)));
     // Mandatory data attribution (CC BY 4.0), small print.
     if (Array.isArray(f.attribution) && f.attribution.length) {
       const attr = el("p", { class: "wf-attribution" }, [
@@ -1613,7 +1618,9 @@
           "[weather] contract",
           f.contract_version,
           f.contract_minor,
-          f.generator_version
+          f.generator_version,
+          "epoch",
+          f.semantics_epoch == null ? 1 : f.semantics_epoch
         );
         renderAll(f);
       })
