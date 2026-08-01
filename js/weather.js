@@ -1011,7 +1011,7 @@
       if (h.wind_gusts_p90_ms != null)
         p90.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
       return p90.length
-        ? el("span", { text: s, title: p90.join(" · ") })
+        ? el("span", { text: s, title: "p90: " + p90.join(" · ") })
         : txt(s);
     });
     // "Feels like": altitudes carry wind_chill_c, base carries wind_chill_base_c.
@@ -1171,7 +1171,7 @@
           p.push(t("wf_wind_p90", { v: num(h.wind_base_p90_ms, 0) }));
         if (h.wind_gusts_p90_ms != null)
           p.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
-        if (p.length) s += " · " + p.join(" · ");
+        if (p.length) s += " · p90: " + p.join(" · ");
         kvT("wf_row_wind", s);
       }
       // Sky / precipitation in words (the header only shows emoji).
@@ -1234,42 +1234,46 @@
       }
 
       const when = ddmm(h.time_local) + " " + hhmm(h.time_local);
-      const closeBtn = el("button", {
-        class: "wf-hd__close",
-        text: "✕",
-        attrs: { type: "button", "aria-label": t("wf_detail_close") },
-      });
       const backTo = h.time_utc;
-      closeBtn.addEventListener("click", function () {
+      // Single close action, shared by the ✕, the bottom button and Esc; returns
+      // focus to the column that opened the panel.
+      function doClose() {
         detailHour = null;
         if (lastData) {
           renderHourlyInto(lastData);
           const b = document.querySelector('#wf-hourly .wf-hcol[data-h="' + backTo + '"]');
           if (b) b.focus();
         }
+      }
+      const closeBtn = el("button", {
+        class: "wf-hd__close",
+        text: "✕",
+        attrs: { type: "button", "aria-label": t("wf_detail_close") },
       });
+      closeBtn.addEventListener("click", doClose);
       const head = el("div", { class: "wf-hd__head wf-hq-" + hq }, [
         verdictMark(hq),
         el("span", { class: "wf-hd__when", text: when }),
         el("span", { class: "wf-hd__verdict", text: t("wf_quality_" + hq) }),
       ]);
+      // Full-width bottom close — a big thumb-reachable target so users don't
+      // have to stretch to the top-right ✕ on a large phone.
+      const closeBtm = el("button", {
+        class: "wf-hd__closebtm",
+        text: t("wf_detail_close"),
+        attrs: { type: "button" },
+      });
+      closeBtm.addEventListener("click", doClose);
       const panel = el(
         "section",
         {
           class: "wf-hdetail",
           attrs: { id: "wf-hdetail", tabindex: "-1", role: "region", "aria-label": when },
         },
-        [closeBtn, head, body]
+        [closeBtn, head, body, closeBtm]
       );
       panel.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") {
-          detailHour = null;
-          if (lastData) {
-            renderHourlyInto(lastData);
-            const b = document.querySelector('#wf-hourly .wf-hcol[data-h="' + backTo + '"]');
-            if (b) b.focus();
-          }
-        }
+        if (e.key === "Escape") doClose();
       });
       return panel;
     }

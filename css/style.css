@@ -763,19 +763,31 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   outline: 2px solid var(--link-color);
   outline-offset: 2px;
 }
+/* Dismiss control — neutral & secondary (never a status colour like the orange
+   link accent, which reads as a warning); 44px tap target via padding. */
 .wf-hd__close {
   position: absolute;
-  top: 0.3rem;
-  right: 0.3rem;
-  min-width: 40px;
-  min-height: 40px;
+  top: 0.2rem;
+  right: 0.2rem;
+  min-width: 44px;
+  min-height: 44px;
   background: transparent;
-  border: 1px solid var(--link-color);
-  color: var(--link-color);
+  border: 1px solid transparent;
+  color: var(--text-color);
+  opacity: 0.55;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.1rem;
   line-height: 1;
+}
+.wf-hd__close:hover {
+  opacity: 1;
+  background: rgba(127, 127, 127, 0.16);
+}
+.wf-hd__close:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--link-color);
+  outline-offset: -2px;
 }
 .wf-hd__head {
   display: flex;
@@ -808,11 +820,35 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   margin: 0 0 0.4rem;
   opacity: 0.9;
 }
+/* Detail rows stack (label over value, both left-aligned): compound
+   "·"-separated values scan far better than right-aligned on a phone. */
 .wf-hd__body .wf-kv {
-  padding: 0.15rem 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  padding: 0.25rem 0;
+}
+.wf-hd__body .wf-kv__v {
+  text-align: left;
 }
 .wf-detail-hint {
   font-style: italic;
+}
+/* Full-width bottom close — thumb-reachable secondary control. */
+.wf-hd__closebtm {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 0.6rem;
+  background: transparent;
+  border: 1px solid var(--link-color);
+  color: var(--link-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+}
+.wf-hd__closebtm:hover {
+  background: rgba(127, 127, 127, 0.14);
 }
 /* Freezing level shown as an unverified estimate (source not anchored, §2.5). */
 .wf-est {
