@@ -161,6 +161,10 @@ i18next.init(
             "Thunder risk lowered: rising air is capped.",
           wf_note_thunder_raised_by_li:
             "Thunder risk raised: the atmosphere is unstable.",
+          wf_note_precip_suppressed_by_ensemble:
+            "Precip risk cleared: the ensemble is almost unanimously dry.",
+          wf_note_precip_raised_by_ensemble:
+            "Precip risk raised: light precipitation is likely — wet rock.",
           wf_alpine_visibility: "visibility",
           wf_alpine_lifted_index: "instability index (thunder)",
           wf_alpine_convective_inhibition: "convection cap (thunder)",
@@ -540,6 +544,10 @@ i18next.init(
             "Риск грозы снижен: подъём воздуха подавлен.",
           wf_note_thunder_raised_by_li:
             "Риск грозы повышен: атмосфера неустойчива.",
+          wf_note_precip_suppressed_by_ensemble:
+            "Риск осадков снят: ансамбль почти единогласно сухой.",
+          wf_note_precip_raised_by_ensemble:
+            "Риск осадков повышен: вероятны слабые осадки — мокрая порода.",
           wf_alpine_visibility: "видимость",
           wf_alpine_lifted_index: "индекс неустойчивости (гроза)",
           wf_alpine_convective_inhibition: "запирание конвекции (гроза)",
@@ -922,6 +930,10 @@ i18next.init(
             "Чагылган коркунучу төмөндөдү: абанын көтөрүлүшү басылды.",
           wf_note_thunder_raised_by_li:
             "Чагылган коркунучу жогорулады: атмосфера туруксуз.",
+          wf_note_precip_suppressed_by_ensemble:
+            "Жаан коркунучу алынды: ансамбль дээрлик бир добуштан кургак.",
+          wf_note_precip_raised_by_ensemble:
+            "Жаан коркунучу жогорулады: аз жаан ыктымал — нымдуу таш.",
           wf_alpine_visibility: "көрүнүү",
           wf_alpine_lifted_index: "туруксуздук индекси (чагылган)",
           wf_alpine_convective_inhibition: "конвекцияны бөгөө (чагылган)",
