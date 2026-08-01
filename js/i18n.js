@@ -45,9 +45,16 @@ i18next.init(
           wf_heading: "Weather forecast at Ratzek hut",
           wf_no_data: "—",
           wf_loading: "Loading forecast…",
-          wf_load_error: "Couldn't load the forecast. Retrying…",
+          wf_load_error: "Couldn't refresh — tap ↻ to retry.",
           wf_contract_error:
             "The forecast format has changed. Please reload the page.",
+          wf_contract_kept:
+            "The forecast format changed; showing the last received data. Reload for the update.",
+          wf_section_error: "Couldn't display this section.",
+          wf_refresh: "Refresh",
+          wf_quality_legend: "Hour verdict:",
+          wf_hourly_caption:
+            "Hourly forecast, one row per metric (temperature, wind, risks…) across the forecast hours.",
           wf_updated: "Updated {{time}} · {{age}} min ago",
           wf_updated_unknown: "Update time unknown",
           wf_refresh_failed: "couldn't refresh",
@@ -111,7 +118,7 @@ i18next.init(
           wf_ridge_note:
             "Astronomical times for 3370 m; behind ridges the real sunrise is later.",
           wf_hourly: "Hourly forecast",
-          wf_hourly_empty: "No hourly data in this mode.",
+          wf_hourly_empty: "No hourly data right now.",
           wf_alt_select: "Altitude for wind/temperature:",
           wf_alt_base: "station",
           wf_wind_ms: "wind, m/s (⇡ gusts)",
@@ -257,7 +264,7 @@ i18next.init(
           wf_flsource_missing: "no value",
           wf_freezing_est_note: "Freezing level is an estimate (source not verified).",
           wf_row_critical_alt: "Bad above, m",
-          wf_critical_alt_legend: "Bad above the shown altitude; «?» — no per-altitude verdict.",
+          wf_critical_alt_legend: "Bad above the shown altitude; «·» — altitudes acceptable; «?» — no per-altitude verdict.",
           wf_critical_alt_nodata: "no per-altitude verdict",
           wf_wind_p90: "wind p90: {{v}}",
           wf_gust_p90: "gusts p90: {{v}}",
@@ -479,7 +486,14 @@ i18next.init(
           wf_heading: "Прогноз погоды на хижине Рацека",
           wf_no_data: "—",
           wf_loading: "Загрузка прогноза…",
-          wf_load_error: "Не удалось загрузить прогноз. Пробуем ещё раз…",
+          wf_load_error: "Обновить не удалось — нажмите ↻ для повтора.",
+          wf_contract_kept:
+            "Формат прогноза изменился; показаны последние полученные данные. Обновите страницу.",
+          wf_section_error: "Не удалось показать этот раздел.",
+          wf_refresh: "Обновить",
+          wf_quality_legend: "Вердикт часа:",
+          wf_hourly_caption:
+            "Почасовой прогноз, по строке на показатель (температура, ветер, риски…) по часам.",
           wf_contract_error:
             "Формат прогноза изменился. Пожалуйста, обновите страницу.",
           wf_updated: "Обновлено в {{time}} · {{age}} мин назад",
@@ -545,7 +559,7 @@ i18next.init(
           wf_ridge_note:
             "Астрономические времена для 3370 м; за гребнями реальный восход позже.",
           wf_hourly: "Почасовой прогноз",
-          wf_hourly_empty: "В этом режиме почасовых данных нет.",
+          wf_hourly_empty: "Почасовых данных сейчас нет.",
           wf_alt_select: "Высота для ветра/температуры:",
           wf_alt_base: "станция",
           wf_wind_ms: "ветер, м/с (⇡ порывы)",
@@ -691,7 +705,7 @@ i18next.init(
           wf_flsource_missing: "значения нет",
           wf_freezing_est_note: "Изотерма 0° — оценка (источник не подтверждён).",
           wf_row_critical_alt: "Плохо выше, м",
-          wf_critical_alt_legend: "Плохо выше показанной высоты; «?» — вердикта по высотам нет.",
+          wf_critical_alt_legend: "Плохо выше показанной высоты; «·» — по высотам приемлемо; «?» — вердикта по высотам нет.",
           wf_critical_alt_nodata: "вердикта по высотам нет",
           wf_wind_p90: "ветер p90: {{v}}",
           wf_gust_p90: "порывы p90: {{v}}",
@@ -916,8 +930,14 @@ i18next.init(
           wf_heading: "Рацек хижинасындагы аба ырайы божомолу",
           wf_no_data: "—",
           wf_loading: "Божомол жүктөлүүдө…",
-          wf_load_error:
-            "Божомолду жүктөө мүмкүн болбоду. Кайра аракет кылып жатабыз…",
+          wf_load_error: "Жаңылоо болбоду — кайталоо үчүн ↻ басыңыз.",
+          wf_contract_kept:
+            "Божомолдун форматы өзгөрдү; акыркы алынган маалымат көрсөтүлдү. Баракты жаңылаңыз.",
+          wf_section_error: "Бул бөлүмдү көрсөтүү мүмкүн болбоду.",
+          wf_refresh: "Жаңылоо",
+          wf_quality_legend: "Сааттын вердикти:",
+          wf_hourly_caption:
+            "Сааттык божомол, ар бир көрсөткүчкө бир сап (температура, шамал, тобокелдиктер…).",
           wf_contract_error: "Божомолдун форматы өзгөрдү. Баракты жаңылаңыз.",
           wf_updated: "Жаңыланды {{time}} · {{age}} мүнөт мурун",
           wf_updated_unknown: "Жаңылоо убактысы белгисиз",
@@ -982,7 +1002,7 @@ i18next.init(
           wf_ridge_note:
             "3370 м үчүн астрономиялык убакыт; кырлардын артында чыныгы күн чыгуу кечирээк.",
           wf_hourly: "Сааттык божомол",
-          wf_hourly_empty: "Бул режимде сааттык маалымат жок.",
+          wf_hourly_empty: "Азыр сааттык маалымат жок.",
           wf_alt_select: "Шамал/температура үчүн бийиктик:",
           wf_alt_base: "станция",
           wf_wind_ms: "шамал, м/с (⇡ соккулар)",
@@ -1128,7 +1148,7 @@ i18next.init(
           wf_flsource_missing: "маани жок",
           wf_freezing_est_note: "0° изотерма — болжол (булак тастыкталган эмес).",
           wf_row_critical_alt: "Начар бийиктиктен, м",
-          wf_critical_alt_legend: "Көрсөтүлгөн бийиктиктен жогору начар; «?» — бийиктик боюнча вердикт жок.",
+          wf_critical_alt_legend: "Көрсөтүлгөн бийиктиктен жогору начар; «·» — бийиктиктер боюнча ылайыктуу; «?» — бийиктик боюнча вердикт жок.",
           wf_critical_alt_nodata: "бийиктик боюнча вердикт жок",
           wf_wind_p90: "шамал p90: {{v}}",
           wf_gust_p90: "сокку p90: {{v}}",

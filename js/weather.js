@@ -109,6 +109,16 @@
     return Math.max(0, Math.floor((Date.now() - ts) / 60000));
   }
 
+  // Forecast age in minutes. Prefer the server-computed age_minutes: the
+  // audience is phones that may be offline with an unsynced clock, and a
+  // client-clock calc can make stale data look fresh (or vice versa). Fall
+  // back to the client calc only when the server didn't provide age.
+  function ageMin(f) {
+    if (f && typeof f.age_minutes === "number" && isFinite(f.age_minutes))
+      return Math.max(0, Math.floor(f.age_minutes));
+    return clientAgeMin(f && f.issued_at_local);
+  }
+
   function tendencyArrow(v) {
     if (v == null) return "→?";
     if (v > 0.1) return "↑";
@@ -162,12 +172,23 @@
     return "wf-q-unknown";
   }
 
-  // NO-GO marker: severe must differ from bad by shape, not just red shade
-  // (§4.2). Returns "⛔" glyph node or null. Callers add localized text.
-  function noGoGlyph(q) {
-    return q === "severe"
-      ? el("span", { class: "wf-nogo", text: "⛔", attrs: { "aria-hidden": "true" } })
+  // Non-colour verdict marker so the hour verdict isn't conveyed by hue alone
+  // (WCAG 1.4.1) — critical for red/green colour-blindness and phone-in-sun.
+  // severe keeps ⛔ (NO-GO); caution/bad/unknown get distinct glyphs; ok none.
+  const VERDICT_GLYPH = { caution: "⚠", bad: "✕", severe: "⛔", unknown: "?" };
+  function verdictMark(q) {
+    const g = VERDICT_GLYPH[q];
+    return g
+      ? el("span", { class: "wf-vmark", text: g, attrs: { "aria-hidden": "true" } })
       : null;
+  }
+
+  // Localized quality_reason, or null for unknown/missing codes (no raw key).
+  function qReasonText(code) {
+    if (!code) return null;
+    const k = "wf_qreason_" + code;
+    const s = t(k);
+    return s === k ? null : s;
   }
 
   // Per-hour altitude verdict state (§2.1). THREE distinct cases — the last two
@@ -229,10 +250,25 @@
         })
       );
     }
-    const opts = { text: km };
+    // Fog-model agreement shown INLINE (§4.6: "visibility from 300 m, 2 of 5
+    // models"), not just in the touch-inaccessible tooltip. Compact "N/M".
+    const foggy =
+      h.visibility_low_models != null &&
+      h.visibility_low_models > 0 &&
+      h.visibility_models != null;
+    const opts = {};
     if (parts.length) opts.title = parts.join(" · ");
     if (m < 1000) opts.class = "wf-vis-low";
-    return el("span", opts);
+    const node = el("span", opts, km);
+    if (foggy) {
+      node.appendChild(
+        el("sub", {
+          class: "wf-vis-frac",
+          text: " " + h.visibility_low_models + "/" + h.visibility_models,
+        })
+      );
+    }
+    return node;
   }
 
   // Ensemble 10–90% spread (°C) at/above which a temperature is "shaky" and gets
@@ -289,7 +325,11 @@
   }
 
   function banner(kind, text) {
-    return el("div", { class: "wf-banner wf-banner--" + kind, text: text });
+    // Danger banners (storm, stale, contract) are urgent → assertive so screen
+    // readers announce them promptly even amid other DOM churn; info/warn stay
+    // polite (the #wf-banners region itself is aria-live="polite").
+    const attrs = kind === "danger" ? { role: "alert" } : null;
+    return el("div", { class: "wf-banner wf-banner--" + kind, attrs: attrs }, text);
   }
 
   function riskBadge(code) {
@@ -317,13 +357,32 @@
     if (node) host.appendChild(node);
   }
 
+  // Slot id → its card's real i18n title key (the slot id ≠ the title key, so a
+  // naive "wf_"+id would show a raw key on failure).
+  const SECTION_TITLE_KEY = {
+    "wf-current": "wf_now",
+    "wf-alpine": "wf_alpine_title",
+    "wf-avalanche": "wf_avalanche_title",
+    "wf-window": "wf_window",
+    "wf-thunder": "wf_thunder",
+    "wf-night": "wf_night",
+    "wf-sun": "wf_sun",
+    "wf-hourly": "wf_hourly",
+    "wf-sources": "wf_sources",
+  };
+
   // Render one section into its slot, isolated so a failure can't blank the page.
   function section(id, fn) {
     try {
       set(id, fn());
     } catch (e) {
       console.error("[weather] section", id, "failed:", e);
-      set(id, card("wf_" + id.replace("wf-", ""), el("p", { text: t("wf_no_data") })));
+      // Distinct "failed to render" text (not the "—" no-data dash) with the
+      // section's real localized title.
+      set(
+        id,
+        card(SECTION_TITLE_KEY[id] || "wf_no_data", el("p", { text: t("wf_section_error") }))
+      );
     }
   }
 
@@ -331,7 +390,7 @@
     const host = document.getElementById("wf-updated");
     if (!host) return;
     host.textContent = "";
-    const age = clientAgeMin(f && f.issued_at_local);
+    const age = ageMin(f);
     const at = hhmm(f && f.issued_at_local);
     let line =
       age == null
@@ -347,13 +406,25 @@
     }
     host.className = "wf-updated " + cls.join(" ");
     host.textContent = line;
+    // Manual refresh — auto-poll can be up to REFETCH_MS away and the channel
+    // flaps; give the user an explicit "refresh now" (single-flight guarded).
+    host.appendChild(document.createTextNode(" "));
+    const btn = el("button", {
+      class: "wf-refresh",
+      text: "↻",
+      attrs: { type: "button", "aria-label": t("wf_refresh"), title: t("wf_refresh") },
+    });
+    btn.addEventListener("click", function () {
+      fetchOnce();
+    });
+    host.appendChild(btn);
   }
 
   function renderBanners(f) {
     const host = document.getElementById("wf-banners");
     if (!host) return;
     host.textContent = "";
-    const age = clientAgeMin(f.issued_at_local);
+    const age = ageMin(f);
     if (f.stale || (age != null && age > STALE_MIN)) {
       host.appendChild(
         banner("danger", t("wf_stale", { age: age == null ? "?" : age }))
@@ -805,6 +876,7 @@
 
     // A table with a sticky label column so every number is self-explanatory.
     const table = el("table", { class: "wf-htable" });
+    table.appendChild(el("caption", { class: "wf-sr", text: t("wf_hourly_caption") }));
 
     // Mark day boundaries so 73 hours across ~3 days stay readable.
     const newDayCols = new Set();
@@ -822,19 +894,23 @@
       const hq =
         (isAlt ? (altOf(h, selectedAltitude) || {}).quality : h.quality) ||
         "unknown";
+      const reason = qReasonText(h.quality_reason);
+      // Screen-reader verdict: the colour + glyph mean nothing to SR/keyboard.
+      // e.g. "NO-GO — опасные порывы". Also makes the reason reachable without
+      // the (touch-inaccessible) title tooltip.
+      const srVerdict =
+        t("wf_quality_" + hq) + (reason ? " — " + reason : "");
       htr.appendChild(
         el(
           "th",
           {
             class: "wf-hq-" + hq + (newDayCols.has(i) ? " wf-newday" : ""),
-            title: h.quality_reason
-              ? t("wf_qreason_" + h.quality_reason) === "wf_qreason_" + h.quality_reason
-                ? undefined
-                : t("wf_qreason_" + h.quality_reason)
-              : undefined,
+            title: reason || undefined,
+            attrs: { scope: "col" },
           },
           [
-            noGoGlyph(hq),
+            el("span", { class: "wf-sr", text: srVerdict }),
+            verdictMark(hq),
             el("div", { class: "wf-hdate", text: showDate ? ddmm(day) : "" }),
             el("div", { class: "wf-hh", text: hhmm(h.time_local) }),
             el("div", {
@@ -856,7 +932,7 @@
 
     const tbody = el("tbody");
     function addRow(labelKey, cellFn) {
-      const tr = el("tr", null, el("th", { text: t(labelKey) }));
+      const tr = el("tr", null, el("th", { text: t(labelKey), attrs: { scope: "row" } }));
       rows.forEach(function (h, i) {
         const node = cellFn(h);
         tr.appendChild(
@@ -960,12 +1036,16 @@
       const title = src && t(key) !== key ? t(key) : t("wf_flsource_raw_blend");
       return el("span", { class: "wf-est", text: v, title: title });
     });
-    // Critical altitude (§2.1): lowest altitude with a bad+ verdict. Shown only
-    // when some hour actually has one; three per-hour states kept distinct.
+    // Critical altitude (§2.1): lowest altitude with a bad+ verdict. Show the
+    // row whenever an altitude layer exists and any hour isn't plain "ok" — so
+    // the 'nodata' case ("no per-altitude verdict") is visible too, not hidden
+    // behind "everything's fine". Three per-hour states kept distinct.
     const critStates = rows.map(criticalAltState);
-    const critShown = critStates.some(function (s) {
-      return s.kind === "bad";
-    });
+    const critShown =
+      alts.length > 0 &&
+      critStates.some(function (s) {
+        return s.kind !== "ok";
+      });
     if (critShown) {
       addRow("wf_row_critical_alt", function (h) {
         const s = criticalAltState(h);
@@ -1021,6 +1101,23 @@
       seg,
       el("div", { class: "wf-timeline" }, table),
     ];
+    // Quality colour-scale legend — the primary at-a-glance code (the header
+    // top-border colour) is otherwise unexplained. Swatch + glyph + label.
+    const qlegend = el("div", { class: "wf-qlegend" });
+    ["ok", "caution", "bad", "severe", "unknown"].forEach(function (q) {
+      qlegend.appendChild(
+        el("span", { class: "wf-qlegend__item" }, [
+          el("span", {
+            class: "wf-qlegend__sw " + qualityClass(q),
+            attrs: { "aria-hidden": "true" },
+          }),
+          verdictMark(q),
+          document.createTextNode(" " + t("wf_quality_" + q)),
+        ])
+      );
+    });
+    cardKids.push(el("p", { class: "wf-note", text: t("wf_quality_legend") }));
+    cardKids.push(qlegend);
     // Temp corridor legend — only when some cell actually carries a p10/p90 band.
     const bandShown = rows.some(function (h) {
       const a = isAlt ? altOf(h, selectedAltitude) || {} : h;
@@ -1047,9 +1144,17 @@
   }
 
   function renderHourlyInto(f) {
+    // Preserve horizontal scroll position across re-renders (poll / language /
+    // altitude switch) so a user reading +50h isn't yanked back to the start.
+    const prev = document.querySelector("#wf-hourly .wf-timeline");
+    const savedScroll = prev ? prev.scrollLeft : 0;
     section("wf-hourly", function () {
       return renderHourly(f);
     });
+    if (savedScroll) {
+      const next = document.querySelector("#wf-hourly .wf-timeline");
+      if (next) next.scrollLeft = savedScroll;
+    }
   }
 
   function renderSources(f) {
@@ -1145,6 +1250,17 @@
   }
 
   function showContractError() {
+    // If we already have a last-good render on screen, keep it and just warn —
+    // wiping it would replace real (if aging) data with nothing. Only clear the
+    // sections when there's nothing good to preserve.
+    if (lastData) {
+      const host = document.getElementById("wf-banners");
+      if (host) {
+        host.textContent = "";
+        host.appendChild(banner("danger", t("wf_contract_kept")));
+      }
+      return;
+    }
     ["wf-current","wf-alpine","wf-avalanche","wf-window","wf-thunder","wf-night","wf-sun","wf-hourly","wf-sources"].forEach(function(id){ set(id, null); });
     set("wf-banners", banner("danger", t("wf_contract_error")));
   }
@@ -1245,4 +1361,31 @@
         else i18next.on("initialized", start);
       }
     });
+
+  // Failsafe for a blank page: the entire render is gated on i18next, so if its
+  // script fails to load over a flaky satellite link nothing ever renders. Show
+  // a static (i18n-independent) loading hint now, and a reload prompt if start()
+  // hasn't run in time. Text is trilingual since we can't rely on the bundle.
+  (function i18nFailsafe() {
+    const host = document.getElementById("wf-banners");
+    if (!host) return;
+    if (!started && !host.hasChildNodes()) {
+      const l = document.createElement("div");
+      l.className = "wf-banner wf-banner--info";
+      l.textContent = "Загрузка… · Loading… · Жүктөлүүдө…";
+      host.appendChild(l);
+    }
+    setTimeout(function () {
+      if (started) return; // a real render took over — nothing to do
+      host.textContent = "";
+      const d = document.createElement("div");
+      d.className = "wf-banner wf-banner--danger";
+      d.setAttribute("role", "alert");
+      d.textContent =
+        "Не удалось загрузить страницу — обновите. · " +
+        "Failed to load — please reload. · " +
+        "Жүктөө болбоду — жаңылаңыз.";
+      host.appendChild(d);
+    }, 12000);
+  })();
 })();
