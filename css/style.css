@@ -723,10 +723,96 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   border-top-color: var(--danger);
   border-top-width: 5px;
 }
-.wf-htable thead th .wf-nogo {
+.wf-htable thead th .wf-vmark {
   display: block;
   font-size: 0.8rem;
   line-height: 1;
+}
+/* Hour header is a button opening the detail panel — reset chrome, fill cell,
+   glove-friendly tap target, subtle affordance. */
+.wf-hcol {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  padding: 0.25rem 0.35rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.wf-hcol:hover {
+  background: rgba(127, 127, 127, 0.14);
+}
+.wf-hcol--open {
+  background: rgba(127, 127, 127, 0.22);
+  outline: 2px solid var(--link-color);
+  outline-offset: -2px;
+}
+
+/* Hour-detail panel (tap a column). Full-width card under the timeline. */
+.wf-hdetail {
+  border: var(--border-section);
+  border-radius: 5px;
+  padding: 0.6rem 0.8rem;
+  margin-top: 0.6rem;
+  position: relative;
+}
+.wf-hdetail:focus {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+.wf-hd__close {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  min-width: 40px;
+  min-height: 40px;
+  background: transparent;
+  border: 1px solid var(--link-color);
+  color: var(--link-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+.wf-hd__head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  padding-bottom: 0.3rem;
+  padding-right: 3rem; /* clear the close button */
+  border-bottom: 2px solid transparent;
+  margin-bottom: 0.4rem;
+}
+.wf-hd__head.wf-hq-ok {
+  border-bottom-color: var(--ok);
+}
+.wf-hd__head.wf-hq-caution {
+  border-bottom-color: var(--warn);
+}
+.wf-hd__head.wf-hq-bad,
+.wf-hd__head.wf-hq-severe {
+  border-bottom-color: var(--danger);
+}
+.wf-hd__head.wf-hq-unknown {
+  border-bottom-color: #6b7280;
+}
+.wf-hd__verdict {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+.wf-hd__reason {
+  margin: 0 0 0.4rem;
+  opacity: 0.9;
+}
+.wf-hd__body .wf-kv {
+  padding: 0.15rem 0;
+}
+.wf-detail-hint {
+  font-style: italic;
 }
 /* Freezing level shown as an unverified estimate (source not anchored, §2.5). */
 .wf-est {

@@ -130,9 +130,12 @@ i18next.init(
           wf_row_rh: "Humidity, %",
           wf_row_freezing: "Freezing level, m",
           wf_row_risks: "Risks",
+          wf_row_sky: "Sky",
+          wf_detail_hint: "Tap an hour for details.",
+          wf_detail_close: "Close",
           wf_temp_band: "10–90%: {{lo}}…{{hi}}°",
           wf_temp_band_legend:
-            "Temperatures in muted italic mean a wide model spread (less reliable); the exact range is in the tooltip.",
+            "Temperatures in muted italic mean a wide model spread (less reliable); tap the hour for the exact range.",
           wf_incloud: "in cloud (humidity ≥95%)",
           wf_feels_note:
             "«Feels like» shows only when wind adds noticeable chill; a dash means it feels like the air temperature.",
@@ -571,9 +574,12 @@ i18next.init(
           wf_row_rh: "Влажность, %",
           wf_row_freezing: "Изотерма 0°, м",
           wf_row_risks: "Риски",
+          wf_row_sky: "Небо",
+          wf_detail_hint: "Нажмите на час — подробности.",
+          wf_detail_close: "Закрыть",
           wf_temp_band: "10–90%: {{lo}}…{{hi}}°",
           wf_temp_band_legend:
-            "Температуры приглушённым курсивом — широкий разброс моделей (менее надёжно); точный диапазон — при наведении.",
+            "Температуры приглушённым курсивом — широкий разброс моделей (менее надёжно); точный диапазон — по тапу на час.",
           wf_incloud: "в облаке (влажность ≥95%)",
           wf_feels_note:
             "«Ощущается» показывается только когда ветер заметно холодит; прочерк — ощущается как температура воздуха.",
@@ -1014,9 +1020,12 @@ i18next.init(
           wf_row_rh: "Нымдуулук, %",
           wf_row_freezing: "0° изотерма, м",
           wf_row_risks: "Тобокелдиктер",
+          wf_row_sky: "Асман",
+          wf_detail_hint: "Чоо-жайын көрүү үчүн саатты басыңыз.",
+          wf_detail_close: "Жабуу",
           wf_temp_band: "10–90%: {{lo}}…{{hi}}°",
           wf_temp_band_legend:
-            "Күңүрт курсив температуралар — моделдердин чоң чачырашы (анча ишенимдүү эмес); так диапазон — курсорду алып келгенде.",
+            "Күңүрт курсив температуралар — моделдердин чоң чачырашы (анча ишенимдүү эмес); так диапазон — саатты басканда.",
           wf_incloud: "булутта (нымдуулук ≥95%)",
           wf_feels_note:
             "«Сезилет» шамал байкаларлык муздатканда гана көрсөтүлөт; сызык — аба температурасындай сезилет дегени.",

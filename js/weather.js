@@ -24,7 +24,17 @@
   let reqSeq = 0; // monotonic request id — ignore stale responses
   let inFlight = false; // single-flight guard
   let selectedAltitude = "base"; // hourly timeline altitude ("base" | number)
+  let detailHour = null; // time_utc of the hour whose detail panel is open, or null
   let started = false;
+
+  // Move focus/scroll to the just-opened hour-detail panel (accessibility).
+  function focusDetail() {
+    const d = document.getElementById("wf-hdetail");
+    if (d) {
+      d.scrollIntoView({ block: "nearest" });
+      d.focus();
+    }
+  }
 
   // --- data source (dev hook: ?data=<relative-path> only) ---
   function dataUrl() {
@@ -900,6 +910,44 @@
       // the (touch-inaccessible) title tooltip.
       const srVerdict =
         t("wf_quality_" + hq) + (reason ? " — " + reason : "");
+      const open = detailHour === h.time_utc;
+      // The header is a real button: tap/keyboard opens the hour-detail panel
+      // (all the per-cell detail that used to live only in hover tooltips).
+      const hbtn = el(
+        "button",
+        {
+          class: "wf-hcol" + (open ? " wf-hcol--open" : ""),
+          attrs: {
+            type: "button",
+            "aria-expanded": open ? "true" : "false",
+            "aria-controls": "wf-hdetail",
+            "data-h": h.time_utc || "",
+          },
+        },
+        [
+          el("span", { class: "wf-sr", text: srVerdict }),
+          verdictMark(hq),
+          el("div", { class: "wf-hdate", text: showDate ? ddmm(day) : "" }),
+          el("div", { class: "wf-hh", text: hhmm(h.time_local) }),
+          el("div", {
+            class: "wf-hsky",
+            text:
+              (SKY_GLYPH[h.sky_code] || "") + (PRECIP_GLYPH[h.precip_code] || ""),
+            title:
+              (enumLabel("sky", h.sky_code) || "") +
+              (h.precip_code && h.precip_code !== "none"
+                ? " · " + enumLabel("precip", h.precip_code)
+                : ""),
+          }),
+        ]
+      );
+      hbtn.addEventListener("click", function () {
+        detailHour = detailHour === h.time_utc ? null : h.time_utc;
+        if (lastData) {
+          renderHourlyInto(lastData);
+          if (detailHour) focusDetail();
+        }
+      });
       htr.appendChild(
         el(
           "th",
@@ -908,23 +956,7 @@
             title: reason || undefined,
             attrs: { scope: "col" },
           },
-          [
-            el("span", { class: "wf-sr", text: srVerdict }),
-            verdictMark(hq),
-            el("div", { class: "wf-hdate", text: showDate ? ddmm(day) : "" }),
-            el("div", { class: "wf-hh", text: hhmm(h.time_local) }),
-            el("div", {
-              class: "wf-hsky",
-              text:
-                (SKY_GLYPH[h.sky_code] || "") +
-                (PRECIP_GLYPH[h.precip_code] || ""),
-              title:
-                (enumLabel("sky", h.sky_code) || "") +
-                (h.precip_code && h.precip_code !== "none"
-                  ? " · " + enumLabel("precip", h.precip_code)
-                  : ""),
-            }),
-          ]
+          hbtn
         )
       );
     });
@@ -1096,11 +1128,168 @@
     });
     table.appendChild(tbody);
 
+    // Full detail for one hour, in plain language, for the selected altitude.
+    // Everything here was previously reachable only via hover tooltips.
+    function renderHourDetail(h, isAlt) {
+      const a = isAlt ? altOf(h, selectedAltitude) || {} : null;
+      const hq = (isAlt ? a.quality : h.quality) || "unknown";
+      const body = el("div", { class: "wf-hd__body" });
+      const kvT = function (labelKey, value) {
+        if (value != null && value !== "") body.appendChild(kv(labelKey, value));
+      };
+      // Reason first — the "why" that used to hide in the header tooltip.
+      const reason = qReasonText(h.quality_reason);
+      if (reason) body.appendChild(el("p", { class: "wf-hd__reason", text: reason }));
+      // Temperature + ensemble corridor.
+      const temp = isAlt ? a.temp_c : h.temp_base_c;
+      const p10 = isAlt ? a.temp_p10_c : h.temp_base_p10_c;
+      const p90 = isAlt ? a.temp_p90_c : h.temp_base_p90_c;
+      if (temp != null) {
+        let s = unit(temp, "°", 0);
+        if (num(p10, 1) != null && num(p90, 1) != null)
+          s += " · " + t("wf_temp_band", { lo: num(p10, 1), hi: num(p90, 1) });
+        kvT("wf_row_temp", s);
+      }
+      const feels = isAlt ? a.wind_chill_c : h.wind_chill_base_c;
+      if (feels != null) kvT("wf_row_chill", unit(feels, "°", 0));
+      if (isAlt && a.rh_pct != null)
+        kvT("wf_row_rh", a.rh_pct + (a.in_cloud === true ? " · " + t("wf_incloud") : ""));
+      // Wind — gusts / p90 are base-only (§4.5).
+      if (isAlt) {
+        if (a.wind_ms != null)
+          kvT(
+            "wf_row_wind_alt",
+            unit(a.wind_ms, "", 0) +
+              (a.wind_dir_deg != null ? " " + windArrow(a.wind_dir_deg) : "")
+          );
+      } else if (h.wind_base_ms != null) {
+        let s =
+          unit(h.wind_base_ms, "", 0) +
+          (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "");
+        const p = [];
+        if (h.wind_base_p90_ms != null)
+          p.push(t("wf_wind_p90", { v: num(h.wind_base_p90_ms, 0) }));
+        if (h.wind_gusts_p90_ms != null)
+          p.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
+        if (p.length) s += " · " + p.join(" · ");
+        kvT("wf_row_wind", s);
+      }
+      // Sky / precipitation in words (the header only shows emoji).
+      const sky = enumLabel("sky", h.sky_code);
+      const precip =
+        h.precip_code && h.precip_code !== "none"
+          ? enumLabel("precip", h.precip_code)
+          : null;
+      if (sky || precip) kvT("wf_row_sky", [sky, precip].filter(Boolean).join(" · "));
+      if (h.precip_prob_pct != null) kvT("wf_row_prob", String(h.precip_prob_pct));
+      // Visibility with worst-case + fog-model context (§4.6).
+      const vm = visMeters(h);
+      if (vm != null) {
+        let s = num(vm / 1000, 1);
+        const extra = [];
+        if (h.visibility_min_m != null && h.visibility_min_m !== vm)
+          extra.push(t("wf_vis_worst", { km: num(h.visibility_min_m / 1000, 1) }));
+        if (
+          h.visibility_low_models != null &&
+          h.visibility_low_models > 0 &&
+          h.visibility_models != null
+        )
+          extra.push(
+            t("wf_vis_fog_models", {
+              low: h.visibility_low_models,
+              total: h.visibility_models,
+            })
+          );
+        if (extra.length) s += " · " + extra.join(" · ");
+        kvT("wf_row_visibility", s);
+      }
+      if (h.freezing_level_m != null) {
+        let s = num(h.freezing_level_m, 0);
+        if (!freezingVerified(h.freezing_level_source)) {
+          const src = h.freezing_level_source;
+          const key = "wf_flsource_" + src;
+          s += " · " + (src && t(key) !== key ? t(key) : t("wf_flsource_raw_blend"));
+        }
+        kvT("wf_row_freezing", s);
+      }
+      if (h.uv_index != null) {
+        const info = uvInfo(h.uv_index);
+        kvT("wf_row_uv", num(h.uv_index, 0) + " · " + t(info.level));
+      }
+      const cs = criticalAltState(h);
+      if (cs.kind === "bad") kvT("wf_row_critical_alt", num(cs.m, 0));
+      else if (cs.kind === "nodata") kvT("wf_row_critical_alt", t("wf_critical_alt_nodata"));
+      // Risks — common-hour ∪ selected-altitude.
+      const codes = Array.isArray(h.risks) ? h.risks.slice() : [];
+      if (isAlt && Array.isArray(a.risks))
+        a.risks.forEach(function (c) {
+          if (codes.indexOf(c) === -1) codes.push(c);
+        });
+      if (codes.length) {
+        const wrap = el("div", { class: "wf-hrisks" });
+        codes.forEach(function (c) {
+          wrap.appendChild(riskBadge(c));
+        });
+        body.appendChild(kv("wf_row_risks", wrap));
+      }
+
+      const when = ddmm(h.time_local) + " " + hhmm(h.time_local);
+      const closeBtn = el("button", {
+        class: "wf-hd__close",
+        text: "✕",
+        attrs: { type: "button", "aria-label": t("wf_detail_close") },
+      });
+      const backTo = h.time_utc;
+      closeBtn.addEventListener("click", function () {
+        detailHour = null;
+        if (lastData) {
+          renderHourlyInto(lastData);
+          const b = document.querySelector('#wf-hourly .wf-hcol[data-h="' + backTo + '"]');
+          if (b) b.focus();
+        }
+      });
+      const head = el("div", { class: "wf-hd__head wf-hq-" + hq }, [
+        verdictMark(hq),
+        el("span", { class: "wf-hd__when", text: when }),
+        el("span", { class: "wf-hd__verdict", text: t("wf_quality_" + hq) }),
+      ]);
+      const panel = el(
+        "section",
+        {
+          class: "wf-hdetail",
+          attrs: { id: "wf-hdetail", tabindex: "-1", role: "region", "aria-label": when },
+        },
+        [closeBtn, head, body]
+      );
+      panel.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          detailHour = null;
+          if (lastData) {
+            renderHourlyInto(lastData);
+            const b = document.querySelector('#wf-hourly .wf-hcol[data-h="' + backTo + '"]');
+            if (b) b.focus();
+          }
+        }
+      });
+      return panel;
+    }
+
     const cardKids = [
       el("p", { class: "wf-sub", text: t("wf_alt_select") }),
       seg,
+      el("p", { class: "wf-note wf-detail-hint", text: t("wf_detail_hint") }),
       el("div", { class: "wf-timeline" }, table),
     ];
+    // Hour-detail panel (tap a column) — all the per-cell detail that used to be
+    // hover-only tooltips, in plain language, for the selected altitude. Rendered
+    // right under the timeline; survives re-render via the detailHour state.
+    if (detailHour != null) {
+      const dh = rows.find(function (h) {
+        return h.time_utc === detailHour;
+      });
+      if (dh) cardKids.push(renderHourDetail(dh, isAlt));
+      else detailHour = null; // hour no longer in data
+    }
     // Quality colour-scale legend — the primary at-a-glance code (the header
     // top-border colour) is otherwise unexplained. Swatch + glyph + label.
     const qlegend = el("div", { class: "wf-qlegend" });
