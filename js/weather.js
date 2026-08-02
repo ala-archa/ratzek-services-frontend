@@ -157,10 +157,14 @@
     return "→";
   }
 
-  function windArrow(deg) {
+  // Wind direction as a localized compass abbreviation, by the meteorological
+  // convention: the direction the wind blows FROM (deg 0 = from north = С/N).
+  // (The old arrows pointed where the wind was going — the opposite — which
+  // users found confusing.)
+  const WIND_DIR_CODES = ["n", "ne", "e", "se", "s", "sw", "w", "nw"];
+  function windDir(deg) {
     if (deg == null) return "";
-    const dirs = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]; // arrow points where wind goes
-    return dirs[Math.round(deg / 45) % 8];
+    return t("wf_dir_" + WIND_DIR_CODES[Math.round(deg / 45) % 8]);
   }
 
   const SKY_GLYPH = { clear: "☀️", partly: "⛅", cloudy: "☁️", overcast: "☁️" };
@@ -1018,7 +1022,7 @@
         const uncertain = a.wind_ms_spread == null || a.wind_ms_spread > 3;
         const s =
           unit(a.wind_ms, "", 0) +
-          (a.wind_dir_deg != null ? " " + windArrow(a.wind_dir_deg) : "");
+          (a.wind_dir_deg != null ? " " + windDir(a.wind_dir_deg) : "");
         return uncertain ? el("span", { class: "wf-uncertain", text: s }) : txt(s);
       }
       // Base station: no direction in the data, but it has gusts. Gusts +
@@ -1181,7 +1185,7 @@
           kvT(
             "wf_row_wind_alt",
             unit(a.wind_ms, "", 0) +
-              (a.wind_dir_deg != null ? " " + windArrow(a.wind_dir_deg) : "")
+              (a.wind_dir_deg != null ? " " + windDir(a.wind_dir_deg) : "")
           );
       } else if (h.wind_base_ms != null) {
         let s =
