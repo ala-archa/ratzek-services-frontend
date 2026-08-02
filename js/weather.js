@@ -480,7 +480,7 @@
       kv("wf_temp", unit(c.temperature_c, "°C", 1)),
       kv(
         "wf_pressure",
-        unit(c.pressure_hpa, " hPa", 1) +
+        unit(c.pressure_hpa, " " + t("wf_unit_hpa"), 1) +
           "  " +
           tendencyArrow(c.tendency_hpa_per_3h) +
           (c.tendency_hpa_per_3h == null && c.tendency_unknown_reason
@@ -1022,7 +1022,7 @@
       if (h.wind_gusts_p90_ms != null)
         p90.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
       return p90.length
-        ? el("span", { text: s, title: "p90: " + p90.join(" · ") })
+        ? el("span", { text: s, title: t("wf_spread_prefix") + ": " + p90.join(" · ") })
         : txt(s);
     });
     // "Feels like": altitudes carry wind_chill_c, base carries wind_chill_base_c.
@@ -1182,7 +1182,7 @@
           p.push(t("wf_wind_p90", { v: num(h.wind_base_p90_ms, 0) }));
         if (h.wind_gusts_p90_ms != null)
           p.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
-        if (p.length) s += " · p90: " + p.join(" · ");
+        if (p.length) s += " · " + t("wf_spread_prefix") + ": " + p.join(" · ");
         kvT("wf_row_wind", s);
       }
       // Sky / precipitation in words (the header only shows emoji).
