@@ -145,7 +145,7 @@ i18next.init(
           wf_snow_depth: "Snow at station, cm",
           wf_row_visibility: "Visibility, km",
           wf_vis_legend:
-            "Visibility is the expected value (model median); fog is flagged as the “loss of visibility” risk.",
+            "Visibility is the expected value (model median); fog is flagged as the “loss of visibility” risk. A small N/M next to a value is how many of the models see fog.",
           wf_vis_worst: "worst model: {{km}}",
           wf_vis_fog_models: "fog possible ({{low}} of {{total}} models)",
           wf_row_uv: "UV index",
@@ -595,7 +595,7 @@ i18next.init(
           wf_snow_depth: "Снег на станции, см",
           wf_row_visibility: "Видимость, км",
           wf_vis_legend:
-            "Видимость — ожидаемая (медиана моделей); туман отмечается риском «потеря видимости».",
+            "Видимость — ожидаемая (медиана моделей); туман отмечается риском «потеря видимости». Маленькое N/M рядом со значением — сколько моделей из общего числа дают туман.",
           wf_vis_worst: "худшая модель: {{km}}",
           wf_vis_fog_models: "туман возможен ({{low}} из {{total}} моделей)",
           wf_row_uv: "UV-индекс",
@@ -1047,7 +1047,7 @@ i18next.init(
           wf_snow_depth: "Станциядагы кар, см",
           wf_row_visibility: "Көрүнүү, км",
           wf_vis_legend:
-            "Көрүнүү — болжолдуу (моделдердин медианасы); туман «көрүнбөй калуу» коркунучу менен белгиленет.",
+            "Көрүнүү — болжолдуу (моделдердин медианасы); туман «көрүнбөй калуу» коркунучу менен белгиленет. Маанинин жанындагы кичине N/M — жалпы санынан канча модель туман көрсөтөт.",
           wf_vis_worst: "эң начар модель: {{km}}",
           wf_vis_fog_models: "туман болушу мүмкүн ({{low}}/{{total}} модель)",
           wf_row_uv: "UV-индекс",
