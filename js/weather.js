@@ -130,14 +130,24 @@
     return Math.max(0, Math.floor((Date.now() - ts) / 60000));
   }
 
-  // Forecast age in minutes. Prefer the server-computed age_minutes: the
-  // audience is phones that may be offline with an unsynced clock, and a
-  // client-clock calc can make stale data look fresh (or vice versa). Fall
-  // back to the client calc only when the server didn't provide age.
+  // Forecast age in minutes. The server's age_minutes is a snapshot baked into
+  // the static file at generation (≈0) — it does NOT advance as the browser
+  // re-polls the same file for up to 30 min, so trusting it alone pins the
+  // display at "0 min ago" and would defeat staleness detection if the
+  // generator stalls (frozen age_minutes=0, stale=false). Compute the live age
+  // from issued_at (client clock) and take the MAX with the server value: the
+  // client calc gives real elapsed time, while the server value is a floor so a
+  // phone whose clock runs behind can't make old data look fresh. Prefer the
+  // absolute issued_at_utc over the local timestamp.
   function ageMin(f) {
-    if (f && typeof f.age_minutes === "number" && isFinite(f.age_minutes))
-      return Math.max(0, Math.floor(f.age_minutes));
-    return clientAgeMin(f && f.issued_at_local);
+    const client = clientAgeMin(f && (f.issued_at_utc || f.issued_at_local));
+    const server =
+      f && typeof f.age_minutes === "number" && isFinite(f.age_minutes)
+        ? Math.max(0, Math.floor(f.age_minutes))
+        : null;
+    if (client == null) return server;
+    if (server == null) return client;
+    return Math.max(client, server);
   }
 
   function tendencyArrow(v) {
