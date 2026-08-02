@@ -61,7 +61,7 @@ i18next.init(
           wf_stale: "Forecast is stale ({{age}} min old)",
           wf_note_station_fog: "Fog at the station right now",
           wf_note_convection_possible:
-            "Conditions for convection/thunder (CAPE {{cape_j_kg}}, humidity {{humidity_pct}}%)",
+            "Conditions for thunderstorms (humidity {{humidity_pct}}%)",
           wf_note_cloud_from_lux:
             "Cloud cover estimated from the light sensor ({{cloud_pct}}%)",
           wf_note_lux_sensor_suspect:
@@ -174,7 +174,7 @@ i18next.init(
           wf_note_thunder_raised_by_li:
             "Thunder risk raised: the atmosphere is unstable.",
           wf_note_precip_suppressed_by_ensemble:
-            "Precip risk cleared: the ensemble is almost unanimously dry.",
+            "Precip risk cleared: models are almost unanimously dry.",
           wf_note_precip_raised_by_ensemble:
             "Precip risk raised: light precipitation is likely — wet rock.",
           wf_alpine_visibility: "visibility",
@@ -276,6 +276,7 @@ i18next.init(
           wf_gust_p90: "gusts {{v}}",
           wf_spread_prefix: "model max",
           wf_unit_hpa: "hPa",
+          wf_unit_m: "m",
           wf_window_latest_start: "latest start: {{time}} (not «leave now»)",
           wf_window_turnaround: "turnaround point: {{time}}",
           wf_window_route_hours: "route planned for {{hours}} h",
@@ -510,7 +511,7 @@ i18next.init(
           wf_stale: "Прогноз устарел (данным {{age}} мин)",
           wf_note_station_fog: "На станции сейчас туман",
           wf_note_convection_possible:
-            "Условия для конвекции/гроз (CAPE {{cape_j_kg}}, влажность {{humidity_pct}}%)",
+            "Условия для гроз (влажность {{humidity_pct}}%)",
           wf_note_cloud_from_lux:
             "Облачность оценена по датчику освещённости ({{cloud_pct}}%)",
           wf_note_lux_sensor_suspect:
@@ -623,7 +624,7 @@ i18next.init(
           wf_note_thunder_raised_by_li:
             "Риск грозы повышен: атмосфера неустойчива.",
           wf_note_precip_suppressed_by_ensemble:
-            "Риск осадков снят: ансамбль почти единогласно сухой.",
+            "Риск осадков снят: модели почти единогласно сухие.",
           wf_note_precip_raised_by_ensemble:
             "Риск осадков повышен: вероятны слабые осадки — мокрая порода.",
           wf_alpine_visibility: "видимость",
@@ -725,6 +726,7 @@ i18next.init(
           wf_gust_p90: "порывы {{v}}",
           wf_spread_prefix: "макс. по моделям",
           wf_unit_hpa: "гПа",
+          wf_unit_m: "м",
           wf_window_latest_start: "последний выход: {{time}} (не «выходить сейчас»)",
           wf_window_turnaround: "точка невозврата: {{time}}",
           wf_window_route_hours: "маршрут рассчитан на {{hours}} ч",
@@ -961,7 +963,7 @@ i18next.init(
           wf_stale: "Божомол эскирген ({{age}} мүнөт болду)",
           wf_note_station_fog: "Станцияда азыр туман",
           wf_note_convection_possible:
-            "Конвекция/чагылган шарттары (CAPE {{cape_j_kg}}, нымдуулук {{humidity_pct}}%)",
+            "Чагылган шарттары (нымдуулук {{humidity_pct}}%)",
           wf_note_cloud_from_lux:
             "Булуттуулук жарык сенсору боюнча бааланган ({{cloud_pct}}%)",
           wf_note_lux_sensor_suspect:
@@ -1074,7 +1076,7 @@ i18next.init(
           wf_note_thunder_raised_by_li:
             "Чагылган коркунучу жогорулады: атмосфера туруксуз.",
           wf_note_precip_suppressed_by_ensemble:
-            "Жаан коркунучу алынды: ансамбль дээрлик бир добуштан кургак.",
+            "Жаан коркунучу алынды: моделдер дээрлик бир добуштан кургак.",
           wf_note_precip_raised_by_ensemble:
             "Жаан коркунучу жогорулады: аз жаан ыктымал — нымдуу таш.",
           wf_alpine_visibility: "көрүнүү",
@@ -1176,6 +1178,7 @@ i18next.init(
           wf_gust_p90: "сокку {{v}}",
           wf_spread_prefix: "моделдер боюнча макс.",
           wf_unit_hpa: "гПа",
+          wf_unit_m: "м",
           wf_window_latest_start: "акыркы чыгуу: {{time}} («азыр чыгуу» эмес)",
           wf_window_turnaround: "кайтуу чекити: {{time}}",
           wf_window_route_hours: "маршрут {{hours}} саатка эсептелген",

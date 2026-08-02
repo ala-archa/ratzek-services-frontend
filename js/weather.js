@@ -731,7 +731,7 @@
           enumLabel("rockfall", n.rockfall_risk),
       }),
       kv("wf_night_min", unit(n.min_temp_base_c, "°C", 1)),
-      kv("wf_freezing_level", unit(n.freezing_level_min_m, " m")),
+      kv("wf_freezing_level", unit(n.freezing_level_min_m, " " + t("wf_unit_m"))),
     ];
     // Moon — light for a pre-dawn start. Isolated so a moon defect can't wipe
     // the safety data (refreeze / rockfall / min temps) of this card.
@@ -781,7 +781,7 @@
             ? lo + "°"
             : lo + "…" + hi + "°";
         return el("tr", null, [
-          el("td", { text: unit(a.altitude_m, " m") }),
+          el("td", { text: unit(a.altitude_m, " " + t("wf_unit_m")) }),
           el("td", { text: range }),
         ]);
       });
