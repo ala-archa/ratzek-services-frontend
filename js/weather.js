@@ -167,6 +167,32 @@
     return t("wf_dir_" + WIND_DIR_CODES[Math.round(deg / 45) % 8]);
   }
 
+  // Wind that risk thresholds are compared against (contract 0.15.0): "mean" mode
+  // → the mean wind, "p90" mode → the ensemble upper-estimate wind (wind_p90_ms,
+  // always ≥ wind_ms). null must render as a dash (unit() → "—"), NOT zero, and
+  // must NOT fall back to wind_ms — a different null-rule from temp_p10_c/p90_c.
+  function assessedWindMs(f, a) {
+    return f && f.threshold_mode === "p90" ? a.wind_p90_ms : a.wind_ms;
+  }
+
+  // Guarded lookups for the p90 strings — they only render in the dormant p90
+  // mode, so a dropped translation wouldn't surface in prod. On a miss: warn,
+  // then fall back to an existing key (labels) or "" (free text) — never leak
+  // the raw key to the user.
+  function pickKey(preferred, fallback) {
+    if (i18next.exists(preferred)) return preferred;
+    console.warn("[weather] missing i18n key:", preferred);
+    return fallback;
+  }
+  function tg(key, opts) {
+    const s = i18next.t(key, opts);
+    if (s === key) {
+      console.warn("[weather] missing i18n key:", key);
+      return "";
+    }
+    return s;
+  }
+
   const SKY_GLYPH = { clear: "☀️", partly: "⛅", cloudy: "☁️", overcast: "☁️" };
   const PRECIP_GLYPH = {
     none: "",
@@ -1016,25 +1042,33 @@
     addRow("wf_row_prob", function (h) {
       return txt(h.precip_prob_pct != null ? String(h.precip_prob_pct) : "—");
     });
-    addRow(isAlt ? "wf_row_wind_alt" : "wf_row_wind", function (h) {
+    // In "p90" mode the altitude wind value is the upper estimate, not the mean,
+    // so the row LABEL carries the marker ("Ветер (верхняя оценка)…") — one
+    // always-visible, screen-reader-announced cue per row instead of 73 glyphs.
+    const windAltLabel =
+      f.threshold_mode === "p90"
+        ? pickKey("wf_row_wind_alt_p90", "wf_row_wind_alt")
+        : "wf_row_wind_alt";
+    addRow(isAlt ? windAltLabel : "wf_row_wind", function (h) {
       if (isAlt) {
         const a = altOf(h, selectedAltitude) || {};
         const uncertain = a.wind_ms_spread == null || a.wind_ms_spread > 3;
+        const v = assessedWindMs(f, a); // mean, or p90 upper estimate; null → "—"
         const s =
-          unit(a.wind_ms, "", 0) +
-          (a.wind_dir_deg != null ? " " + windDir(a.wind_dir_deg) : "");
+          unit(v, "", 0) +
+          // No direction on a null value ("— NW" would read as calm-with-bearing).
+          (v != null && a.wind_dir_deg != null ? " " + windDir(a.wind_dir_deg) : "");
         return uncertain ? el("span", { class: "wf-uncertain", text: s }) : txt(s);
       }
-      // Base station: no direction in the data, but it has gusts. Gusts +
-      // ensemble p90 are BASE-only (§4.5) — never labelled onto altitudes.
+      // Base station: no direction in the data, but it has gusts. The gust upper
+      // estimate is wind_gusts_p90_basis_ms (≥ gusts); the raw wind_gusts_p90_ms
+      // is NOT an upper bound (can be below the mean) and is not shown. BASE-only.
       const s =
         unit(h.wind_base_ms, "", 0) +
         (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "");
       const p90 = [];
-      if (h.wind_base_p90_ms != null)
-        p90.push(t("wf_wind_p90", { v: num(h.wind_base_p90_ms, 0) }));
-      if (h.wind_gusts_p90_ms != null)
-        p90.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
+      if (h.wind_gusts_p90_basis_ms != null)
+        p90.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_basis_ms, 0) }));
       return p90.length
         ? el("span", { text: s, title: t("wf_spread_prefix") + ": " + p90.join(" · ") })
         : txt(s);
@@ -1181,21 +1215,28 @@
         kvT("wf_row_rh", a.rh_pct + (a.in_cloud === true ? " · " + t("wf_incloud") : ""));
       // Wind — gusts / p90 are base-only (§4.5).
       if (isAlt) {
-        if (a.wind_ms != null)
+        // Gate on the mean (data presence), NOT on the assessed value: in p90
+        // mode a null wind_p90_ms must show a dash here, not drop the row.
+        if (a.wind_ms != null) {
+          const isP90 = f.threshold_mode === "p90";
+          const v = assessedWindMs(f, a); // null (p90) → "—"
+          let s =
+            unit(v, "", 0) +
+            (v != null && a.wind_dir_deg != null ? " " + windDir(a.wind_dir_deg) : "");
+          if (isP90)
+            s += " · " + tg("wf_wind_mean_ctx", { mean: unit(a.wind_ms, "", 0) });
           kvT(
-            "wf_row_wind_alt",
-            unit(a.wind_ms, "", 0) +
-              (a.wind_dir_deg != null ? " " + windDir(a.wind_dir_deg) : "")
+            isP90 ? pickKey("wf_row_wind_alt_p90", "wf_row_wind_alt") : "wf_row_wind_alt",
+            s
           );
+        }
       } else if (h.wind_base_ms != null) {
         let s =
           unit(h.wind_base_ms, "", 0) +
           (h.wind_gusts_ms != null ? " ⇡" + num(h.wind_gusts_ms, 0) : "");
         const p = [];
-        if (h.wind_base_p90_ms != null)
-          p.push(t("wf_wind_p90", { v: num(h.wind_base_p90_ms, 0) }));
-        if (h.wind_gusts_p90_ms != null)
-          p.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_ms, 0) }));
+        if (h.wind_gusts_p90_basis_ms != null)
+          p.push(t("wf_gust_p90", { v: num(h.wind_gusts_p90_basis_ms, 0) }));
         if (p.length) s += " · " + t("wf_spread_prefix") + ": " + p.join(" · ");
         kvT("wf_row_wind", s);
       }
@@ -1438,6 +1479,11 @@
     if (feelsShown) {
       cardKids.push(el("p", { class: "wf-note", text: t("wf_feels_note") }));
     }
+    // Explains the "верхняя оценка" wind-row marker and that "—" ≠ calm. The only
+    // channel that reaches touch/screen-reader users; shown only in p90 mode.
+    if (isAlt && f.threshold_mode === "p90") {
+      cardKids.push(el("p", { class: "wf-note", text: tg("wf_wind_p90_legend") }));
+    }
     if (visShown) {
       cardKids.push(el("p", { class: "wf-note", text: t("wf_vis_legend") }));
     }
@@ -1476,6 +1522,12 @@
     const s = f.sources || {};
     const parts = [];
     parts.push(kv("wf_mode", enumLabel("mode", f.mode) || t("wf_no_data")));
+    // Which wind the risk assessment used this cycle (contract 0.15.0). The
+    // service self-downgrades an insufficient ensemble to "mean", so an unknown
+    // value is shown as "mean" rather than blank; null = no alpine layer → hide.
+    const thm =
+      f.threshold_mode === "p90" ? "p90" : f.threshold_mode == null ? null : "mean";
+    if (thm) parts.push(kv("wf_threshold", enumLabel("thmode", thm)));
     if (Array.isArray(s.models_used) && s.models_used.length)
       parts.push(kv("wf_models", s.models_used.join(", ")));
     parts.push(
@@ -1634,7 +1686,9 @@
           f.contract_minor,
           f.generator_version,
           "epoch",
-          f.semantics_epoch == null ? 1 : f.semantics_epoch
+          f.semantics_epoch == null ? 1 : f.semantics_epoch,
+          "thmode",
+          f.threshold_mode
         );
         renderAll(f);
       })
