@@ -21,6 +21,13 @@
   --ok: #1b7a3d;
   --warn: #c2410c;
   --danger: #b00020;
+  /* "Line" variants of the verdict colours: used for borders/swatches (i.e. as
+     non-text UI components, WCAG 1.4.11 needs 3:1 against the page background),
+     never as a fill under white text. Light theme can reuse the fill tokens. */
+  --ok-line: var(--ok);
+  --warn-line: var(--warn);
+  --danger-line: var(--danger);
+  --unknown-line: #6b7280;
 }
 
 * {
@@ -30,8 +37,11 @@
   font-family: Consolas;
 }
 
+/* Respect display cutouts / rounded corners (the pages ask for viewport-fit=cover). */
 .wrapper {
   padding: 0.5rem;
+  padding-left: max(0.5rem, env(safe-area-inset-left));
+  padding-right: max(0.5rem, env(safe-area-inset-right));
   width: 100%;
 }
 
@@ -48,7 +58,9 @@ b {
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  transition: background-color 0.5s, color 0.5s;
+  transition:
+    background-color 0.5s,
+    color 0.5s;
 }
 
 body.theme-dark {
@@ -56,25 +68,47 @@ body.theme-dark {
   --text-color: whitesmoke;
   --border-section: 1px solid whitesmoke;
   --link-color: #ffa500; /* bright orange: 7.2:1 on the dark background */
+  /* #c2410c reaches only 2.75:1 against hsl(207,26%,17%) — under the 3:1 that
+     WCAG 1.4.11 asks of a control's boundary. Simply brightening it cannot work:
+     any fill light enough to clear 3:1 against this background is already too
+     light to carry white text at 4.5:1 (the two requirements cross over). So the
+     dark theme flips the pairing — light fill, dark label: #ff9d5c is 6.9:1
+     against the background and carries #1a1a1a text at 10.2:1. */
+  --accent-fill: #ff9d5c;
+  --on-accent: #1a1a1a;
+  /* The fill tokens are far too dark to read as lines on hsl(207,26%,17%)
+     (1.9–2.8:1). These lighter shades give 5.6–6.9:1. */
+  --ok-line: #4ade80;
+  --warn-line: #ff9d5c;
+  --danger-line: #ff7a7a;
+  --unknown-line: #9ca3af;
 }
 
 /*! header */
+/* Sticky, not fixed. A fixed bar is out of flow, so `.main` had to guess its
+   height with a hard-coded margin-top; the guess broke the moment the bar grew
+   (wrapped language buttons at 200% zoom / very narrow screens), permanently
+   hiding the top of the page behind an opaque bar. Sticky keeps the bar in the
+   flow — it always reserves exactly its own height, whatever that turns out to
+   be — while still pinning to the top on scroll. */
 .header {
   display: flex;
   align-items: center;
-  height: 4rem;
+  min-height: 4rem;
+  padding-top: env(safe-area-inset-top);
   background-color: rgba(31, 48, 104, 1);
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
+  z-index: 10; /* above the sticky label column of the hourly table (z-index 1) */
   box-shadow: 8px 8px 8px 0px rgba(34, 60, 80, 0.2);
-  transition: height 1s;
 }
 
+/* Height is deliberately NOT changed on scroll any more: an in-flow sticky bar
+   that shrinks drags the whole page up under the user's finger. */
 .header_scrolled {
-  height: 3rem; /* gentle shrink that still fits the header controls */
   background-color: rgba(31, 48, 104, 1);
 }
 
@@ -92,8 +126,10 @@ body.theme-dark {
 }
 
 /*!  main */
+/* No margin-top: the sticky header above already occupies its own space.
+   The bottom padding keeps the last card clear of the iPhone home indicator. */
 .main {
-  margin-top: 4rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
 .main_content {
@@ -154,7 +190,22 @@ body.theme-dark {
 }
 
 .section_list a:active {
-  background-color: rgba(127, 127, 127, 0.18); /* touch feedback, theme-neutral */
+  background-color: rgba(
+    127,
+    127,
+    127,
+    0.18
+  ); /* touch feedback, theme-neutral */
+}
+
+/* Keyboard focus on the non-weather pages — the UA default ring is nearly
+   invisible on these low-contrast backgrounds. */
+.section_attention__button:focus-visible,
+.section_about__button:focus-visible,
+.section_signIn__button:focus-visible,
+.section_list a:focus-visible {
+  outline: 3px solid var(--link-color);
+  outline-offset: 2px;
 }
 
 /* Plain (non-link) list items, e.g. the participants list — keep readable spacing. */
@@ -275,15 +326,21 @@ body.theme-dark {
 }
 
 /* ! theme switch */
+/* 44px tall hit area (WCAG 2.5.8) around a visually unchanged 33px switch —
+   dark theme is the night/gloves scenario. */
 .toggle-switch {
   position: relative;
   width: 66.67px;
-  height: 33.33px;
+  height: 44px;
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
 label {
   position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   width: 100%;
   height: 33.33px;
   background-color: var(--dark);
@@ -314,6 +371,15 @@ input {
   height: 100%;
   border-radius: 16.67px;
   transition: 0.3s;
+}
+
+/* The checkbox is the actual hit target: stretch it past the 33px switch so the
+   whole 44px row is tappable while the switch keeps its size. */
+.toggle-switch input {
+  top: 50%;
+  bottom: auto;
+  height: 44px;
+  transform: translateY(-50%);
 }
 
 input:checked ~ .slider {
@@ -370,10 +436,32 @@ input:checked ~ .slider::before {
   cursor: pointer;
 }
 
-/* Current language = filled accent so it stands out against the dark header. */
+/* Current language = filled accent so it stands out against the dark header.
+   Not var(--accent-fill): the header is dark blue in BOTH themes, and the light
+   theme's #c2410c only reaches 2.41:1 against it — below the 3:1 WCAG 1.4.11
+   wants for a control boundary. #ff9d5c is 6.1:1 on the blue and carries
+   #1a1a1a text at 10.2:1, in either theme. */
 .language-switcher_button.active {
-  background-color: var(--accent-fill);
-  border-color: var(--accent-fill);
+  background-color: #ff9d5c;
+  border-color: #ff9d5c;
+  color: #1a1a1a;
+}
+
+/* Header is dark blue: a white ring is the only one visible on it. */
+.language-switcher_button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Very narrow screens (or 200% zoom): tighten the segmented control so the
+   three languages stay on one row and the header keeps its 4rem height. */
+@media (max-width: 360px) {
+  .language-switcher_button {
+    padding: 0.4rem 0.5rem;
+  }
+  .language-slider {
+    gap: 0.3rem;
+  }
 }
 
 /*! entry banner */
@@ -406,12 +494,12 @@ input:checked ~ .slider::before {
 /*! weather forecast page */
 .wf-h1 {
   font-family: JetBrains;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   margin-bottom: 0.25rem;
 }
 
 .wf-updated {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   opacity: 0.85;
   margin-bottom: 0.5rem;
 }
@@ -456,26 +544,34 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   border: 1px solid var(--link-color);
   color: var(--link-color);
   border-radius: 5px;
-  min-height: 28px;
-  min-width: 28px;
-  padding: 0 0.4rem;
+  min-height: 44px; /* the only recovery control — glove-friendly (WCAG 2.5.8) */
+  min-width: 44px;
+  padding: 0 0.75rem;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   line-height: 1;
   vertical-align: middle;
+}
+/* aria-disabled, not :disabled — a truly disabled button loses keyboard focus
+   mid-refresh, so the markup keeps it focusable and only marks it busy. */
+.wf-refresh--busy,
+.wf-refresh[aria-disabled="true"],
+.wf-refresh:disabled {
+  opacity: 0.6;
+  cursor: progress;
 }
 
 /* Non-colour verdict glyph in hour headers / legend. */
 .wf-vmark {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   line-height: 1;
 }
 
 /* Fog-model fraction shown inline next to visibility (§4.6). */
 .wf-vis-frac {
-  font-size: 0.7em;
-  opacity: 0.85;
+  font-size: 0.92em;
+  opacity: 1;
 }
 
 /* Quality colour-scale legend. */
@@ -483,7 +579,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   display: flex;
   flex-wrap: wrap;
   gap: 0.1rem 0.7rem;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   margin-top: 0.2rem;
 }
 .wf-qlegend__item {
@@ -493,13 +589,35 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 }
 .wf-qlegend__sw {
   display: inline-block;
-  width: 0.8rem;
-  height: 0.8rem;
+  width: 0.9rem;
+  height: 0.9rem;
   border-radius: 2px;
+}
+/* Swatches are non-text UI: use the line tokens so they stay ≥3:1 in dark theme. */
+.wf-qlegend__sw.wf-q-ok {
+  background-color: var(--ok-line);
+}
+.wf-qlegend__sw.wf-q-warn {
+  background-color: var(--warn-line);
+}
+.wf-qlegend__sw.wf-q-bad,
+.wf-qlegend__sw.wf-q-severe {
+  background-color: var(--danger-line);
+}
+/* `bad` and `severe` share the danger colour; in the table they are told apart
+   by a 5px vs 7px bar. Give the legend swatch a matching heavier look so the
+   two entries are not distinguishable by glyph alone. */
+.wf-qlegend__sw.wf-q-severe {
+  height: 1.1rem;
+  outline: 2px solid var(--text-color);
+  outline-offset: -2px;
+}
+.wf-qlegend__sw.wf-q-unknown {
+  background-color: var(--unknown-line);
 }
 .wf-qlegend .wf-vmark {
   display: inline;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
 }
 
 .wf-banner {
@@ -507,7 +625,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   padding: 0.6rem 0.8rem;
   margin-bottom: 0.5rem;
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   font-weight: 700;
 }
 .wf-banner--info {
@@ -524,14 +642,14 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 .wf-sub {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   opacity: 0.8;
 }
 .wf-note {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   opacity: 0.85;
 }
 .wf-strong {
@@ -553,7 +671,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 }
 
 .wf-warnbox {
-  border-color: var(--warn);
+  border-color: var(--warn-line);
 }
 
 .wf-chip {
@@ -561,7 +679,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   border-radius: 4px;
   padding: 0.1rem 0.5rem;
   color: #fff;
-  font-size: 0.78rem;
+  font-size: 0.9rem;
 }
 .wf-q-ok {
   background-color: var(--ok);
@@ -598,7 +716,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 .wf-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
 }
 .wf-table th,
 .wf-table td {
@@ -617,7 +735,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   color: #fff;
   border-radius: 4px;
   padding: 0.05rem 0.35rem;
-  font-size: 0.7rem;
+  font-size: 0.9rem; /* the densest labels in the table — 13.6px was too small */
   margin: 0.1rem 0.1rem 0 0;
 }
 .wf-risk--unknown {
@@ -643,7 +761,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   border-radius: 5px;
   min-height: 44px; /* glove-friendly tap target (WCAG 2.5.8) — main control */
   padding: 0.35rem 0.8rem;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   cursor: pointer;
 }
 .wf-alt-btn.active {
@@ -656,10 +774,34 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 .wf-timeline {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  /* Scroll affordance: the two "cover" gradients are attached to the content
+     (local) and the two shadows to the container (scroll), so a shadow shows
+     only on the side that still has hidden hours. Neutral grey works in both
+     themes; no mask-image (poor support in old Android WebViews). */
+  background-image: linear-gradient(
+      to right,
+      var(--background-color),
+      rgba(127, 127, 127, 0)
+    ),
+    linear-gradient(to left, var(--background-color), rgba(127, 127, 127, 0)),
+    linear-gradient(to right, rgba(127, 127, 127, 0.45), rgba(127, 127, 127, 0)),
+    linear-gradient(to left, rgba(127, 127, 127, 0.45), rgba(127, 127, 127, 0));
+  background-position:
+    left center,
+    right center,
+    left center,
+    right center;
+  background-repeat: no-repeat;
+  background-size:
+    20px 100%,
+    20px 100%,
+    12px 100%,
+    12px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 .wf-htable {
   border-collapse: collapse;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   /* Containing block for the .wf-sr (visually-hidden verdict) spans and the
      sr caption. Without a positioned ancestor their containing block is the
      document root, so — sitting at static positions deep inside this wide,
@@ -670,17 +812,24 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 }
 .wf-htable th,
 .wf-htable td {
-  padding: 0.25rem 0.45rem;
+  /* Tight horizontal padding: every 0.2rem saved here is another hour visible
+     side by side, and comparing neighbouring hours is the point of the table. */
+  padding: 0.25rem 0.25rem;
   text-align: center;
-  white-space: nowrap;
   border-bottom: 1px solid rgba(127, 127, 127, 0.2);
+}
+/* Only the data cells and hour headers must stay on one line — the sticky row
+   labels wrap (see below), otherwise a long label eats the whole 320px screen. */
+.wf-htable td,
+.wf-htable thead th {
+  white-space: nowrap;
 }
 .wf-htable td {
   font-family: JetBrains;
 }
 /* sticky label column stays in view while the hours scroll */
 .wf-htable tbody th,
-.wf-htable__corner {
+.wf-htable thead th.wf-htable__corner {
   position: sticky;
   left: 0;
   z-index: 1;
@@ -688,17 +837,28 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   text-align: left;
   font-weight: normal;
   opacity: 0.9;
+  white-space: normal;
+  max-width: 9ch;
+  /* Russian labels contain single words longer than 9ch ("Температура, °C").
+     Without this they overflow the cell and — the column being sticky and
+     z-indexed — print on top of the first visible hour.
+     `break-word`, NOT `anywhere`: `anywhere` also drops the column's min-content
+     width to a single glyph, which collapses the whole label column to ~21px
+     and stacks the labels one letter per line. */
+  overflow-wrap: break-word;
 }
 .wf-htable thead th {
   font-family: JetBrains;
-  border-top: 3px solid transparent;
+  /* 5px, not 3px: this bar is the primary go/no-go scan cue and has to survive
+     bright sun and long-sighted eyes. */
+  border-top: 5px solid transparent;
 }
 .wf-hdate {
-  font-size: 0.6rem;
-  opacity: 0.7;
+  font-size: 0.9rem;
+  opacity: 0.85;
   font-family: JetBrains;
-  min-height: 0.72rem;
-  line-height: 0.9;
+  min-height: 1em;
+  line-height: 1.2;
 }
 .wf-hh {
   font-weight: 700;
@@ -712,27 +872,39 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   border-left: 2px solid rgba(127, 127, 127, 0.5);
 }
 .wf-htable thead th.wf-hq-ok {
-  border-top-color: var(--ok);
+  border-top-color: var(--ok-line);
 }
 .wf-htable thead th.wf-hq-caution {
-  border-top-color: var(--warn);
+  border-top-color: var(--warn-line);
 }
 .wf-htable thead th.wf-hq-bad {
-  border-top-color: var(--danger);
+  border-top-color: var(--danger-line);
 }
 .wf-htable thead th.wf-hq-unknown {
-  border-top-color: #6b7280;
+  border-top-color: var(--unknown-line);
   /* hatched top edge so "no data" hours differ from a mild warning at a glance */
   border-top-style: dashed;
 }
 /* severe hour: thick danger top edge + the ⛔ glyph rendered in the cell */
 .wf-htable thead th.wf-hq-severe {
-  border-top-color: var(--danger);
-  border-top-width: 5px;
+  border-top-color: var(--danger-line);
+  border-top-width: 7px;
 }
 .wf-htable thead th .wf-vmark {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+/* Current hour: ring the whole column header so "now" is findable instantly. */
+.wf-hnow {
+  box-shadow: inset 0 0 0 2px var(--link-color);
+  border-radius: 4px;
+}
+.wf-hnow-badge {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--link-color);
   line-height: 1;
 }
 /* Hour header is a button opening the detail panel — reset chrome, fill cell,
@@ -741,9 +913,10 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   display: block;
   width: 100%;
   min-height: 44px;
+  min-width: 44px; /* WCAG 2.5.8 tap target */
   background: transparent;
   border: 0;
-  padding: 0.25rem 0.35rem;
+  padding: 0.25rem 0.15rem;
   font: inherit;
   color: inherit;
   cursor: pointer;
@@ -756,6 +929,19 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   background: rgba(127, 127, 127, 0.22);
   outline: 2px solid var(--link-color);
   outline-offset: -2px;
+}
+
+/* Keyboard focus must be obvious on every weather control — the UA default ring
+   nearly vanishes on these transparent backgrounds. */
+.wf-hcol:focus-visible,
+.wf-alt-btn:focus-visible,
+.wf-jumpbtn:focus-visible,
+.wf-refresh:focus-visible,
+.wf-hd__nav:focus-visible,
+.wf-hd__closebtm:focus-visible,
+.wf-details > summary:focus-visible {
+  outline: 3px solid var(--link-color);
+  outline-offset: 2px;
 }
 
 /* Hour-detail panel (tap a column). Full-width card under the timeline. */
@@ -807,17 +993,17 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   margin-bottom: 0.4rem;
 }
 .wf-hd__head.wf-hq-ok {
-  border-bottom-color: var(--ok);
+  border-bottom-color: var(--ok-line);
 }
 .wf-hd__head.wf-hq-caution {
-  border-bottom-color: var(--warn);
+  border-bottom-color: var(--warn-line);
 }
 .wf-hd__head.wf-hq-bad,
 .wf-hd__head.wf-hq-severe {
-  border-bottom-color: var(--danger);
+  border-bottom-color: var(--danger-line);
 }
 .wf-hd__head.wf-hq-unknown {
-  border-bottom-color: #6b7280;
+  border-bottom-color: var(--unknown-line);
 }
 .wf-hd__when {
   flex: 1;
@@ -829,7 +1015,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 }
 .wf-hd__verdict {
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 /* Prev/next hour navigation — neutral, 44px tap targets flanking the header. */
 .wf-hd__nav {
@@ -848,7 +1034,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   background: rgba(127, 127, 127, 0.14);
 }
 .wf-hd__nav:disabled {
-  opacity: 0.3;
+  opacity: 0.45; /* still reads as "off" but not as a rendering glitch */
   cursor: default;
 }
 .wf-hd__reason {
@@ -885,13 +1071,13 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 .wf-hd__closebtm:hover {
   background: rgba(127, 127, 127, 0.14);
 }
-/* Freezing level shown as an unverified estimate (source not anchored, §2.5). */
+/* Freezing level shown as an unverified estimate (source not anchored, §2.5).
+   Italic only — no dimming: "uncertain" means "plan for the worst case", so
+   these values must stay as legible as the confident ones. */
 .wf-est {
-  opacity: 0.6;
   font-style: italic;
 }
 .wf-uncertain {
-  opacity: 0.55;
   font-style: italic;
 }
 /* Neutral "inside cloud" indicator on altitude temps — informational, muted. */
@@ -904,6 +1090,29 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.1rem;
+}
+/* Inside the hourly timeline a long risk label (nowrap, inherited from the td)
+   stretches its whole column: an hour carrying "потеря видимости" measured 162px
+   against 67px for a plain one, so a phone showed ~2 hours instead of ~5. Cap the
+   badge stack and let the label wrap — the column stays near the common width. */
+.wf-htable td .wf-hrisks {
+  max-width: 4.5rem;
+  margin: 0 auto;
+}
+.wf-htable td .wf-risk {
+  white-space: normal;
+  padding: 0.05rem 0.15rem; /* every pixel of text width is one wrap less */
+  /* The cap above is narrower than single words like "видимости"; without this
+     the badge would spill out of its cell and over the neighbouring hour. Safe
+     here because the cap, not the content, decides the column width. */
+  overflow-wrap: anywhere;
+}
+/* Visibility reads "12.4 1/2" — on one line that single cell was the widest
+   thing in its column (64px) and set the width of every hour. Stacking the
+   fog-model fraction under the number keeps them associated and costs nothing
+   but a couple of pixels of row height. */
+.wf-htable td .wf-vis-frac {
+  display: block;
 }
 
 /* Avalanche: a list of triggered signs (never a danger scale). */
@@ -919,7 +1128,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 .wf-avflag__v {
   font-weight: 700;
@@ -940,7 +1149,7 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   opacity: 0.85;
 }
 .wf-sources .wf-card__body {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
 }
 
 /* UV / visibility highlights: fill + fixed white text (readable in both themes) */
@@ -949,8 +1158,26 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 .wf-vis-low {
   color: #fff;
   border-radius: 3px;
-  padding: 0 0.3rem;
+  /* room for the leading ⚠ glyph (added in JS) so it never gets clipped */
+  padding: 0 0.35rem;
   font-weight: 700;
+  /* Wraps by default: the same classes also wrap whole sentences in the sun
+     card ("UV пик 8 (очень высокий) около 13:00"), and nowrap there pushed the
+     page itself into horizontal scroll. */
+  white-space: normal;
+}
+/* Inside the timeline these badges are the widest thing in a cell ("⚠ 4500" =
+   67px) and, with 72 auto-sized columns, one of them setting the width sets it
+   for the whole table. Cap them: the ⚠ drops onto its own line inside the same
+   coloured badge rather than stretching every hour. */
+.wf-htable td .wf-uv-high,
+.wf-htable td .wf-uv-very-high,
+.wf-htable td .wf-vis-low {
+  display: inline-block;
+  max-width: 3.2rem;
+  padding: 0 0.2rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .wf-uv-high {
   background-color: var(--warn);
@@ -961,8 +1188,62 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
 }
 
 .wf-attribution {
-  font-size: 0.68rem;
+  font-size: 0.85rem;
   opacity: 0.7;
   margin-top: 0.3rem;
   overflow-wrap: anywhere;
+}
+
+/* Quick-jump row above the timeline (now / morning / tomorrow …). */
+.wf-jump {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.4rem 0;
+}
+/* Keep the "Jump to:" caption at its own size instead of being stretched to
+   the height of the 44px button row. */
+.wf-jump__label {
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+.wf-jumpbtn {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--link-color);
+  border-radius: 5px;
+  min-height: 44px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.wf-jumpbtn:hover {
+  background: rgba(127, 127, 127, 0.14);
+}
+
+/* Explicit "swipe sideways" hint — the timeline scrolls inside itself and that
+   is not discoverable on touch without a visible cue. */
+.wf-scrollhint {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* Collapsed legends / technical details. */
+.wf-details {
+  margin-top: 0.5rem;
+}
+/* `display: flex` removes the native disclosure triangle in Chrome, which left
+   these blocks looking like plain paragraphs — nothing said they could open.
+   `list-item` keeps the marker; padding restores the 44px tap target. */
+.wf-details > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: list-item;
+  list-style-position: inside;
+  padding: 0.6rem 0;
+  font-size: 0.95rem;
 }

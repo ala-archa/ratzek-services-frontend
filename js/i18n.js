@@ -1,16 +1,44 @@
 const languageSlide = document.getElementById("language-slider");
 
+const SUPPORTED_LANGUAGES = ["en", "ru", "ky"];
+const DEFAULT_LANGUAGE = "ru";
+
+// ISO 639-1 for Kyrgyz is "ky"; "kg" is Kongo. The site used to ship "kg", and
+// some pages (index.html, donate.html, how-its-done.html) still have
+// data-lang="kg" / changeLanguage('kg'), so every entry point normalizes here.
+function normalizeLang(lng) {
+  return lng === "kg" ? "ky" : lng;
+}
+
+// Reads the persisted language, migrating a legacy "kg" value in place.
+function readSavedLanguage() {
+  const stored = localStorage.getItem("language");
+  if (!stored) return DEFAULT_LANGUAGE;
+  const normalized = normalizeLang(stored);
+  if (normalized !== stored) localStorage.setItem("language", normalized);
+  return SUPPORTED_LANGUAGES.includes(normalized)
+    ? normalized
+    : DEFAULT_LANGUAGE;
+}
+
 function updateContent() {
   document.querySelectorAll("[data-i18n]").forEach(function (element) {
     const key = element.getAttribute("data-i18n");
     element.innerHTML = i18next.t(key);
   });
+  // Localizable attributes. setAttribute (not innerHTML), so the "no JSON-derived
+  // text through data-i18n" invariant documented in weather.js still holds.
+  document.querySelectorAll("[data-i18n-aria-label]").forEach(function (element) {
+    const key = element.getAttribute("data-i18n-aria-label");
+    element.setAttribute("aria-label", i18next.t(key));
+  });
 }
 
 function updateButtons() {
-  const currentLanguage = localStorage.getItem("language") || "ru";
+  const currentLanguage = readSavedLanguage();
   Array.from(languageSlide.children).forEach((element) => {
-    const isActive = element.getAttribute("data-lang") === currentLanguage;
+    const isActive =
+      normalizeLang(element.getAttribute("data-lang")) === currentLanguage;
     element.classList.toggle("active", isActive);
     // Expose selection state to assistive tech (buttons act as a radio group).
     element.setAttribute("aria-pressed", isActive ? "true" : "false");
@@ -18,16 +46,17 @@ function updateButtons() {
 }
 
 function changeLanguage(lng) {
-  i18next.changeLanguage(lng, function (err, t) {
+  const lang = normalizeLang(lng);
+  i18next.changeLanguage(lang, function (err, t) {
     if (err) return console.log("Something went wrong in loading i18n", err);
     updateContent();
-    localStorage.setItem("language", lng);
-    document.documentElement.lang = lng; // keep <html lang> in sync for a11y/translation
+    localStorage.setItem("language", lang);
+    document.documentElement.lang = lang; // keep <html lang> in sync for a11y/translation
     updateButtons();
   });
 }
 
-const savedLanguage = localStorage.getItem("language") || "ru";
+const savedLanguage = readSavedLanguage();
 document.documentElement.lang = savedLanguage;
 
 i18next.init(
@@ -46,11 +75,63 @@ i18next.init(
           wf_no_data: "—",
           wf_loading: "Loading forecast…",
           wf_load_error: "Couldn't refresh — tap ↻ to retry.",
+          wf_load_error_first: "The forecast didn't load. Tap ↻ to retry.",
+          wf_retry_stopped: "Auto-retry stopped — tap ↻.",
+          wf_err_timeout: "Still no answer — the connection is slow. Retry: ↻",
+          wf_err_offline:
+            "No connection. Showing the last forecast; it will refresh automatically.",
+          wf_err_offline_nodata:
+            "No connection, the forecast didn't load. The page will refresh itself once the connection is back.",
+          wf_err_partial:
+            "The data came through incomplete — the connection dropped. Retry: ↻",
+          wf_err_server:
+            "The forecast server is not responding. Please try later.",
+          wf_err_missing:
+            "The forecast is unavailable. Refreshing is unlikely to help — try later.",
+          wf_section_nodata:
+            "There is no data for this section. That does not mean there is no danger.",
+          wf_nodata_all:
+            "There is no data for any section. Missing data is not a sign of safety.",
+          wf_stale_unknown:
+            "The forecast may be out of date — the age of the data is unknown.",
+          wf_refreshing: "Refreshing…",
+          wf_risk_other: "other risk",
+          wf_window_status_unknown:
+            "Window status unknown — judge from the hourly forecast.",
+          wf_now_marker: "now",
+          wf_scroll_hint_left: "← swipe",
+          wf_scroll_hint_right: "3-day forecast →",
+          wf_legend_details: "How to read the table",
+          wf_tech_details: "Technical information",
+          wf_nodata_legend:
+            "«—» means «no data». It is not zero and not «safe».",
+          wf_risks_empty_legend:
+            "An empty cell in the «Risks» row means risks were not assessed.",
+          wf_incloud_legend:
+            "☁ next to a temperature — that altitude is inside cloud (humidity ≥95%).",
+          wf_jump_label: "Jump to:",
+          wf_wind_now: "Wind",
+          wf_precip_now: "Precipitation now",
+          wf_uncertain_sr: "less reliable",
+          wf_obsstatus_ok: "station observations available",
+          wf_obsstatus_fresh: "station observations are fresh",
+          wf_obsstatus_unavailable: "no station observations",
+          wf_obsstatus_degraded: "observations incomplete",
+          wf_obsstatus_stale: "observations out of date",
+          wf_obsstatus_missing: "no observations",
+          wf_nwpstatus_ok: "model forecasts available",
+          wf_nwpstatus_degraded: "model forecasts incomplete",
+          wf_nwpstatus_stale: "model forecasts out of date",
+          wf_nwpstatus_missing: "no model forecasts",
+          wf_nwpstatus_fresh: "model forecasts are fresh",
+          wf_nwpstatus_unavailable: "model forecasts unavailable",
+          theme_toggle: "Dark theme",
           wf_contract_error:
-            "The forecast format has changed. Please reload the page.",
+            "The forecast format has changed. Please reload the page. If that doesn't help, the forecast is being rebuilt right now — come back in 10 minutes.",
           wf_contract_kept:
-            "The forecast format changed; showing the last received data. Reload for the update.",
-          wf_section_error: "Couldn't display this section.",
+            "The forecast format changed; showing the last received data. Reload for the update. If that doesn't help, the forecast is being rebuilt right now — come back in 10 minutes.",
+          wf_section_error:
+            "Couldn't display this section. The rest of the forecast is current; try ↻.",
           wf_refresh: "Refresh",
           wf_quality_legend: "Hour verdict:",
           wf_hourly_caption:
@@ -79,11 +160,11 @@ i18next.init(
           wf_alpine_title: "High-altitude data",
           wf_alpine_warn:
             "«Not enough data» is not «safe» — treat missing values with caution.",
-          wf_alpine_missing: "Missing:",
-          wf_alpine_cape: "thunder index",
-          wf_alpine_levels_700: "700 hPa level",
-          wf_alpine_levels_600: "600 hPa level",
-          wf_alpine_levels_500: "500 hPa level",
+          wf_alpine_missing: "Not shown because the data is missing:",
+          wf_alpine_cape: "data for judging thunderstorms",
+          wf_alpine_levels_700: "data at ≈3000 m",
+          wf_alpine_levels_600: "data at ≈4200 m",
+          wf_alpine_levels_500: "data at ≈5500 m",
           wf_alpine_precip_prob: "precip probability",
           wf_alpine_gusts: "gusts",
           wf_window: "Weather window",
@@ -100,28 +181,31 @@ i18next.init(
           wf_thunder: "Thunderstorms",
           wf_thunder_likely: "Thunder likely from {{time}}",
           wf_thunder_possible: "Thunder possible from {{time}}",
-          wf_thunder_none: "No thunder expected in the next 24 h",
+          wf_thunder_none:
+            "No thunder expected in the next 24 h. Beyond that, check the hourly forecast.",
           wf_night: "Coming night",
           wf_rockfall: "rockfall",
           wf_night_min: "Min temp (station)",
           wf_freezing_level: "Freezing level",
           wf_altitude: "Altitude",
           wf_night_min_col: "Night min, °C",
-          wf_night_range_note: "Range: expected minimum … milder case.",
-          wf_min: "min",
+          wf_night_range_note: "Expected minimum … milder case.",
           wf_sun: "Sun",
           wf_sunrise: "Sunrise",
           wf_sunset: "Sunset",
           wf_civil: "Twilight (light without a headlamp)",
           wf_daylight: "Daylight",
+          wf_sun_nodata: "Sunrise and sunset times did not arrive.",
           wf_hours: "h",
           wf_ridge_note:
             "Astronomical times for 3370 m; behind ridges the real sunrise is later.",
           wf_hourly: "Hourly forecast",
-          wf_hourly_empty: "No hourly data right now.",
+          wf_hourly_empty:
+            "No hourly data right now — the station or the models are unavailable. Try refreshing (↻) in a few minutes.",
+          wf_hourly_none_offline:
+            "There is no hourly forecast: the hut has no internet, so only the pressure-based forecast works. It will appear once the connection is back.",
           wf_alt_select: "Altitude for wind/temperature:",
           wf_alt_base: "station",
-          wf_wind_ms: "wind, m/s (⇡ gusts)",
           wf_row_temp: "Temperature, °C",
           wf_row_prob: "Precip chance, %",
           wf_row_wind: "Wind, m/s (⇡ gust)",
@@ -137,7 +221,7 @@ i18next.init(
           wf_detail_next: "Next hour",
           wf_temp_band: "spread: {{lo}}…{{hi}}°",
           wf_temp_band_legend:
-            "Temperatures in muted italic mean a wide model spread (less reliable); tap the hour for the exact range.",
+            "Temperatures and wind speeds in italics with a ≈ sign mean the forecasts disagree widely, so the value is less reliable; tap the hour for the exact range.",
           wf_incloud: "in cloud (humidity ≥95%)",
           wf_feels_note:
             "«Feels like» shows only when wind adds noticeable chill; a dash means it feels like the air temperature.",
@@ -145,7 +229,7 @@ i18next.init(
           wf_snow_depth: "Snow at station, cm",
           wf_row_visibility: "Visibility, km",
           wf_vis_legend:
-            "Visibility is the expected value (model median); fog is flagged as the “loss of visibility” risk. A small N/M next to a value is how many of the models see fog.",
+            "Visibility is the most likely value across several forecasts. Fog is flagged as the “loss of visibility” risk. A small N/M is how many forecasts out of the total see fog.",
           wf_vis_worst: "worst model: {{km}}",
           wf_vis_fog_models: "fog possible ({{low}} of {{total}} models)",
           wf_row_uv: "UV index",
@@ -170,16 +254,16 @@ i18next.init(
           wf_moonphase_last_quarter: "Last quarter",
           wf_moonphase_waning_crescent: "Waning crescent",
           wf_note_thunder_suppressed_by_cin:
-            "Thunder risk lowered: rising air is capped.",
+            "Thunder risk lowered: clouds are struggling to grow upward.",
           wf_note_thunder_raised_by_li:
             "Thunder risk raised: the atmosphere is unstable.",
           wf_note_precip_suppressed_by_ensemble:
-            "Precip risk cleared: models are almost unanimously dry.",
+            "Precip risk cleared: almost every forecast gives dry weather.",
           wf_note_precip_raised_by_ensemble:
             "Precip risk raised: light precipitation is likely — wet rock.",
           wf_alpine_visibility: "visibility",
-          wf_alpine_lifted_index: "instability index (thunder)",
-          wf_alpine_convective_inhibition: "convection cap (thunder)",
+          wf_alpine_lifted_index: "atmospheric instability",
+          wf_alpine_convective_inhibition: "conditions for thunderstorms to build",
           wf_alpine_uv_index: "UV index",
           wf_sources: "Sources",
           wf_mode: "Mode",
@@ -189,7 +273,7 @@ i18next.init(
           wf_freeair_station: "from station",
           wf_freeair_700: "from 700 hPa (≈3000 m)",
           wf_pressure_fc: "Pressure forecast",
-          wf_uncalibrated: "less reliable (uncalibrated)",
+          wf_uncalibrated: "A rough barometer estimate — it can be wrong.",
           wf_version: "Version",
           wf_epoch: "Data epoch",
           wf_mode_hybrid: "hybrid (obs + models)",
@@ -197,9 +281,10 @@ i18next.init(
           wf_mode_stale_nwp: "stale model data",
           wf_mode_zambretti:
             "no internet — pressure-only forecast, no hourly data",
-          wf_mode_unavailable: "no data available",
+          wf_mode_unavailable: "no data",
           wf_alarm_deterioration: "Pressure falling — weather deteriorating",
           wf_alarm_storm: "Pressure dropping fast — storm possible",
+          wf_alarm_other: "Special conditions — see the hourly table for details.",
           wf_tendreason_NoData: "no data",
           wf_tendreason_LowCoverage: "sparse data",
           wf_tendreason_ShortSpan: "span too short",
@@ -209,7 +294,7 @@ i18next.init(
           wf_alpinestatus_partial: "partial",
           wf_alpinestatus_none: "unavailable",
           wf_alpinereason_ok: "high-altitude data available",
-          wf_alpinereason_no_pressure_levels: "no pressure-level data",
+          wf_alpinereason_no_pressure_levels: "no altitude-level data",
           wf_alpinereason_no_cape: "no thunder index",
           wf_quality_ok: "good",
           wf_quality_caution: "caution",
@@ -218,8 +303,9 @@ i18next.init(
           wf_windowstatus_none_in_48h: "no window in the next 48 h",
           wf_windowstatus_insufficient_data:
             "not enough data to find a window",
-          wf_confidence_low: "low confidence",
-          wf_confidence_unknown: "confidence unknown",
+          wf_confidence_low: "The thunder estimate is unreliable — watch the sky.",
+          wf_confidence_unknown:
+            "How reliable the thunder estimate is — unknown. Watch the sky.",
           wf_refreeze_yes: "refreeze: yes",
           wf_refreeze_likely: "refreeze: likely",
           wf_refreeze_no: "no refreeze",
@@ -251,7 +337,7 @@ i18next.init(
           wf_quality_unknown: "no data",
           wf_quality_severe: "NO-GO",
           wf_qreason_clear: "no limits",
-          wf_qreason_single_risk: "one risk triggered",
+          wf_qreason_single_risk: "one risk triggered (see the «Risks» row)",
           wf_qreason_thunder_likely: "thunder likely",
           wf_qreason_severe_wind: "severe wind",
           wf_qreason_severe_gust: "severe gusts",
@@ -263,27 +349,29 @@ i18next.init(
           wf_qreason_wind_and_precip_on_ridge: "wind with precipitation on the ridge",
           wf_qreason_freezing_rain_with_wind: "freezing rain with wind",
           wf_qreason_whiteout_with_precip: "loss of visibility with precipitation",
-          wf_flsource_interpolated: "true zero crossing in the profile (reliable)",
-          wf_flsource_clamped_below: "whole profile below zero — isotherm under the route",
-          wf_flsource_clamped_above: "no crossing — isotherm above the route",
-          wf_flsource_raw_blend: "raw model data, not verified",
+          wf_flsource_interpolated:
+            "computed from measurements at altitude (reliable)",
+          wf_flsource_clamped_below:
+            "below zero everywhere — the zero level is under the route",
+          wf_flsource_clamped_above: "the zero level is above the route",
+          wf_flsource_raw_blend: "model data, not verified",
           wf_flsource_missing: "no value",
           wf_freezing_est_note: "Freezing level is an estimate (source not verified).",
           wf_row_critical_alt: "Bad above, m",
           wf_critical_alt_legend: "Bad above the shown altitude; «·» — altitudes acceptable; «?» — no per-altitude verdict.",
           wf_critical_alt_nodata: "no per-altitude verdict",
-          wf_wind_p90: "wind {{v}}",
           wf_gust_p90: "gusts {{v}}",
           wf_spread_prefix: "model max",
           wf_threshold: "Wind used for risk",
           wf_thmode_mean: "mean",
-          wf_thmode_p90: "upper estimate",
-          wf_row_wind_alt_p90: "Wind (upper estimate), m/s (dir)",
+          wf_thmode_p90: "with margin for gusts",
+          wf_row_wind_alt_p90: "Wind, worst case, m/s",
           wf_wind_mean_ctx: "mean {{mean}} m/s",
           wf_wind_p90_legend:
-            "The wind row shows the upper estimate — with margin for gusts and model spread, not the mean. A dash means the estimate can't be computed (not calm).",
+            "The wind row shows the worst case — with margin for gusts and model spread, not the mean. A dash means the estimate can't be computed (not calm).",
           wf_unit_hpa: "hPa",
           wf_unit_m: "m",
+          wf_unit_ms: "m/s",
           wf_dir_n: "N",
           wf_dir_ne: "NE",
           wf_dir_e: "E",
@@ -295,8 +383,11 @@ i18next.init(
           wf_window_latest_start: "latest start: {{time}} (not «leave now»)",
           wf_window_turnaround: "turnaround point: {{time}}",
           wf_window_route_hours: "route planned for {{hours}} h",
-          wf_avalanche: "Avalanche",
           wf_avalanche_title: "Avalanche",
+          wf_avalanche_summary: "Avalanche — signs triggered: {{n}} of {{m}}",
+          wf_avalanche_summary_nodata: "Avalanche — no data on the signs",
+          wf_avalanche_summary_partial:
+            "Avalanche — signs triggered: {{n}} of {{m}} assessed ({{k}} without data)",
           wf_avalanche_no_rating:
             "Avalanche danger level is not assessed — there is no bulletin for the Tien Shan.",
           wf_avalanche_flags_intro: "Triggered signs (not a danger scale):",
@@ -359,7 +450,7 @@ i18next.init(
           section_title_always_available:
             "Always available, even without internet",
           section_title_services: "Useful services on the internet",
-          section_title_thank_you: "DONATE",
+          section_title_thank_you: "Thank you",
           section_thank_you_button: "Thank you — click!",
           section_title_login: "Login and Statistics",
           section_login_text:
@@ -486,7 +577,6 @@ i18next.init(
             "mikrotik-exporter — delivering data from antennas to the system",
           software_used_item11:
             "openvpn — possibility to administer the entire system from afar",
-          section_title_thank_you: "Thank you",
           section_thank_you_text:
             "We would appreciate partial reimbursement of expenses. The ways to transfer donations are described <a href='/donate.html' class='otherlink' data-i18n='donate_link'>here</a>. About 350 man-hours of work and about 60,000 soms in 2022-2023 prices were invested in the possibility of the internet appearing here. We pay the mobile operator more than 1,000 soms monthly.",
           about_project_task1:
@@ -511,15 +601,66 @@ i18next.init(
           wf_no_data: "—",
           wf_loading: "Загрузка прогноза…",
           wf_load_error: "Обновить не удалось — нажмите ↻ для повтора.",
+          wf_load_error_first: "Прогноз не загрузился. Нажмите ↻, чтобы повторить.",
+          wf_retry_stopped: "Автоповтор остановлен — нажмите ↻.",
+          wf_err_timeout: "Долго нет ответа — связь медленная. Повторить: ↻",
+          wf_err_offline:
+            "Нет связи. Показан последний прогноз; обновится автоматически.",
+          wf_err_offline_nodata:
+            "Нет связи, прогноз не загружен. Страница обновится сама, когда связь появится.",
+          wf_err_partial:
+            "Данные пришли не полностью — связь оборвалась. Повторить: ↻",
+          wf_err_server: "Сервер прогноза не отвечает. Попробуйте позже.",
+          wf_err_missing:
+            "Прогноз недоступен. Обновление вряд ли поможет — попробуйте позже.",
+          wf_section_nodata:
+            "Данных для этого раздела нет. Это не значит, что опасности нет.",
+          wf_nodata_all:
+            "Данных нет ни по одному разделу. Отсутствие данных — не признак безопасности.",
+          wf_stale_unknown:
+            "Прогноз, возможно, устарел — возраст данных неизвестен.",
+          wf_refreshing: "Обновляем…",
+          wf_risk_other: "прочий риск",
+          wf_window_status_unknown:
+            "Статус окна неизвестен — оценивайте по почасовому прогнозу.",
+          wf_now_marker: "сейчас",
+          wf_scroll_hint_left: "← смахните",
+          wf_scroll_hint_right: "прогноз на 3 суток →",
+          wf_legend_details: "Как читать таблицу",
+          wf_tech_details: "Техническая информация",
+          wf_nodata_legend:
+            "«—» означает «данных нет». Это не ноль и не «безопасно».",
+          wf_risks_empty_legend:
+            "Пустая ячейка в строке «Риски» — риски не оценивались.",
+          wf_incloud_legend:
+            "☁ рядом с температурой — высота внутри облака (влажность ≥95%).",
+          wf_jump_label: "Перейти:",
+          wf_wind_now: "Ветер",
+          wf_precip_now: "Осадки сейчас",
+          wf_uncertain_sr: "менее надёжно",
+          wf_obsstatus_ok: "наблюдения станции есть",
+          wf_obsstatus_fresh: "наблюдения станции свежие",
+          wf_obsstatus_unavailable: "наблюдений станции нет",
+          wf_obsstatus_degraded: "наблюдения неполные",
+          wf_obsstatus_stale: "наблюдения устарели",
+          wf_obsstatus_missing: "наблюдений нет",
+          wf_nwpstatus_ok: "прогнозы моделей есть",
+          wf_nwpstatus_degraded: "прогнозы моделей неполные",
+          wf_nwpstatus_stale: "прогнозы моделей устарели",
+          wf_nwpstatus_missing: "прогнозов моделей нет",
+          wf_nwpstatus_fresh: "прогнозы моделей свежие",
+          wf_nwpstatus_unavailable: "прогнозы моделей недоступны",
+          theme_toggle: "Тёмная тема",
           wf_contract_kept:
-            "Формат прогноза изменился; показаны последние полученные данные. Обновите страницу.",
-          wf_section_error: "Не удалось показать этот раздел.",
+            "Формат прогноза изменился; показаны последние полученные данные. Обновите страницу. Если не помогло — прогноз сейчас пересобирается, зайдите через 10 минут.",
+          wf_section_error:
+            "Не удалось показать этот раздел. Остальной прогноз актуален; попробуйте ↻.",
           wf_refresh: "Обновить",
           wf_quality_legend: "Вердикт часа:",
           wf_hourly_caption:
             "Почасовой прогноз, по строке на показатель (температура, ветер, риски…) по часам.",
           wf_contract_error:
-            "Формат прогноза изменился. Пожалуйста, обновите страницу.",
+            "Формат прогноза изменился. Пожалуйста, обновите страницу. Если не помогло — прогноз сейчас пересобирается, зайдите через 10 минут.",
           wf_updated: "Обновлено в {{time}} · {{age}} мин назад",
           wf_updated_unknown: "Время обновления неизвестно",
           wf_refresh_failed: "обновить не удалось",
@@ -544,11 +685,11 @@ i18next.init(
           wf_alpine_title: "Высотные данные",
           wf_alpine_warn:
             "«Данных не хватает» ≠ «безопасно» — относитесь к пропускам осторожно.",
-          wf_alpine_missing: "Отсутствует:",
-          wf_alpine_cape: "грозовой индекс",
-          wf_alpine_levels_700: "уровень 700 гПа",
-          wf_alpine_levels_600: "уровень 600 гПа",
-          wf_alpine_levels_500: "уровень 500 гПа",
+          wf_alpine_missing: "Не показываем из-за отсутствия данных:",
+          wf_alpine_cape: "данные для оценки гроз",
+          wf_alpine_levels_700: "данные на высоте ≈3000 м",
+          wf_alpine_levels_600: "данные на высоте ≈4200 м",
+          wf_alpine_levels_500: "данные на высоте ≈5500 м",
           wf_alpine_precip_prob: "вероятность осадков",
           wf_alpine_gusts: "порывы",
           wf_window: "Окно выхода",
@@ -565,35 +706,38 @@ i18next.init(
           wf_thunder: "Грозы",
           wf_thunder_likely: "Гроза вероятна с {{time}}",
           wf_thunder_possible: "Гроза возможна с {{time}}",
-          wf_thunder_none: "Гроз в ближайшие сутки не ожидается",
+          wf_thunder_none:
+            "Гроз в ближайшие сутки не ожидается. Дальше — смотрите почасовой прогноз.",
           wf_night: "Ближайшая ночь",
           wf_rockfall: "камнеопасность",
           wf_night_min: "Мин. температура (станция)",
-          wf_freezing_level: "Нулевая изотерма",
+          wf_freezing_level: "Высота нуля градусов",
           wf_altitude: "Высота",
           wf_night_min_col: "Мин. ночью, °C",
-          wf_night_range_note: "Диапазон: холодный … более мягкий сценарий.",
-          wf_min: "мин",
+          wf_night_range_note: "Ожидаемый минимум … более мягкий вариант.",
           wf_sun: "Солнце",
           wf_sunrise: "Восход",
           wf_sunset: "Закат",
           wf_civil: "Сумерки (светло без фонаря)",
           wf_daylight: "Световой день",
+          wf_sun_nodata: "Времена восхода и заката не пришли.",
           wf_hours: "ч",
           wf_ridge_note:
             "Астрономические времена для 3370 м; за гребнями реальный восход позже.",
           wf_hourly: "Почасовой прогноз",
-          wf_hourly_empty: "Почасовых данных сейчас нет.",
+          wf_hourly_empty:
+            "Почасовых данных сейчас нет — станция или модели недоступны. Попробуйте обновить (↻) через несколько минут.",
+          wf_hourly_none_offline:
+            "Почасового прогноза нет: на хижине нет интернета, работает только прогноз по давлению. Он появится, когда связь вернётся.",
           wf_alt_select: "Высота для ветра/температуры:",
           wf_alt_base: "станция",
-          wf_wind_ms: "ветер, м/с (⇡ порывы)",
           wf_row_temp: "Температура, °C",
-          wf_row_prob: "Вероятность осадков, %",
+          wf_row_prob: "Шанс осадков, %",
           wf_row_wind: "Ветер, м/с (⇡ порыв)",
           wf_row_wind_alt: "Ветер, м/с (напр.)",
           wf_row_chill: "Ощущается, °C",
           wf_row_rh: "Влажность, %",
-          wf_row_freezing: "Нулевая изотерма, м",
+          wf_row_freezing: "Нуль градусов, м",
           wf_row_risks: "Риски",
           wf_row_sky: "Небо",
           wf_detail_hint: "Нажмите на час — подробности; ← → соседние часы.",
@@ -602,7 +746,7 @@ i18next.init(
           wf_detail_next: "Следующий час",
           wf_temp_band: "разброс: {{lo}}…{{hi}}°",
           wf_temp_band_legend:
-            "Температуры приглушённым курсивом — широкий разброс моделей (менее надёжно); точный диапазон — по тапу на час.",
+            "Температуры и скорости ветра курсивом со знаком ≈ — прогнозы сильно расходятся, значение менее надёжно; точный диапазон — по нажатию на час.",
           wf_incloud: "в облаке (влажность ≥95%)",
           wf_feels_note:
             "«Ощущается» показывается только когда ветер заметно холодит; прочерк — ощущается как температура воздуха.",
@@ -610,7 +754,7 @@ i18next.init(
           wf_snow_depth: "Снег на станции, см",
           wf_row_visibility: "Видимость, км",
           wf_vis_legend:
-            "Видимость — ожидаемая (медиана моделей); туман отмечается риском «потеря видимости». Маленькое N/M рядом со значением — сколько моделей из общего числа дают туман.",
+            "Видимость — наиболее вероятное значение по нескольким прогнозам. Туман отмечается риском «потеря видимости». Маленькое N/M — сколько прогнозов из общего числа дают туман.",
           wf_vis_worst: "худшая модель: {{km}}",
           wf_vis_fog_models: "туман возможен ({{low}} из {{total}} моделей)",
           wf_row_uv: "UV-индекс",
@@ -635,16 +779,16 @@ i18next.init(
           wf_moonphase_last_quarter: "Последняя четверть",
           wf_moonphase_waning_crescent: "Убывающий серп",
           wf_note_thunder_suppressed_by_cin:
-            "Риск грозы снижен: подъём воздуха подавлен.",
+            "Риск грозы снижен: облакам трудно расти вверх.",
           wf_note_thunder_raised_by_li:
             "Риск грозы повышен: атмосфера неустойчива.",
           wf_note_precip_suppressed_by_ensemble:
-            "Риск осадков снят: модели почти единогласно сухие.",
+            "Риск осадков снят: почти все прогнозы дают сухую погоду.",
           wf_note_precip_raised_by_ensemble:
             "Риск осадков повышен: вероятны слабые осадки — мокрая порода.",
           wf_alpine_visibility: "видимость",
-          wf_alpine_lifted_index: "индекс неустойчивости (гроза)",
-          wf_alpine_convective_inhibition: "запирание конвекции (гроза)",
+          wf_alpine_lifted_index: "неустойчивость атмосферы",
+          wf_alpine_convective_inhibition: "условия для развития гроз",
           wf_alpine_uv_index: "UV-индекс",
           wf_sources: "Источники",
           wf_mode: "Режим",
@@ -654,7 +798,7 @@ i18next.init(
           wf_freeair_station: "от станции",
           wf_freeair_700: "от уровня 700 гПа (≈3000 м)",
           wf_pressure_fc: "Прогноз по давлению",
-          wf_uncalibrated: "менее надёжно (без калибровки)",
+          wf_uncalibrated: "Грубая оценка по барометру — может ошибаться.",
           wf_version: "Версия",
           wf_epoch: "Эпоха данных",
           wf_mode_hybrid: "гибрид (наблюдения + модели)",
@@ -662,9 +806,10 @@ i18next.init(
           wf_mode_stale_nwp: "устаревшие данные моделей",
           wf_mode_zambretti:
             "нет интернета — прогноз только по давлению, без почасовки",
-          wf_mode_unavailable: "данных нет",
+          wf_mode_unavailable: "нет данных",
           wf_alarm_deterioration: "Давление падает — погода портится",
           wf_alarm_storm: "Резкое падение давления — возможен шторм",
+          wf_alarm_other: "Особые условия — подробности в почасовой таблице.",
           wf_tendreason_NoData: "нет данных",
           wf_tendreason_LowCoverage: "мало данных",
           wf_tendreason_ShortSpan: "слишком короткий интервал",
@@ -674,7 +819,7 @@ i18next.init(
           wf_alpinestatus_partial: "частичные",
           wf_alpinestatus_none: "недоступны",
           wf_alpinereason_ok: "высотные данные доступны",
-          wf_alpinereason_no_pressure_levels: "нет данных барических уровней",
+          wf_alpinereason_no_pressure_levels: "нет данных по высотам",
           wf_alpinereason_no_cape: "нет грозового индекса",
           wf_quality_ok: "хорошо",
           wf_quality_caution: "осторожно",
@@ -683,8 +828,9 @@ i18next.init(
           wf_windowstatus_none_in_48h: "окна в ближайшие 48 ч нет",
           wf_windowstatus_insufficient_data:
             "данных не хватило, чтобы найти окно",
-          wf_confidence_low: "низкая уверенность",
-          wf_confidence_unknown: "уверенность неизвестна",
+          wf_confidence_low: "Оценка гроз ненадёжна — следите за небом.",
+          wf_confidence_unknown:
+            "Насколько надёжна оценка гроз — неизвестно. Следите за небом.",
           wf_refreeze_yes: "смерзание: да",
           wf_refreeze_likely: "смерзание: вероятно",
           wf_refreeze_no: "смерзания не будет",
@@ -713,10 +859,10 @@ i18next.init(
           wf_risk_freezing_rain_unknown: "ледяной дождь",
           wf_risk_wet_cold: "мокро и холодно",
           wf_risk_wet_cold_unknown: "мокро и холодно",
-          wf_quality_unknown: "данных нет",
-          wf_quality_severe: "NO-GO",
+          wf_quality_unknown: "нет данных",
+          wf_quality_severe: "НЕ ИДТИ",
           wf_qreason_clear: "ограничений нет",
-          wf_qreason_single_risk: "один сработавший риск",
+          wf_qreason_single_risk: "сработал один риск (см. строку «Риски»)",
           wf_qreason_thunder_likely: "вероятна гроза",
           wf_qreason_severe_wind: "опасный ветер",
           wf_qreason_severe_gust: "опасные порывы",
@@ -728,27 +874,29 @@ i18next.init(
           wf_qreason_wind_and_precip_on_ridge: "ветер с осадками на гребне",
           wf_qreason_freezing_rain_with_wind: "ледяной дождь с ветром",
           wf_qreason_whiteout_with_precip: "потеря видимости с осадками",
-          wf_flsource_interpolated: "настоящее пересечение нуля в профиле (достоверно)",
-          wf_flsource_clamped_below: "весь профиль ниже нуля — изотерма под маршрутом",
-          wf_flsource_clamped_above: "пересечения нет — изотерма выше маршрута",
-          wf_flsource_raw_blend: "сырые данные модели, не проверено",
+          wf_flsource_interpolated:
+            "посчитано по замерам на высотах (надёжно)",
+          wf_flsource_clamped_below:
+            "везде ниже нуля — нуль градусов ниже маршрута",
+          wf_flsource_clamped_above: "нуль градусов выше маршрута",
+          wf_flsource_raw_blend: "данные модели, не проверено",
           wf_flsource_missing: "значения нет",
-          wf_freezing_est_note: "Нулевая изотерма — оценка (источник не подтверждён).",
+          wf_freezing_est_note: "Высота нуля градусов — оценка (источник не подтверждён).",
           wf_row_critical_alt: "Плохо выше, м",
           wf_critical_alt_legend: "Плохо выше показанной высоты; «·» — по высотам приемлемо; «?» — вердикта по высотам нет.",
           wf_critical_alt_nodata: "вердикта по высотам нет",
-          wf_wind_p90: "ветер {{v}}",
           wf_gust_p90: "порывы {{v}}",
           wf_spread_prefix: "макс. по моделям",
           wf_threshold: "Ветер для оценки риска",
           wf_thmode_mean: "среднее",
-          wf_thmode_p90: "верхняя оценка",
-          wf_row_wind_alt_p90: "Ветер (верхняя оценка), м/с (напр.)",
+          wf_thmode_p90: "с запасом на порывы",
+          wf_row_wind_alt_p90: "Ветер с запасом, м/с",
           wf_wind_mean_ctx: "среднее {{mean}} м/с",
           wf_wind_p90_legend:
-            "В строке ветра показана верхняя оценка — с запасом на порывы и разброс моделей, а не среднее. «—» означает, что оценку посчитать нельзя (это не штиль).",
+            "В строке ветра показан ветер с запасом — на порывы и разброс моделей, а не среднее. «—» означает, что оценку посчитать нельзя (это не штиль).",
           wf_unit_hpa: "гПа",
           wf_unit_m: "м",
+          wf_unit_ms: "м/с",
           wf_dir_n: "С",
           wf_dir_ne: "СВ",
           wf_dir_e: "В",
@@ -760,8 +908,11 @@ i18next.init(
           wf_window_latest_start: "последний выход: {{time}} (не «выходить сейчас»)",
           wf_window_turnaround: "точка невозврата: {{time}}",
           wf_window_route_hours: "маршрут рассчитан на {{hours}} ч",
-          wf_avalanche: "Лавины",
           wf_avalanche_title: "Лавины",
+          wf_avalanche_summary: "Лавины — сработали признаки: {{n}} из {{m}}",
+          wf_avalanche_summary_nodata: "Лавины — данных по признакам нет",
+          wf_avalanche_summary_partial:
+            "Лавины — сработали признаки: {{n}} из {{m}} оценённых ({{k}} без данных)",
           wf_avalanche_no_rating:
             "Лавинный уровень не оценивается — бюллетеня для Тянь-Шаня нет.",
           wf_avalanche_flags_intro: "Сработавшие признаки (не шкала опасности):",
@@ -774,7 +925,7 @@ i18next.init(
           wf_avalanche_flag_rain_on_snow: "дождь по снегу",
           wf_avalanche_flag_no_overnight_refreeze: "ночью не подмёрзло",
           wf_avalanche_flag_rapid_warming: "резкое потепление",
-          wf_avalanche_flag_high_freezing_level: "высокая нулевая изотерма",
+          wf_avalanche_flag_high_freezing_level: "высоко поднялся нуль градусов",
           wf_sky_clear: "ясно",
           wf_sky_partly: "переменная облачность",
           wf_sky_cloudy: "облачно",
@@ -825,7 +976,7 @@ i18next.init(
           section_title_services: "Полезные сервисы в интернете",
           section_title_thank_you: "Поблагодарить",
           section_thank_you_text:
-            "Будем благодарны за частичную компенсацию расходов. Здесь описаны способы перевода донатов. В возможность появления здесь интернета было вложено порядка 350 человеко-часов работы и около 60 000 сомов в ценах 2022-2023 годов. Ежемесячно сотовому оператору мы оплачиваем более 1000 сомов.",
+            "Будем благодарны за частичную компенсацию расходов. <a href='/donate.html' class='otherlink' data-i18n='donate_link'>Здесь</a> описаны способы перевода донатов. В возможность появления здесь интернета было вложено порядка 350 человеко-часов работы и около 60 000 сомов в ценах 2022-2023 годов. Ежемесячно сотовому оператору мы оплачиваем более 1000 сомов.",
           section_thank_you_button: "Поблагодарить — жми!",
           section_title_login: "Вход и статистика",
           section_login_text:
@@ -952,11 +1103,6 @@ i18next.init(
             "mikrotik-exporter — поставка данных с антенн в систему",
           software_used_item11:
             "openvpn — возможность администрирования всей системой с большой земли",
-          section_title_thank_you: "Поблагодарить",
-          section_thank_you_text:
-            "Будем благодарны за частичную компенсацию расходов. <a href='/donate.html' class='otherlink' data-i18n='donate_link'>Здесь</a> описаны способы перевода донатов. В возможность появления здесь интернета было вложено порядка 350 человеко-часов работы и около 60 000 сомов в ценах 2022-2023 годов. Ежемесячно сотовому оператору мы оплачиваем более 1000 сомов.",
-          section_thank_you_button: "Поблагодарить — жми!",
-
           about_project_task1:
             "Организация радиомоста. Никто из нас не является сетевым инженером, пришлось разбираться с нуля.",
           about_project_task2:
@@ -967,7 +1113,7 @@ i18next.init(
             "Для локальных сервисов и организации удобного доступа в интернет нужен был красивый локальный сайт. Им занялся Святослав.",
         },
       },
-      kg: {
+      ky: {
         translation: {
           header_title: "[Рацек Хижинасындагы Интернет]",
           title: "Рацек Хижинасындагы Интернет",
@@ -979,14 +1125,67 @@ i18next.init(
           wf_no_data: "—",
           wf_loading: "Божомол жүктөлүүдө…",
           wf_load_error: "Жаңылоо болбоду — кайталоо үчүн ↻ басыңыз.",
+          wf_load_error_first: "Божомол жүктөлгөн жок. Кайталоо үчүн ↻ басыңыз.",
+          wf_retry_stopped: "Авто-кайталоо токтоду — ↻ басыңыз.",
+          wf_err_timeout: "Жооп көпкө жок — байланыш жай. Кайталоо: ↻",
+          wf_err_offline:
+            "Байланыш жок. Акыркы божомол көрсөтүлдү; автоматтык түрдө жаңыланат.",
+          wf_err_offline_nodata:
+            "Байланыш жок, божомол жүктөлгөн жок. Байланыш пайда болгондо барак өзү жаңыланат.",
+          wf_err_partial:
+            "Маалымат толук келген жок — байланыш үзүлдү. Кайталоо: ↻",
+          wf_err_server:
+            "Божомол сервери жооп бербей жатат. Кийинчерээк аракет кылыңыз.",
+          wf_err_missing:
+            "Божомол жеткиликсиз. Жаңылоо жардам бербеши мүмкүн — кийинчерээк аракет кылыңыз.",
+          wf_section_nodata:
+            "Бул бөлүм үчүн маалымат жок. Бул коркунуч жок дегенди билдирбейт.",
+          wf_nodata_all:
+            "Бир да бөлүм боюнча маалымат жок. Маалыматтын жоктугу коопсуздуктун белгиси эмес.",
+          wf_stale_unknown:
+            "Божомол эскирген болушу мүмкүн — маалыматтын жашы белгисиз.",
+          wf_refreshing: "Жаңыланууда…",
+          wf_risk_other: "башка тобокелдик",
+          wf_window_status_unknown:
+            "Чыгууга ылайыктуу мезгил белгисиз — сааттык божомол боюнча баалаңыз.",
+          wf_now_marker: "азыр",
+          wf_scroll_hint_left: "← сүрүңүз",
+          wf_scroll_hint_right: "3 күндүк божомол →",
+          wf_legend_details: "Таблицаны кантип окуу керек",
+          wf_tech_details: "Техникалык маалымат",
+          wf_nodata_legend:
+            "«—» «маалымат жок» дегенди билдирет. Бул нөл да, «коопсуз» да эмес.",
+          wf_risks_empty_legend:
+            "«Тобокелдиктер» сабындагы бош уяча — тобокелдиктер бааланган эмес.",
+          wf_incloud_legend:
+            "Температуранын жанындагы ☁ — бул бийиктик булуттун ичинде (нымдуулук ≥95%).",
+          wf_jump_label: "Өтүү:",
+          wf_wind_now: "Шамал",
+          wf_precip_now: "Азыр жаан-чачын",
+          wf_uncertain_sr: "анча ишенимдүү эмес",
+          wf_obsstatus_ok: "станциянын байкоолору бар",
+          wf_obsstatus_fresh: "станциянын байкоолору жаңы",
+          wf_obsstatus_unavailable: "станциянын байкоолору жок",
+          wf_obsstatus_degraded: "байкоолор толук эмес",
+          wf_obsstatus_stale: "байкоолор эскирген",
+          wf_obsstatus_missing: "байкоолор жок",
+          wf_nwpstatus_ok: "моделдердин божомолдору бар",
+          wf_nwpstatus_degraded: "моделдердин божомолдору толук эмес",
+          wf_nwpstatus_stale: "моделдердин божомолдору эскирген",
+          wf_nwpstatus_missing: "моделдердин божомолдору жок",
+          wf_nwpstatus_fresh: "моделдердин божомолдору жаңы",
+          wf_nwpstatus_unavailable: "моделдердин божомолдору жеткиликсиз",
+          theme_toggle: "Караңгы тема",
           wf_contract_kept:
-            "Божомолдун форматы өзгөрдү; акыркы алынган маалымат көрсөтүлдү. Баракты жаңылаңыз.",
-          wf_section_error: "Бул бөлүмдү көрсөтүү мүмкүн болбоду.",
+            "Божомолдун форматы өзгөрдү; акыркы алынган маалымат көрсөтүлдү. Баракты жаңылаңыз. Жардам бербесе — божомол азыр кайра түзүлүүдө, 10 мүнөттөн кийин кайрылыңыз.",
+          wf_section_error:
+            "Бул бөлүмдү көрсөтүү мүмкүн болбоду. Божомолдун калган бөлүгү актуалдуу; ↻ басып көрүңүз.",
           wf_refresh: "Жаңылоо",
-          wf_quality_legend: "Сааттын вердикти:",
+          wf_quality_legend: "Сааттын баасы:",
           wf_hourly_caption:
             "Сааттык божомол, ар бир көрсөткүчкө бир сап (температура, шамал, тобокелдиктер…).",
-          wf_contract_error: "Божомолдун форматы өзгөрдү. Баракты жаңылаңыз.",
+          wf_contract_error:
+            "Божомолдун форматы өзгөрдү. Баракты жаңылаңыз. Жардам бербесе — божомол азыр кайра түзүлүүдө, 10 мүнөттөн кийин кайрылыңыз.",
           wf_updated: "Жаңыланды {{time}} · {{age}} мүнөт мурун",
           wf_updated_unknown: "Жаңылоо убактысы белгисиз",
           wf_refresh_failed: "жаңылоо мүмкүн болбоду",
@@ -1011,65 +1210,68 @@ i18next.init(
           wf_alpine_title: "Бийиктик маалыматтары",
           wf_alpine_warn:
             "«Маалымат жетишсиз» ≠ «коопсуз» — жоктукка этият болуңуз.",
-          wf_alpine_missing: "Жок:",
-          wf_alpine_cape: "чагылган индекси",
-          wf_alpine_levels_700: "700 гПа деңгээли",
-          wf_alpine_levels_600: "600 гПа деңгээли",
-          wf_alpine_levels_500: "500 гПа деңгээли",
+          wf_alpine_missing: "Маалымат жок болгондуктан көрсөтүлбөйт:",
+          wf_alpine_cape: "чагылганды баалоо үчүн маалымат",
+          wf_alpine_levels_700: "≈3000 м бийиктиктеги маалымат",
+          wf_alpine_levels_600: "≈4200 м бийиктиктеги маалымат",
+          wf_alpine_levels_500: "≈5500 м бийиктиктеги маалымат",
           wf_alpine_precip_prob: "жаан-чачын ыктымалдыгы",
           wf_alpine_gusts: "шамал соккулары",
-          wf_window: "Чыгуу терезеси",
+          wf_window: "Чыгууга ылайыктуу мезгил",
           wf_window_intro:
             "Чыгууга ылайыктуу аба ырайынын жакынкы үзгүлтүксүз мезгили.",
           wf_window_span_sameday: "{{date}}, {{from}}–{{to}}",
           wf_window_span_multiday: "{{fromDate}} {{from}} → {{toDate}} {{to}}",
           wf_window_duration: "узактыгы: {{dur}}",
-          wf_window_quality: "терезедеги аба ырайы: {{q}}",
-          wf_dur_h: "{{h}} с",
+          wf_window_quality: "ошол мезгилдеги аба ырайы: {{q}}",
+          wf_dur_h: "{{h}} саат",
           wf_dur_d: "{{d}} күн",
-          wf_dur_dh: "{{d}} күн {{h}} с",
-          wf_window_closes: "учурдагы терезе {{time}} жабылат",
+          wf_dur_dh: "{{d}} күн {{h}} саат",
+          wf_window_closes: "учурдагы ылайыктуу мезгил {{time}} аяктайт",
           wf_thunder: "Чагылгандар",
           wf_thunder_likely: "Чагылган {{time}} тартып ыктымал",
           wf_thunder_possible: "Чагылган {{time}} тартып мүмкүн",
-          wf_thunder_none: "Жакынкы бир сутка чагылган күтүлбөйт",
+          wf_thunder_none:
+            "Жакынкы 24 саатта чагылган күтүлбөйт. Андан ары — сааттык божомолду караңыз.",
           wf_night: "Жакынкы түн",
           wf_rockfall: "таш кулоо коркунучу",
           wf_night_min: "Мин. температура (станция)",
-          wf_freezing_level: "Нөл изотермасы",
+          wf_freezing_level: "Нөл градустун бийиктиги",
           wf_altitude: "Бийиктик",
           wf_night_min_col: "Түнкү мин., °C",
-          wf_night_range_note: "Диапазон: суук … жумшагыраак сценарий.",
-          wf_min: "мин",
+          wf_night_range_note: "Күтүлгөн эң суук … жумшагыраак учур.",
           wf_sun: "Күн",
           wf_sunrise: "Күн чыгуу",
           wf_sunset: "Күн батуу",
           wf_civil: "Иңир (фонарсыз жарык)",
           wf_daylight: "Күндүзгү жарык",
-          wf_hours: "с",
+          wf_sun_nodata: "Күн чыгуу жана батуу убактылары келген жок.",
+          wf_hours: "саат",
           wf_ridge_note:
             "3370 м үчүн астрономиялык убакыт; кырлардын артында чыныгы күн чыгуу кечирээк.",
           wf_hourly: "Сааттык божомол",
-          wf_hourly_empty: "Азыр сааттык маалымат жок.",
+          wf_hourly_empty:
+            "Азыр сааттык маалымат жок — станция же моделдер жеткиликсиз. Бир нече мүнөттөн кийин жаңылап көрүңүз (↻).",
+          wf_hourly_none_offline:
+            "Сааттык божомол жок: хижинада интернет жок, басым боюнча божомол гана иштейт. Байланыш кайтканда ал пайда болот.",
           wf_alt_select: "Шамал/температура үчүн бийиктик:",
           wf_alt_base: "станция",
-          wf_wind_ms: "шамал, м/с (⇡ соккулар)",
           wf_row_temp: "Температура, °C",
-          wf_row_prob: "Жаан ыктымалдыгы, %",
+          wf_row_prob: "Жаан ыктымал., %",
           wf_row_wind: "Шамал, м/с (⇡ сокку)",
           wf_row_wind_alt: "Шамал, м/с (багыт)",
           wf_row_chill: "Сезилет, °C",
           wf_row_rh: "Нымдуулук, %",
-          wf_row_freezing: "Нөл изотермасы, м",
+          wf_row_freezing: "Нөл градус, м",
           wf_row_risks: "Тобокелдиктер",
           wf_row_sky: "Асман",
           wf_detail_hint: "Чоо-жайын көрүү үчүн саатты басыңыз; ← → чектеш сааттар.",
           wf_detail_close: "Жабуу",
           wf_detail_prev: "Мурунку саат",
           wf_detail_next: "Кийинки саат",
-          wf_temp_band: "диапазон: {{lo}}…{{hi}}°",
+          wf_temp_band: "чектер: {{lo}}…{{hi}}°",
           wf_temp_band_legend:
-            "Күңүрт курсив температуралар — моделдердин чоң чачырашы (анча ишенимдүү эмес); так диапазон — саатты басканда.",
+            "≈ белгиси менен курсив температуралар жана шамал ылдамдыктары — божомолдор бири-биринен катуу айырмаланат, маани анча ишенимдүү эмес; так чектери — саатты басканда.",
           wf_incloud: "булутта (нымдуулук ≥95%)",
           wf_feels_note:
             "«Сезилет» шамал байкаларлык муздатканда гана көрсөтүлөт; сызык — аба температурасындай сезилет дегени.",
@@ -1077,7 +1279,7 @@ i18next.init(
           wf_snow_depth: "Станциядагы кар, см",
           wf_row_visibility: "Көрүнүү, км",
           wf_vis_legend:
-            "Көрүнүү — болжолдуу (моделдердин медианасы); туман «көрүнбөй калуу» коркунучу менен белгиленет. Маанинин жанындагы кичине N/M — жалпы санынан канча модель туман көрсөтөт.",
+            "Көрүнүү — бир нече божомол боюнча эң ыктымал маани. Туман «көрүнбөй калуу» коркунучу менен белгиленет. Кичине N/M — жалпы санынан канча божомол туман берет.",
           wf_vis_worst: "эң начар модель: {{km}}",
           wf_vis_fog_models: "туман болушу мүмкүн ({{low}}/{{total}} модель)",
           wf_row_uv: "UV-индекс",
@@ -1086,7 +1288,7 @@ i18next.init(
           wf_uv_moderate: "орточо",
           wf_uv_high: "жогорку",
           wf_uv_very_high: "өтө жогорку",
-          wf_uv_extreme: "өтө коркунучтуу",
+          wf_uv_extreme: "эң жогорку",
           wf_moon: "Ай",
           wf_moon_sets: "{{time}} батат",
           wf_moon_rises: "{{time}} чыгат",
@@ -1102,16 +1304,16 @@ i18next.init(
           wf_moonphase_last_quarter: "Акыркы чейрек",
           wf_moonphase_waning_crescent: "Кичирейип бараткан жарым ай",
           wf_note_thunder_suppressed_by_cin:
-            "Чагылган коркунучу төмөндөдү: абанын көтөрүлүшү басылды.",
+            "Чагылган коркунучу төмөндөдү: булуттардын өйдө өсүшү кыйын.",
           wf_note_thunder_raised_by_li:
             "Чагылган коркунучу жогорулады: атмосфера туруксуз.",
           wf_note_precip_suppressed_by_ensemble:
-            "Жаан коркунучу алынды: моделдер дээрлик бир добуштан кургак.",
+            "Жаан коркунучу алынды: божомолдордун дээрлик баары кургак аба ырайын берет.",
           wf_note_precip_raised_by_ensemble:
             "Жаан коркунучу жогорулады: аз жаан ыктымал — нымдуу таш.",
           wf_alpine_visibility: "көрүнүү",
-          wf_alpine_lifted_index: "туруксуздук индекси (чагылган)",
-          wf_alpine_convective_inhibition: "конвекцияны бөгөө (чагылган)",
+          wf_alpine_lifted_index: "атмосферанын туруксуздугу",
+          wf_alpine_convective_inhibition: "чагылган өнүгүү шарттары",
           wf_alpine_uv_index: "UV-индекс",
           wf_sources: "Булактар",
           wf_mode: "Режим",
@@ -1121,7 +1323,7 @@ i18next.init(
           wf_freeair_station: "станциядан",
           wf_freeair_700: "700 гПа деңгээлинен (≈3000 м)",
           wf_pressure_fc: "Басым боюнча божомол",
-          wf_uncalibrated: "азыраак ишенимдүү (калибрленбеген)",
+          wf_uncalibrated: "Барометр боюнча болжолдуу баа — жаңылышы мүмкүн.",
           wf_version: "Версия",
           wf_epoch: "Маалымат доору",
           wf_mode_hybrid: "гибрид (байкоо + моделдер)",
@@ -1132,32 +1334,36 @@ i18next.init(
           wf_mode_unavailable: "маалымат жок",
           wf_alarm_deterioration: "Басым түшүүдө — аба ырайы начарлайт",
           wf_alarm_storm: "Басым тез түшүүдө — шторм болушу мүмкүн",
+          wf_alarm_other: "Өзгөчө шарттар — чоо-жайы сааттык таблицада.",
           wf_tendreason_NoData: "маалымат жок",
           wf_tendreason_LowCoverage: "маалымат аз",
-          wf_tendreason_ShortSpan: "интервал өтө кыска",
+          wf_tendreason_ShortSpan: "мезгил өтө кыска",
           wf_tendreason_StaleLatest: "эскирген өлчөө",
           wf_tendreason_FrozenSensor: "сенсор катып калган",
           wf_alpinestatus_full: "толук",
           wf_alpinestatus_partial: "жарым-жартылай",
           wf_alpinestatus_none: "жеткиликсиз",
           wf_alpinereason_ok: "бийиктик маалыматтары бар",
-          wf_alpinereason_no_pressure_levels: "барикалык деңгээл маалыматы жок",
+          wf_alpinereason_no_pressure_levels:
+            "бийиктиктер боюнча маалымат жок",
           wf_alpinereason_no_cape: "чагылган индекси жок",
           wf_quality_ok: "жакшы",
           wf_quality_caution: "этият",
           wf_quality_bad: "начар",
-          wf_windowstatus_found: "терезе табылды",
-          wf_windowstatus_none_in_48h: "жакынкы 48 саатта терезе жок",
+          wf_windowstatus_found: "ылайыктуу мезгил табылды",
+          wf_windowstatus_none_in_48h:
+            "жакынкы 48 саатта ылайыктуу мезгил жок",
           wf_windowstatus_insufficient_data:
-            "терезе табууга маалымат жетишсиз",
-          wf_confidence_low: "төмөн ишеним",
-          wf_confidence_unknown: "ишеним белгисиз",
+            "ылайыктуу мезгилди табууга маалымат жетишсиз",
+          wf_confidence_low: "Чагылган баасы ишенимсиз — асманды байкаңыз.",
+          wf_confidence_unknown:
+            "Чагылган баасынын ишенимдүүлүгү белгисиз — асманды байкаңыз.",
           wf_refreeze_yes: "тоңуу: ооба",
           wf_refreeze_likely: "тоңуу: ыктымал",
           wf_refreeze_no: "тоңуу болбойт",
           wf_refreeze_unknown: "тоңуу: белгисиз",
           wf_rockfall_low: "төмөн",
-          wf_rockfall_elevated: "жогорулаган",
+          wf_rockfall_elevated: "орточодон жогору",
           wf_rockfall_high: "жогорку",
           wf_rockfall_unknown: "белгисиз",
           wf_risk_thunder_possible: "чагылган?",
@@ -1173,62 +1379,68 @@ i18next.init(
           wf_risk_cold: "суук",
           wf_risk_cold_unknown: "суук",
           wf_risk_pressure_alarm: "басымдын тез түшүшү",
-          wf_risk_gust: "шамал сокку",
-          wf_risk_gust_unknown: "шамал сокку",
-          wf_risk_gust_severe: "коркунучтуу сокку",
-          wf_risk_freezing_rain: "муздак жамгыр",
-          wf_risk_freezing_rain_unknown: "муздак жамгыр",
+          wf_risk_gust: "шамал соккулары",
+          wf_risk_gust_unknown: "шамал соккулары",
+          wf_risk_gust_severe: "коркунучтуу соккулар",
+          wf_risk_freezing_rain: "тоңдуруучу жаан",
+          wf_risk_freezing_rain_unknown: "тоңдуруучу жаан",
           wf_risk_wet_cold: "нымдуу жана суук",
           wf_risk_wet_cold_unknown: "нымдуу жана суук",
           wf_quality_unknown: "маалымат жок",
-          wf_quality_severe: "NO-GO",
+          wf_quality_severe: "ЧЫКПА",
           wf_qreason_clear: "чектөө жок",
-          wf_qreason_single_risk: "бир тобокелдик",
+          wf_qreason_single_risk:
+            "бир тобокелдик иштеди («Тобокелдиктер» сабын караңыз)",
           wf_qreason_thunder_likely: "чагылган ыктымал",
           wf_qreason_severe_wind: "коркунучтуу шамал",
-          wf_qreason_severe_gust: "коркунучтуу сокку",
+          wf_qreason_severe_gust: "коркунучтуу соккулар",
           wf_qreason_cold: "суук",
-          wf_qreason_freezing_rain: "муздак жамгыр",
+          wf_qreason_freezing_rain: "тоңдуруучу жаан",
           wf_qreason_wet_cold: "нымдуу жана суук",
           wf_qreason_unknown_inputs: "кириш маалымат жетишсиз",
           wf_qreason_pressure_alarm: "басымдын тез түшүшү",
           wf_qreason_wind_and_precip_on_ridge: "кырда шамал жана жаан-чачын",
-          wf_qreason_freezing_rain_with_wind: "муздак жамгыр шамал менен",
+          wf_qreason_freezing_rain_with_wind: "тоңдуруучу жаан шамал менен",
           wf_qreason_whiteout_with_precip: "көрүнбөй калуу жаан-чачын менен",
-          wf_flsource_interpolated: "профилде чыныгы нөл кесилиши (ишенимдүү)",
-          wf_flsource_clamped_below: "бүт профиль нөлдөн төмөн — изотерма маршруттун астында",
-          wf_flsource_clamped_above: "кесилиш жок — изотерма маршруттун үстүндө",
-          wf_flsource_raw_blend: "чийки модель дайындары, текшерилген эмес",
+          wf_flsource_interpolated:
+            "бийиктиктердеги өлчөөлөр боюнча эсептелген (ишенимдүү)",
+          wf_flsource_clamped_below:
+            "бардык жерде нөлдөн төмөн — нөл градус маршруттун астында",
+          wf_flsource_clamped_above: "нөл градус маршруттун үстүндө",
+          wf_flsource_raw_blend: "модель маалыматы, текшерилген эмес",
           wf_flsource_missing: "маани жок",
-          wf_freezing_est_note: "Нөл изотермасы — болжол (булак тастыкталган эмес).",
+          wf_freezing_est_note: "Нөл градустун бийиктиги — болжол (булак тастыкталган эмес).",
           wf_row_critical_alt: "Начар бийиктиктен, м",
-          wf_critical_alt_legend: "Көрсөтүлгөн бийиктиктен жогору начар; «·» — бийиктиктер боюнча ылайыктуу; «?» — бийиктик боюнча вердикт жок.",
-          wf_critical_alt_nodata: "бийиктик боюнча вердикт жок",
-          wf_wind_p90: "шамал {{v}}",
+          wf_critical_alt_legend: "Көрсөтүлгөн бийиктиктен жогору начар; «·» — бийиктиктер боюнча ылайыктуу; «?» — бийиктик боюнча баа жок.",
+          wf_critical_alt_nodata: "бийиктик боюнча баа жок",
           wf_gust_p90: "сокку {{v}}",
           wf_spread_prefix: "моделдер боюнча макс.",
           wf_threshold: "Тобокелди баалоо үчүн шамал",
           wf_thmode_mean: "орточо",
-          wf_thmode_p90: "жогорку баа",
-          wf_row_wind_alt_p90: "Шамал (жогорку баа), м/с (багыт)",
+          wf_thmode_p90: "соккуларга кор менен",
+          wf_row_wind_alt_p90: "Шамал, эң жогоркусу, м/с",
           wf_wind_mean_ctx: "орточо {{mean}} м/с",
           wf_wind_p90_legend:
-            "Шамал сабында жогорку баа көрсөтүлгөн — соккуларга жана моделдердин чачырашына кор менен, орточо эмес. «—» баа эсептелбейт дегенди билдирет (тынч эмес).",
+            "Шамал сабында эң жогорку маани көрсөтүлгөн — соккуларга жана моделдердин чачырашына кор менен, орточо эмес. «—» баа эсептелбейт дегенди билдирет (тынч эмес).",
           wf_unit_hpa: "гПа",
           wf_unit_m: "м",
-          wf_dir_n: "N",
-          wf_dir_ne: "NE",
-          wf_dir_e: "E",
-          wf_dir_se: "SE",
-          wf_dir_s: "S",
-          wf_dir_sw: "SW",
-          wf_dir_w: "W",
-          wf_dir_nw: "NW",
+          wf_unit_ms: "м/с",
+          wf_dir_n: "Түн",
+          wf_dir_ne: "ТүнЧ",
+          wf_dir_e: "Чыг",
+          wf_dir_se: "ТүшЧ",
+          wf_dir_s: "Түш",
+          wf_dir_sw: "ТүшБ",
+          wf_dir_w: "Бат",
+          wf_dir_nw: "ТүнБ",
           wf_window_latest_start: "акыркы чыгуу: {{time}} («азыр чыгуу» эмес)",
           wf_window_turnaround: "кайтуу чекити: {{time}}",
           wf_window_route_hours: "маршрут {{hours}} саатка эсептелген",
-          wf_avalanche: "Көчкү",
           wf_avalanche_title: "Көчкү",
+          wf_avalanche_summary: "Көчкү — иштеген белгилер: {{m}} белгиден {{n}}",
+          wf_avalanche_summary_nodata: "Көчкү — белгилер боюнча маалымат жок",
+          wf_avalanche_summary_partial:
+            "Көчкү — иштеген белгилер: бааланган {{m}} белгиден {{n}} ({{k}} маалыматсыз)",
           wf_avalanche_no_rating:
             "Көчкү коркунучунун деңгээли бааланбайт — Тянь-Шань үчүн бюллетень жок.",
           wf_avalanche_flags_intro: "Иштеген белгилер (коркунуч шкаласы эмес):",
@@ -1241,7 +1453,7 @@ i18next.init(
           wf_avalanche_flag_rain_on_snow: "карга жамгыр",
           wf_avalanche_flag_no_overnight_refreeze: "түнү тоңбоду",
           wf_avalanche_flag_rapid_warming: "тез жылуулук",
-          wf_avalanche_flag_high_freezing_level: "жогорку нөл изотермасы",
+          wf_avalanche_flag_high_freezing_level: "нөл градус бийик көтөрүлдү",
           wf_sky_clear: "ачык",
           wf_sky_partly: "аз булуттуу",
           wf_sky_cloudy: "булуттуу",
@@ -1277,7 +1489,7 @@ i18next.init(
           wf_zambretti_24: "Салыштырмалуу ачык, эрте нөшөр мүмкүн",
           wf_zambretti_25: "Эрте нөшөр, жакшырат",
           wf_zambretti_26: "Өзгөрмө, оңолуп жатат",
-          wf_zambretti_27: "Тескерисинче туруксуз, кийин ачылуулар",
+          wf_zambretti_27: "Кыйла туруксуз, кийин ачылуулар",
           wf_zambretti_28: "Туруксуз, жакшырышы ыктымал",
           wf_zambretti_29: "Туруксуз, кыска ачылуулар",
           wf_zambretti_30: "Абдан туруксуз, убакыт-убакыт жакшыраак",
@@ -1292,6 +1504,8 @@ i18next.init(
             "Интернетсиз дагы ар дайым жеткиликтүү",
           section_title_services: "Интернеттеги пайдалуу кызматтар",
           section_title_thank_you: "Ыраазычылык билдирүү",
+          section_thank_you_text:
+            "Чыгымдарды жарым-жартылай жабууга жардам бергениңизге ыраазы болобуз. Донорлук кылуунун жолдору <a href='/donate.html' class='otherlink' data-i18n='donate_link'>бул жерде</a> сүрөттөлгөн. Бул жерде интернеттин пайда болуу мүмкүнчүлүгүнө болжол менен 350 адам-саат жумуш жана 2022-2023-жылдардагы баалар менен 60,000 сом салынган. Биз айына мобилдик операторго 1,000 сомдон ашык төлөйбүз.",
           section_thank_you_button: "Ыраазычылык билдирүү — басыңыз!",
           section_title_login: "Кирүү жана статистика",
           section_login_text:
@@ -1417,11 +1631,6 @@ i18next.init(
             "mikrotik-exporter — антенналардан тутумга маалымат берүү",
           software_used_item11:
             "openvpn — чоң жерден бүткүл системаны башкаруу мүмкүнчүлүгү",
-          section_title_thank_you: "Ыраазычылык билдирүү",
-          section_thank_you_text:
-            "Чыгымдарды жарым-жартылай жабууга жардам бергениңизге ыраазы болобуз. Донорлук кылуунун жолдору <a href='/donate.html' class='otherlink' data-i18n='donate_link'>бул жерде</a> сүрөттөлгөн. Бул жерде интернеттин пайда болуу мүмкүнчүлүгүнө болжол менен 350 адам-саат жумуш жана 2022-2023-жылдардагы баалар менен 60,000 сом салынган. Биз айына мобилдик операторго 1,000 сомдон ашык төлөйбүз.",
-          section_thank_you_button: "Ыраазычылык билдирүү — басыңыз!",
-
           about_project_task1:
             "Радиокөпүрөнү уюштуруу. Биздин эч кимибиз тармак инженери эмеспиз, андыктан нөлдөн түшүнүүгө туура келди.",
           about_project_task2:

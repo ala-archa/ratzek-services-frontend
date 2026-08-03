@@ -32,11 +32,11 @@
               RU
             </button>
             <button
-              data-lang="kg"
+              data-lang="ky"
               class="language-switcher_button"
-              onclick="changeLanguage('kg')"
+              onclick="changeLanguage('ky')"
             >
-              KG
+              KY
             </button>
           </div>
           <div class="toggle-switch">
@@ -44,6 +44,7 @@
               <input
                 type="checkbox"
                 class="header_theme-switcher"
+                data-i18n-aria-label="theme_toggle"
                 aria-label="Тёмная тема / Dark theme"
               />
               <span class="slider"></span>
@@ -70,16 +71,26 @@
 
           <!-- Заголовок страницы + строка свежести (заполняется weather.js) -->
           <h1 class="wf-h1" data-i18n="wf_heading">Прогноз погоды на хижине Рацека</h1>
-          <p id="wf-updated" class="wf-updated" aria-live="polite"></p>
+          <!-- No aria-live here: the freshness line is rewritten once a minute
+               ("23 min ago" -> "24 min ago"), and a live region turned that into
+               an endless metronome over the top of whatever the user was
+               reading. This is ambient status, not an event; events are the
+               banners in #wf-banners. -->
+          <p id="wf-updated" class="wf-updated"></p>
 
           <!-- Слоты; наполняет js/weather.js -->
           <div id="wf-banners" aria-live="polite"></div>
-          <div id="wf-current"></div>
-          <div id="wf-alpine"></div>
-          <div id="wf-avalanche"></div>
+          <!-- Order answers the user's real question ("do I go, and when?")
+               first: the outing window and thunder, then what it is doing right
+               now, and only then the reference blocks. renderAll() fills the
+               slots in this same order. -->
+          <div id="wf-pressure"></div>
           <div id="wf-window"></div>
           <div id="wf-thunder"></div>
+          <div id="wf-current"></div>
           <div id="wf-night"></div>
+          <div id="wf-avalanche"></div>
+          <div id="wf-alpine"></div>
           <div id="wf-sun"></div>
           <div id="wf-hourly"></div>
           <div id="wf-sources"></div>
