@@ -73,9 +73,47 @@ http://82.146.59.228:8080/weather-forecast.html` (200); `/api/v1/client`,
 
 Caveats: no TLS (plain HTTP over IP:port — that's why bank details are NOT
 exposed); the config is not under config-management (keep it in sync with the
-repo copy); after a big asset change flush the gateway cache
-(`rm -rf /var/cache/nginx-ratzek/*`). Rollback: delete the file on the gateway →
+repo copy). Rollback: delete the file on the gateway →
 `nginx -t && systemctl reload nginx`.
+
+### Gateway cache and stale assets after a deploy
+
+`weather-forecast.html` is proxied uncached, but `js/` and `css/` are cached on
+the gateway with `proxy_ignore_headers Cache-Control` (the origin sends
+`no-store`). With the original `proxy_cache_valid 200 1h` that meant a deploy
+produced a **fresh page against up-to-hour-old code** — which renders as a
+visibly broken layout, not as "old version".
+
+The cache is now split so this self-heals:
+
+- `/assets/` (fonts, images — change only on a redesign): 24h + revalidate.
+- `/js/`, `/css/` (change on every deploy): **1m**, which bounds the mismatch.
+
+`proxy_cache_revalidate on` is set but currently does nothing: the origin is a
+captive portal and deliberately defeats validators — `web.ratzek.conf` has
+`add_header Last-Modified $date_gmt` (the *request* time, not the file's mtime),
+`if_modified_since off` and `etag off`. A conditional request therefore gets
+`200`, never `304`, and `X-Cache-Status` after expiry reads `EXPIRED`, not
+`REVALIDATED`. Cost: a full refetch of js+css (~134 KB) at most once a minute,
+and only when someone actually loads the page. If you ever want the cheap-304
+behaviour, the origin would have to serve real validators for `/js/` and
+`/css/` — which conflicts with the captive-portal no-cache policy, so it is a
+deliberate trade, not an oversight.
+
+So a normal deploy needs no gateway action — the page catches up within a
+minute. Flush by hand only when you need it *immediately* (entries keep the TTL
+they were stored with, so a config change to the TTL does not retroactively
+expire them):
+
+    ssh root@82.146.59.228 'find /var/cache/nginx-ratzek -mindepth 1 -delete \
+      && systemctl reload nginx'
+
+Check what the public port actually serves — this compares the proxy against
+your working tree and is the fastest way to tell "not deployed" from "cached":
+
+    md5sum css/style.css js/weather.js
+    curl -s http://82.146.59.228:8080/css/style.css | md5sum
+    curl -sI http://82.146.59.228:8080/css/style.css | grep -i x-cache-status
 
 ## Notes
 
@@ -86,9 +124,13 @@ repo copy); after a big asset change flush the gateway cache
   the old version, so the frontend must be deployed AFTER the backend cuts over
   (when live `latest.json` returns `contract_version: 3`); until then the page
   shows the contract-error banner. `js/` is cached on the gateway (and in the
-  browser — no cache-busting on `<script>`), so **flush the gateway cache on
-  every deploy AND rollback** (`find /var/cache/nginx-ratzek -mindepth 1
-  -delete`); `latest.json` is `no-store`, so there is no JSON staleness race.
+  browser — no cache-busting on `<script>`); the gateway now expires js/css
+  after 1m and revalidates, so it catches up on its own, but for a *coordinated*
+  cutover flush it by hand so the two sides never disagree even briefly
+  (`find /var/cache/nginx-ratzek -mindepth 1 -delete`). A browser that already
+  holds the old `weather.js` still needs a hard reload — there is no
+  cache-busting on `<script>`. `latest.json` is `no-store`, so there is no JSON
+  staleness race.
 - **Rollback is fix-forward only.** `git revert` + redeploy does NOT recover
   after the backend cutover (old `CONTRACT` vs new data = the same error). Fix
   forward, or ask the backend to roll the generator back to the previous major.
