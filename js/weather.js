@@ -1980,6 +1980,10 @@
       el("p", { class: "wf-note", text: t("wf_nodata_legend") }),
       el("p", { class: "wf-note", text: t("wf_risks_empty_legend") }),
       el("p", { class: "wf-note", text: t("wf_incloud_legend") }),
+      // The row labels are kept to ~10 characters so the sticky label column
+      // stays narrow and never wraps; the units that had to come out of them
+      // (and the gust arrow) are spelled out here instead.
+      el("p", { class: "wf-note", text: tf("wf_row_units_legend", "") }),
     ]);
     // Temp corridor legend — only when some cell actually carries a p10/p90 band.
     const bandShown = rows.some(function (h) {

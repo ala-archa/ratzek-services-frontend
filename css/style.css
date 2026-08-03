@@ -837,15 +837,17 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
   text-align: left;
   font-weight: normal;
   opacity: 0.9;
-  white-space: normal;
-  max-width: 9ch;
-  /* Russian labels contain single words longer than 9ch ("Температура, °C").
-     Without this they overflow the cell and — the column being sticky and
-     z-indexed — print on top of the first visible hour.
-     `break-word`, NOT `anywhere`: `anywhere` also drops the column's min-content
-     width to a single glyph, which collapses the whole label column to ~21px
-     and stacks the labels one letter per line. */
-  overflow-wrap: break-word;
+  /* No max-width and no wrapping: the labels are kept short enough (~10 chars)
+     to sit on one line, so the column sizes itself to the longest of them. A
+     capped width forced "Ветер, м/с (⇡ порыв)" onto three lines and inflated
+     every row; it also risked the label printing on top of the first hour,
+     this column being sticky and z-indexed. Letting the column size itself
+     cannot overflow — a longer translation widens it instead. */
+  white-space: nowrap;
+  /* Breathing room + a rule, so the label never looks glued to the first value. */
+  padding-right: 0.6rem;
+  border-right: 1px solid rgba(127, 127, 127, 0.35);
+  vertical-align: middle;
 }
 .wf-htable thead th {
   font-family: JetBrains;
@@ -1096,16 +1098,21 @@ body.theme-dark .wf-avflag--yes .wf-avflag__v {
    against 67px for a plain one, so a phone showed ~2 hours instead of ~5. Cap the
    badge stack and let the label wrap — the column stays near the common width. */
 .wf-htable td .wf-hrisks {
-  max-width: 4.5rem;
+  /* Wide enough for the longest single word in a risk label ("видимости" is
+     ~80px at this size). At 4.5rem the cap fell *below* that, and the
+     `anywhere` break below then chopped labels mid-word — "потер/я/видим/ости".
+     Risk names are the most content-bearing text in the table; splitting them
+     across four lines defeats reading them at a glance. */
+  max-width: 5.5rem;
   margin: 0 auto;
 }
 .wf-htable td .wf-risk {
   white-space: normal;
   padding: 0.05rem 0.15rem; /* every pixel of text width is one wrap less */
-  /* The cap above is narrower than single words like "видимости"; without this
-     the badge would spill out of its cell and over the neighbouring hour. Safe
-     here because the cap, not the content, decides the column width. */
-  overflow-wrap: anywhere;
+  /* `break-word`, not `anywhere`: a word is only broken when it cannot fit on a
+     line of its own, which — given the cap above — no risk label does. Keeps
+     the badge inside its cell without ever splitting a word needlessly. */
+  overflow-wrap: break-word;
 }
 /* Visibility reads "12.4 1/2" — on one line that single cell was the widest
    thing in its column (64px) and set the width of every hour. Stacking the
